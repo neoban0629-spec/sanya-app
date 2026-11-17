@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#0b4a9e"/>
+  <path d="M256 96 L400 200 V400 a16 16 0 0 1-16 16 H128 a16 16 0 0 1-16-16 V200 Z" fill="#ffffff" opacity="0.95"/>
+  <path d="M256 130 L372 214 V396 H140 V214 Z" fill="#1f6feb"/>
+  <rect x="226" y="300" width="60" height="96" rx="6" fill="#ffffff"/>
+  <rect x="176" y="260" width="36" height="36" rx="4" fill="#ffffff" opacity="0.9"/>
+  <rect x="300" y="260" width="36" height="36" rx="4" fill="#ffffff" opacity="0.9"/>
+  <text x="256" y="240" font-family="sans-serif" font-size="64" font-weight="bold" fill="#ffffff" text-anchor="middle">房</text>
+</svg>

@@ -1,0 +1,19 @@
+{
+  "name": "妙妙屋经纪人日程管理",
+  "short_name": "妙妙屋日程",
+  "description": "三亚房产新人每日工作任务、好房、知识、日报、AI复盘与能力档案管理",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f2f5f9",
+  "theme_color": "#0b4a9e",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
