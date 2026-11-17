@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>黄金矿工 · 试用版</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#2b1f12;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:12px}
+.trial{width:100%;max-width:400px;background:#fff;border-radius:18px;padding:16px 14px;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.lk-title{font-size:21px;font-weight:900;color:#8a5a1c;text-align:center}
+.lk-sub{font-size:13px;color:#6b5a44;text-align:center;margin:8px 0 12px;line-height:1.7}
+.btn{display:block;width:100%;border:0;border-radius:12px;padding:13px;font-size:16px;font-weight:800;color:#fff;background:linear-gradient(180deg,#ffb23e,#e88b12);cursor:pointer}
+.btn.ghost{background:#f2ece2;color:#7a6a52}
+.hidden{display:none!important}
+.rb-amt-big{font-size:40px;font-weight:900;color:#e02020;font-variant-numeric:tabular-nums}
+.lk-prize-n{font-size:13px;color:#8a7a60;margin-top:2px}
+.trial-tag{display:inline-block;background:#e8590c;color:#fff;font-size:11px;font-weight:800;padding:2px 10px;border-radius:10px;margin-bottom:6px}
+.rb-foot{font-size:11px;color:#a29070;text-align:center;margin-top:8px;line-height:1.6}
+/* ===== 以下为游戏样式（与正式端同源） ===== */
+/* ===== 黄金矿工挖宝挑战 ===== */
+.rb-hud{display:flex;gap:7px;margin:10px 0 8px}
+.rb-hud-i{flex:1;background:#fff6f5;border:1px solid #ffdcd6;border-radius:10px;padding:5px 2px;font-size:11px;color:#b0453a;line-height:1.4}
+.rb-hud-i b{display:block;font-size:19px;font-weight:900;color:#e02020;line-height:1.35;font-variant-numeric:tabular-nums}
+.rb-arena{position:relative;height:330px;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,#33241466,transparent),linear-gradient(180deg,#3a2a18 0%,#5c421f 42%,#7d5c2d 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+.rb-arena:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% -12%,rgba(255,214,130,.32),transparent 60%)}
+.rb{position:absolute;width:30px;height:32px;margin-left:-15px;z-index:2;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;background:linear-gradient(180deg,#ffe08a,#f6a623);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 6px rgba(0,0,0,.26)}
+.rb i{position:absolute;top:-6px;left:50%;margin-left:-10px;width:20px;height:10px;background:#ffdf7a;border-radius:12px 12px 4px 4px}
+.rb span{position:relative;z-index:1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.2))}
+.rb.got{animation:rbPop .26s ease-out forwards;pointer-events:none}
+@keyframes rbPop{0%{transform:scale(1)}100%{transform:scale(1.7);opacity:0}}
+/* 矿洞物件：炸弹 / 小猫（会跑） / 空木箱 / 钻石（最深处） */
+.rb-bomb{background:linear-gradient(180deg,#6d7683,#2b323b);width:34px;height:34px;border-radius:50%;margin-left:-17px;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.rb-bomb i{display:none}
+.rb-bomb span{font-size:17px}
+.rb-cat{background:linear-gradient(180deg,#ffe9c9,#f0c07c)}
+.gm-crate{background:linear-gradient(180deg,#c99a5b,#8f6a35);border:2px solid #6d4d22;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 2px 6px rgba(0,0,0,.3)}
+.gm-crate span{font-size:15px;opacity:.85}
+.gm-dia{background:linear-gradient(180deg,#d6f4ff,#4fc3f7);border:2px solid #1e88e5;box-shadow:0 0 12px rgba(79,195,247,.9),0 2px 8px rgba(0,0,0,.3);animation:gmDia 1.1s ease-in-out infinite alternate}
+.gm-dia span{font-size:18px}
+@keyframes gmDia{0%{transform:scale(1)}100%{transform:scale(1.18)}}
+/* 黄金矿工：矿工小人 + 绞盘钢索 + 爪头（枢轴 y=30，小人头顶不被裁） */
+.gm-rig{position:absolute;top:30px;left:50%;width:0;height:0;z-index:3;pointer-events:none}
+.gm-man{position:absolute;top:-25px;left:-17px;width:34px;height:28px;line-height:28px;text-align:center;font-size:23px;filter:drop-shadow(0 1px 3px rgba(0,0,0,.55))}
+.gm-man:after{content:"⛏";position:absolute;right:-9px;top:2px;font-size:14px}
+.gm-rope{position:absolute;left:-1.5px;top:0;width:3px;height:30px;transform-origin:50% 0;background:linear-gradient(180deg,#e3c078,#8a6a2f);border-radius:2px;will-change:transform,height}
+.gm-claw{position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);font-size:15px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
+/* 特效层：爆炸闪光 + 烟雾遮挡 + 飘字 */
+.rb-fx{position:absolute;z-index:5;pointer-events:none}
+.rb-smoke{inset:0;background:radial-gradient(circle at 50% 55%,rgba(255,246,214,.94),rgba(255,178,110,.62) 45%,rgba(90,70,55,.5) 100%);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);animation:rbSmoke 1.2s ease-out forwards}
+@keyframes rbSmoke{0%{opacity:0}10%{opacity:1}100%{opacity:0}}
+.rb-flash{inset:0;background:#fff;animation:rbFlash .5s ease-out forwards}
+@keyframes rbFlash{0%{opacity:.9}100%{opacity:0}}
+.rb-float{font-size:14px;font-weight:900;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.55);white-space:nowrap;animation:rbFloatUp .72s ease-out forwards}
+@keyframes rbFloatUp{0%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-40px)}}
+.rb-tip{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-size:58px;font-weight:900;text-shadow:0 4px 14px rgba(0,0,0,.38);pointer-events:none}
+</style>
+</head>
+<body>
+<div class="trial">
+  <div style="text-align:center"><span class="trial-tag">试用版 · 无限次畅玩</span></div>
+  <div id="lkCele">
+    <div class="lk-title">⛏️ 黄金矿工 · 挖宝挑战</div>
+    <div class="lk-sub">🧧 红包 1.2 元/个（共 10 个）｜ 💎 钻石在最深处 +8 元<br>💣 炸弹倒扣 1 元并挡视线 ｜ 🐱 会跑、📦 空箱，白费一爪<br>钩子摆到哪就往哪挖，点屏幕放爪！</div>
+    <button class="btn" onclick="lkGoDraw()">⛏️ 开始挖宝（30 秒）</button>
+  </div>
+  <div id="lkDraw" class="hidden">
+    <div class="lk-title">⛏️ 黄金矿工 · 挖宝挑战</div>
+    <div class="lk-sub" id="lkDrawSub">钩子摆到哪就往哪挖——🧧 红包 1.2 元/个，💎 钻石 +8 元！</div>
+    <div class="rb-hud">
+      <div class="rb-hud-i"><span>剩余</span><b id="rbTime">30.0</b><span>秒</span></div>
+      <div class="rb-hud-i"><span>红包</span><b id="rbCnt">0</b><span>个</span></div>
+      <div class="rb-hud-i"><span>金额</span><b id="rbAmt">0.00</b><span>元</span></div>
+    </div>
+    <div class="rb-arena" id="rbArena">
+      <div class="gm-rig"><div class="gm-man">👷</div><div class="gm-rope" id="gmRope"><span class="gm-claw">⚓</span></div></div>
+      <div class="rb-tip" id="rbTip"></div>
+    </div>
+    <div class="rb-foot">🧧 红包 1.2 元/个（共 10 个）｜ 💎 钻石在最深处 +8 元 ｜ 💣 倒扣 1 元挡视线 ｜ 🐱 会跑 📦 空箱，白费一爪</div>
+  </div>
+  <div id="lkResult" class="hidden">
+    <div class="lk-title" id="lkResTitle">⛏️ 挑战结束！</div>
+    <div id="lkResPrize" style="text-align:center;margin:10px 0"></div>
+    <div class="lk-sub" id="lkResNote"></div>
+    <button class="btn" onclick="lkGoDraw()">⛏️ 再挖一次（无限次）</button>
+    <button class="btn ghost" style="margin-top:8px" onclick="lkStep('lkCele')">返回首页</button>
+    <div class="rb-foot" style="margin-top:12px">※ 本页为试用链接：成绩仅作体验、<b>不计入正式战绩、不可兑换</b>。正式版请从 App 内「签单惊喜」进入。</div>
+  </div>
+</div>
+<script>
+/* ===== 试用版桩：无限次 + 本地结算，不连云端 ===== */
+function vibrate(){try{if(navigator.vibrate)navigator.vibrate(30);}catch(e){}}
+function lkStep(s){["lkCele","lkDraw","lkResult"].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.toggle("hidden",id!==s);});}
+function lkQuota(){return 999;}          /* 无限次 */
+function lkUsed(){return 0;}
+function lkLeft(){return 999;}
+function lkTodayList(){return [];}
+function lkQuotaText(){return "";}
+function lkGoDraw(){
+  const ds=document.getElementById("lkDrawSub");
+  if(ds)ds.innerHTML="试用版 · 无限次｜钩子摆到哪就往哪挖——🧧 红包 1.2 元/个，💎 钻石 +8 元！";
+  lkStep("lkDraw");
+  rbStart();
+}
+/* 本地结算：只展示，不上传、不限次数 */
+function rbSettle(caught,dia){
+  const n=Math.max(0,Math.min(RB_TOTAL,Math.round(Number(caught)||0)));
+  const d=Number(dia)?1:0;
+  const amount=Math.round((rbMoney(n)+d*DIA_VALUE)*100)/100;
+  const t=document.getElementById("lkResTitle"),pr=document.getElementById("lkResPrize"),no=document.getElementById("lkResNote");
+  if(t)t.textContent="⛏️ 挑战结束！（试用版）";
+  if(pr)pr.innerHTML='<div style="font-size:46px">'+(d?"💎":"🧧")+'</div><div class="rb-amt-big">¥ '+rbAmtText(amount)+'</div><div class="lk-prize-n">抓到 '+n+' 个红包'+(d?" + 💎×1":"")+'</div>';
+  if(no)no.textContent="本次折算 "+rbAmtText(amount)+" 元。试用版成绩不计入正式战绩，仅供体验手感～";
+  lkStep("lkResult");
+  return {caught:n,dia:d,amount:amount};
+}
+/* ============ 签单惊喜 · 黄金矿工挖宝挑战 ============ */
+/* 规则：30 秒限时，钩爪左右摆动、点屏幕放爪。10 个红包 ×1.2 元（上限 12 元）；
+   💎 钻石埋在最深一层正中附近（只有近垂直角度够得着，且爪扫过正中时角速度最快 → 最难抓），抓到直接 +8 元；
+   💣 炸弹倒扣 1 元并挡视线；🐱 小猫不停移动、📦 空木箱是干扰。
+   摆动 + 收放最坏周期 ≈1.9 秒 → 30 秒保底可下爪 15 次。 */
+const RB_TOTAL=10;            /* 一轮红包总数（10 × 1.2 = 上限 12 元） */
+const RB_UNIT=1.2;            /* 每个红包金额（不在页面展示） */
+const RB_BOMB=4;              /* 炸弹个数：抓到倒扣 1 个，并短暂遮挡视线 */
+const RB_TRAP=3;              /* 小猫个数：不停移动的干扰项，不计分 */
+const RB_CRATE=3;             /* 空木箱个数：不计分 */
+const DIA_VALUE=8;            /* 钻石：抓到直接 +8 元 */
+const RB_PLAY=30000;          /* 游戏时长 30 秒 */
+const RB_READY=3000;          /* 开始前准备时间 3 秒 */
+const GM_SWING=1300;          /* 钩爪单摆全周期 ms */
+const GM_AMPL=58;             /* 摆角幅度（度） */
+const GM_OUT=1150;            /* 放爪速度 px/s */
+const GM_BACK=880;            /* 收爪速度 px/s */
+const GM_BASE=30;             /* 钢索基长 px */
+const GM_TOP=30;              /* 绞盘枢轴 y 坐标（矿工小人下方） */
+const GM_HIT=30;              /* 爪尖抓取判定半径 px（小判定 = 指哪打哪，方向准） */
+const GM_CAT_V=95;            /* 小猫移动速度 px/s */
+const rbState={on:false,t:0,caught:0,dia:0,drops:0,phase:"swing",ang:0,angT:0,len:GM_BASE,carry:null,items:[],last:0,raf:0,timer:0,plan:[],W:360,H:300,arenaTap:0};
+/* 一轮物件构成：10 红包 + 4 炸弹 + 3 小猫 + 3 空木箱 + 1 钻石 = 21 件 */
+function rbPlan(){
+  const a=[];
+  for(let i=0;i<RB_TOTAL;i++)a.push("rb");
+  for(let i=0;i<RB_BOMB;i++)a.push("bomb");
+  for(let i=0;i<RB_TRAP;i++)a.push("cat");
+  for(let i=0;i<RB_CRATE;i++)a.push("crate");
+  a.push("dia");
+  return shuffleArr(a);
+}
+const RB_RAF=(typeof requestAnimationFrame==="function")?requestAnimationFrame.bind(window):(f=>setTimeout(()=>f(Date.now()),16));
+function rbMoney(cnt){return Math.round((Math.min(Math.max(0,Math.round(Number(cnt)||0)),RB_TOTAL))*RB_UNIT*100)/100;}   /* 红包个数 → 金额（封顶 10 个 = 12 元） */
+function rbAmtText(v){return (Math.round((Number(v)||0)*100)/100).toFixed(2);} /* 金额 → 两位小数文本 */
+function shuffleArr(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[j];a[j]=t;}return a;}
+/* ===== 黄金矿工：矿图布局 / 绞盘 / 抓取 ===== */
+function rbClear(){
+  rbState.items.forEach(it=>{try{it.el.remove();}catch(e){}});
+  rbState.items=[];
+  const arena=document.getElementById("rbArena");
+  if(arena&&typeof arena.querySelectorAll==="function"){
+    const old=arena.querySelectorAll(".rb,.rb-fx");
+    for(let i=0;i<old.length;i++){try{old[i].remove();}catch(e){}}
+  }
+  const rope=document.getElementById("gmRope");
+  if(rope){rope.style.height=GM_BASE+"px";rope.style.transform="rotate(0deg)";}
+}
+function rbStop(){
+  rbState.on=false;
+  if(rbState.timer){clearInterval(rbState.timer);rbState.timer=0;}
+  if(rbState.raf){if(typeof cancelAnimationFrame==="function")cancelAnimationFrame(rbState.raf);rbState.raf=0;}
+  if(rbState.arenaTap){const ar=document.getElementById("rbArena");if(ar&&ar.removeEventListener){try{ar.removeEventListener("pointerdown",rbState.arenaTap);}catch(e){}}rbState.arenaTap=0;}
+  rbClear();
+}
+function rbHud(){
+  const t=document.getElementById("rbTime"),c=document.getElementById("rbCnt"),a=document.getElementById("rbAmt");
+  const sec=Math.max(0,rbState.t/1000);
+  if(t)t.textContent=sec.toFixed(1);
+  if(c)c.textContent=String(rbState.caught);
+  if(a)a.textContent=rbAmtText(rbTotalMoney());
+}
+function rbTotalMoney(){return Math.round((rbMoney(rbState.caught)+rbState.dia*DIA_VALUE)*100)/100;}
+/* 摆矿图：钻石埋最深一层正中 ±14%（钢索加深后近垂直够得着、爪扫正中角速度最快 → 最难抓），两颗炸弹贴身护卫 */
+function rbLayout(){
+  const arena=document.getElementById("rbArena");if(!arena)return;
+  const W=(arena.clientWidth||360),H=(arena.clientHeight||300);
+  rbState.W=W;rbState.H=H;
+  const types=(rbState.plan&&rbState.plan.length)?rbState.plan.slice():rbPlan();
+  const placed=[];const minD=46;
+  const okPos=(x,y)=>x>=20&&x<=W-20&&y>=66&&y<=H-24&&placed.every(p=>Math.hypot(p.x-x,p.y-y)>=minD);
+  const randPos=()=>{for(let k=0;k<600;k++){const x=20+Math.random()*(W-40),y=66+Math.random()*(H-90);if(okPos(x,y))return{x:x,y:y};}return{x:W/2,y:110+Math.random()*(H-160)};};
+  const diaX=Math.max(44,Math.min(W-44,W/2+(Math.random()*0.28-0.14)*W));
+  placed.push({type:"dia",x:diaX,y:H-30});
+  placed.push({type:"bomb",x:Math.max(20,diaX-52),y:H-34});
+  placed.push({type:"bomb",x:Math.min(W-20,diaX+52),y:H-34});
+  /* 钻石和 2 颗护卫炸弹已特殊摆放，从随机池剔除，避免重复 */
+  let di=types.indexOf("dia");if(di>=0)types.splice(di,1);
+  for(let k=0;k<2;k++){di=types.indexOf("bomb");if(di>=0)types.splice(di,1);}
+  shuffleArr(types).forEach(t=>{const p=randPos();placed.push({type:t,x:p.x,y:p.y});});
+  rbClear();
+  placed.forEach(p=>rbCreate(p));
+  rbState.items=placed;
+}
+function rbCreate(p){
+  const arena=document.getElementById("rbArena");if(!arena)return;
+  const el=document.createElement("div");
+  let inner="";
+  if(p.type==="bomb"){el.className="rb rb-bomb";inner="<span>💣</span>";}
+  else if(p.type==="cat"){el.className="rb rb-cat";inner="<span>🐱</span>";}
+  else if(p.type==="crate"){el.className="rb gm-crate";inner="<span>📦</span>";}
+  else if(p.type==="dia"){el.className="rb gm-dia";inner="<span>💎</span>";}
+  else{el.className="rb";inner="<i></i><span>🧧</span>";}
+  el.style.left=p.x.toFixed(1)+"px";
+  el.style.top=p.y.toFixed(1)+"px";
+  el.innerHTML=inner;
+  arena.appendChild(el);
+  p.el=el;
+  if(p.type==="cat")p.vx=(Math.random()<0.5?-1:1)*GM_CAT_V;
+}
+function rbTipPos(){
+  const a=rbState.ang*Math.PI/180;
+  return {x:(rbState.W||360)/2+Math.sin(a)*rbState.len,y:GM_TOP+Math.cos(a)*rbState.len};
+}
+function rbMaxLen(){
+  const W=rbState.W||360,H=rbState.H||300;
+  const a=rbState.ang*Math.PI/180;
+  const s=Math.abs(Math.sin(a));
+  /* 最大绳长：爪尖最深可达 y=H-10 —— 钻石判定中心 y≈H-14，近垂直角度刚好够得着（难但不是够不到） */
+  let m=H-GM_TOP-10;
+  if(s>0.02)m=Math.min(m,(W/2-14)/s);
+  return Math.max(GM_BASE+40,m);
+}
+function rbRope(){
+  const r=document.getElementById("gmRope");if(!r)return;
+  r.style.height=rbState.len.toFixed(1)+"px";
+  r.style.transform="rotate("+rbState.ang.toFixed(1)+"deg)";
+}
+/* 点屏幕 = 放爪（只在摆动中有效；收放中点了不响应） */
+function rbTap(){
+  if(!rbState.on||rbState.phase!=="swing")return;
+  rbState.phase="extend";
+  rbState.drops++;
+  try{vibrate();}catch(e){}
+}
+function rbHitTest(){
+  const p=rbTipPos();
+  for(let i=0;i<rbState.items.length;i++){
+    const it=rbState.items[i];
+    if(it.claimed||it===rbState.carry)continue;
+    if(Math.hypot(it.x-p.x,it.y+16-p.y)<GM_HIT)return it;   /* 16 = 缩小后物件半高（32px 高的物体中心） */
+  }
+  return null;
+}
+/* 飘字提示（+1 / -1 / 不是红包） */
+function rbFloat(it,txt){
+  const arena=document.getElementById("rbArena");if(!arena)return;
+  const f=document.createElement("div");
+  f.className="rb-fx rb-float";
+  f.textContent=txt;
+  f.style.left=(it&&it.el&&it.el.style&&it.el.style.left)||"50%";
+  f.style.top=Math.max(8,Math.min(260,(it&&it.y)||0))+"px";
+  arena.appendChild(f);
+  setTimeout(()=>{try{f.remove();}catch(e){}},720);
+}
+/* 炸弹：闪白 + 烟雾遮挡视线约 1.2 秒，并倒扣 1 个红包 */
+function rbBoom(it){
+  const arena=document.getElementById("rbArena");if(!arena)return;
+  try{if(navigator.vibrate)navigator.vibrate([40,30,70]);}catch(e){}
+  try{
+    const fl=document.createElement("div");fl.className="rb-fx rb-flash";
+    const sm=document.createElement("div");sm.className="rb-fx rb-smoke";
+    arena.appendChild(fl);arena.appendChild(sm);
+    setTimeout(()=>{try{fl.remove();}catch(e){}},520);
+    setTimeout(()=>{try{sm.remove();}catch(e){}},1200);
+  }catch(e){}
+  rbFloat(it,"💥 -1");
+}
+function rbCatch(it){
+  if(!it||it.claimed)return;
+  it.claimed=true;
+  const type=it.type||"rb";
+  if(type==="rb"){
+    rbState.caught=Math.min(RB_TOTAL,rbState.caught+1);
+    rbFloat(it,"+1.2元");
+    try{vibrate();}catch(e){}
+  }else if(type==="bomb"){
+    rbState.caught=Math.max(0,rbState.caught-1);
+    rbBoom(it);
+  }else if(type==="dia"){
+    rbState.dia=1;
+    rbFloat(it,"💎 +8元！");
+    try{if(navigator.vibrate)navigator.vibrate([30,50,30,50,120]);}catch(e){}
+  }else{
+    /* 小猫 / 空木箱：干扰项，不计分不扣分，但白白浪费一爪 */
+    rbFloat(it,type==="cat"?"🐱 溜了~ 白忙一爪":"📦 空木箱！一分没有");
+    try{vibrate();}catch(e){}
+  }
+  try{it.el.classList.add("got");}catch(e){}
+  setTimeout(()=>{try{it.el.remove();}catch(e){}},320);
+  rbState.items=rbState.items.filter(x=>!x.claimed);
+  rbHud();
+}
+function rbTick(ts){
+  if(!rbState.on)return;
+  const now=(typeof ts==="number")?ts:Date.now();
+  const dt=rbState.last?Math.min(60,now-rbState.last):16;
+  rbState.last=now;
+  rbState.t-=dt;
+  const W=rbState.W||360;
+  /* 小猫不停移动（撞边反弹） */
+  for(let i=0;i<rbState.items.length;i++){
+    const it=rbState.items[i];
+    if(it.type==="cat"&&it.vx&&!it.claimed&&it!==rbState.carry){
+      it.x+=it.vx*dt/1000;
+      if(it.x<26){it.x=26;it.vx=Math.abs(it.vx);}
+      if(it.x>W-26){it.x=W-26;it.vx=-Math.abs(it.vx);}
+      try{it.el.style.left=it.x.toFixed(1)+"px";}catch(e){}
+    }
+  }
+  if(rbState.phase==="swing"){
+    rbState.angT+=dt;
+    rbState.ang=GM_AMPL*Math.sin(2*Math.PI*rbState.angT/GM_SWING);
+  }else if(rbState.phase==="extend"){
+    rbState.len+=GM_OUT*dt/1000;
+    const mx=rbMaxLen();
+    const g=(rbState.len>=mx)?null:rbHitTest();
+    if(g){
+      if(g.type==="bomb"){rbCatch(g);}
+      else{rbState.carry=g;}
+      rbState.phase="back";
+    }else if(rbState.len>=mx){
+      rbState.len=mx;rbState.phase="back";
+    }
+  }else if(rbState.phase==="back"){
+    rbState.len-=GM_BACK*dt/1000;
+    if(rbState.carry){
+      const p=rbTipPos();
+      try{rbState.carry.el.style.left=p.x.toFixed(1)+"px";rbState.carry.el.style.top=Math.max(0,p.y-16).toFixed(1)+"px";}catch(e){}
+    }
+    if(rbState.len<=GM_BASE){
+      rbState.len=GM_BASE;
+      const c=rbState.carry;rbState.carry=null;
+      rbState.phase="swing";rbState.angT=0;
+      if(c){c.y=GM_TOP+42;rbCatch(c);}
+    }
+  }
+  rbRope();
+  rbHud();
+  if(rbState.t<=0){rbFinish();return;}
+  rbState.raf=RB_RAF(rbTick);
+}
+function rbStart(){
+  rbStop();
+  const tip=document.getElementById("rbTip");
+  rbState.on=true;rbState.t=RB_PLAY;rbState.caught=0;rbState.dia=0;rbState.drops=0;
+  rbState.phase="swing";rbState.ang=0;rbState.angT=0;rbState.len=GM_BASE;rbState.carry=null;rbState.last=0;
+  rbState.plan=rbPlan();
+  rbHud();
+  rbLayout();
+  const arena=document.getElementById("rbArena");
+  if(arena){
+    const h=e=>{if(e&&e.preventDefault)e.preventDefault();rbTap();};
+    rbState.arenaTap=h;
+    try{
+      if(typeof window!=="undefined"&&window.PointerEvent)arena.addEventListener("pointerdown",h,{passive:false});
+      else{arena.addEventListener("touchstart",h,{passive:false});arena.addEventListener("mousedown",h,{passive:false});}
+    }catch(e){}
+  }
+  let n=3;
+  if(tip){tip.style.display="flex";tip.innerHTML=n+"<small>矿机预热中，看好红包位置…</small>";}
+  rbState.timer=setInterval(()=>{
+    n--;
+    if(n>0){if(tip)tip.innerHTML=n+"<small>矿机预热中…</small>";return;}
+    clearInterval(rbState.timer);rbState.timer=0;
+    if(tip)tip.innerHTML="开挖！<small>点屏幕放爪：🧧×1.2元 💎+8元，小心💣</small>";
+    setTimeout(()=>{if(tip)tip.style.display="none";},550);
+    rbState.last=0;
+    rbState.raf=RB_RAF(rbTick);
+  },1000);
+}
+function rbFinish(){
+  const c=rbState.carry;rbState.carry=null;
+  if(c){c.y=GM_TOP+42;rbCatch(c);}
+  rbState.on=false;
+  if(rbState.timer){clearInterval(rbState.timer);rbState.timer=0;}
+  if(rbState.raf){if(typeof cancelAnimationFrame==="function")cancelAnimationFrame(rbState.raf);rbState.raf=0;}
+  const tip=document.getElementById("rbTip");
+  rbState.t=0;rbHud();
+  if(tip){tip.style.display="flex";tip.innerHTML="收工！<small>抓到 "+rbState.caught+" 个红包"+(rbState.dia?" + 1 颗💎":"")+"</small>";}
+  setTimeout(()=>rbSettle(rbState.caught,rbState.dia),750);
+}
+/* ===== 黄金矿工：矿图布局 / 绞盘 / 抓取 ===== */
+function rbClear(){
+  rbState.items.forEach(it=>{try{it.el.remove();}catch(e){}});
+  rbState.items=[];
+  const arena=document.getElementById("rbArena");
+  if(arena&&typeof arena.querySelectorAll==="function"){
+    const old=arena.querySelectorAll(".rb,.rb-fx");
+    for(let i=0;i<old.length;i++){try{old[i].remove();}catch(e){}}
+  }
+  const rope=document.getElementById("gmRope");
+  if(rope){rope.style.height=GM_BASE+"px";rope.style.transform="rotate(0deg)";}
+}
+function rbStop(){
+  rbState.on=false;
+  if(rbState.timer){clearInterval(rbState.timer);rbState.timer=0;}
+  if(rbState.raf){if(typeof cancelAnimationFrame==="function")cancelAnimationFrame(rbState.raf);rbState.raf=0;}
+  if(rbState.arenaTap){const ar=document.getElementById("rbArena");if(ar&&ar.removeEventListener){try{ar.removeEventListener("pointerdown",rbState.arenaTap);}catch(e){}}rbState.arenaTap=0;}
+  rbClear();
+}
+function rbHud(){
+  const t=document.getElementById("rbTime"),c=document.getElementById("rbCnt"),a=document.getElementById("rbAmt");
+  const sec=Math.max(0,rbState.t/1000);
+  if(t)t.textContent=sec.toFixed(1);
+  if(c)c.textContent=String(rbState.caught);
+  if(a)a.textContent=rbAmtText(rbTotalMoney());
+}
+function rbTotalMoney(){return Math.round((rbMoney(rbState.caught)+rbState.dia*DIA_VALUE)*100)/100;}
+/* 摆矿图：钻石埋最深一层正中 ±14%（钢索加深后近垂直够得着、爪扫正中角速度最快 → 最难抓），两颗炸弹贴身护卫 */
+function rbLayout(){
+  const arena=document.getElementById("rbArena");if(!arena)return;
+  const W=(arena.clientWidth||360),H=(arena.clientHeight||300);
+  rbState.W=W;rbState.H=H;
+  const types=(rbState.plan&&rbState.plan.length)?rbState.plan.slice():rbPlan();
+  const placed=[];const minD=46;
+  const okPos=(x,y)=>x>=20&&x<=W-20&&y>=66&&y<=H-24&&placed.every(p=>Math.hypot(p.x-x,p.y-y)>=minD);
+  const randPos=()=>{for(let k=0;k<600;k++){const x=20+Math.random()*(W-40),y=66+Math.random()*(H-90);if(okPos(x,y))return{x:x,y:y};}return{x:W/2,y:110+Math.random()*(H-160)};};
+  const diaX=Math.max(44,Math.min(W-44,W/2+(Math.random()*0.28-0.14)*W));
+  placed.push({type:"dia",x:diaX,y:H-30});
+  placed.push({type:"bomb",x:Math.max(20,diaX-52),y:H-34});
+  placed.push({type:"bomb",x:Math.min(W-20,diaX+52),y:H-34});
+  /* 钻石和 2 颗护卫炸弹已特殊摆放，从随机池剔除，避免重复 */
+  let di=types.indexOf("dia");if(di>=0)types.splice(di,1);
+  for(let k=0;k<2;k++){di=types.indexOf("bomb");if(di>=0)types.splice(di,1);}
+  shuffleArr(types).forEach(t=>{const p=randPos();placed.push({type:t,x:p.x,y:p.y});});
+  rbClear();
+  placed.forEach(p=>rbCreate(p));
+  rbState.items=placed;
+}
+function rbCreate(p){
+  const arena=document.getElementById("rbArena");if(!arena)return;
+  const el=document.createElement("div");
+  let inner="";
+  if(p.type==="bomb"){el.className="rb rb-bomb";inner="<span>💣</span>";}
+  else if(p.type==="cat"){el.className="rb rb-cat";inner="<span>🐱</span>";}
+  else if(p.type==="crate"){el.className="rb gm-crate";inner="<span>📦</span>";}
+  else if(p.type==="dia"){el.className="rb gm-dia";inner="<span>💎</span>";}
+  else{el.className="rb";inner="<i></i><span>🧧</span>";}
+  el.style.left=p.x.toFixed(1)+"px";
+  el.style.top=p.y.toFixed(1)+"px";
+  el.innerHTML=inner;
+  arena.appendChild(el);
+  p.el=el;
+  if(p.type==="cat")p.vx=(Math.random()<0.5?-1:1)*GM_CAT_V;
+}
+function rbTipPos(){
+  const a=rbState.ang*Math.PI/180;
+  return {x:(rbState.W||360)/2+Math.sin(a)*rbState.len,y:GM_TOP+Math.cos(a)*rbState.len};
+}
+function rbMaxLen(){
+  const W=rbState.W||360,H=rbState.H||300;
+  const a=rbState.ang*Math.PI/180;
+  const s=Math.abs(Math.sin(a));
+  /* 最大绳长：爪尖最深可达 y=H-10 —— 钻石判定中心 y≈H-14，近垂直角度刚好够得着（难但不是够不到） */
+  let m=H-GM_TOP-10;
+  if(s>0.02)m=Math.min(m,(W/2-14)/s);
+  return Math.max(GM_BASE+40,m);
+}
+function rbRope(){
+  const r=document.getElementById("gmRope");if(!r)return;
+  r.style.height=rbState.len.toFixed(1)+"px";
+  r.style.transform="rotate("+rbState.ang.toFixed(1)+"deg)";
+}
+/* 点屏幕 = 放爪（只在摆动中有效；收放中点了不响应） */
+function rbTap(){
+  if(!rbState.on||rbState.phase!=="swing")return;
+  rbState.phase="extend";
+  rbState.drops++;
+  try{vibrate();}catch(e){}
+}
+function rbHitTest(){
+  const p=rbTipPos();
+  for(let i=0;i<rbState.items.length;i++){
+    const it=rbState.items[i];
+    if(it.claimed||it===rbState.carry)continue;
+    if(Math.hypot(it.x-p.x,it.y+16-p.y)<GM_HIT)return it;   /* 16 = 缩小后物件半高（32px 高的物体中心） */
+  }
+  return null;
+}
+/* 飘字提示（+1 / -1 / 不是红包） */
+function rbFloat(it,txt){
+  const arena=document.getElementById("rbArena");if(!arena)return;
+  const f=document.createElement("div");
+  f.className="rb-fx rb-float";
+  f.textContent=txt;
+  f.style.left=(it&&it.el&&it.el.style&&it.el.style.left)||"50%";
+  f.style.top=Math.max(8,Math.min(260,(it&&it.y)||0))+"px";
+  arena.appendChild(f);
+  setTimeout(()=>{try{f.remove();}catch(e){}},720);
+}
+/* 炸弹：闪白 + 烟雾遮挡视线约 1.2 秒，并倒扣 1 个红包 */
+function rbBoom(it){
+  const arena=document.getElementById("rbArena");if(!arena)return;
+  try{if(navigator.vibrate)navigator.vibrate([40,30,70]);}catch(e){}
+  try{
+    const fl=document.createElement("div");fl.className="rb-fx rb-flash";
+    const sm=document.createElement("div");sm.className="rb-fx rb-smoke";
+    arena.appendChild(fl);arena.appendChild(sm);
+    setTimeout(()=>{try{fl.remove();}catch(e){}},520);
+    setTimeout(()=>{try{sm.remove();}catch(e){}},1200);
+  }catch(e){}
+  rbFloat(it,"💥 -1");
+}
+function rbCatch(it){
+  if(!it||it.claimed)return;
+  it.claimed=true;
+  const type=it.type||"rb";
+  if(type==="rb"){
+    rbState.caught=Math.min(RB_TOTAL,rbState.caught+1);
+    rbFloat(it,"+1.2元");
+    try{vibrate();}catch(e){}
+  }else if(type==="bomb"){
+    rbState.caught=Math.max(0,rbState.caught-1);
+    rbBoom(it);
+  }else if(type==="dia"){
+    rbState.dia=1;
+    rbFloat(it,"💎 +8元！");
+    try{if(navigator.vibrate)navigator.vibrate([30,50,30,50,120]);}catch(e){}
+  }else{
+    /* 小猫 / 空木箱：干扰项，不计分不扣分，但白白浪费一爪 */
+    rbFloat(it,type==="cat"?"🐱 溜了~ 白忙一爪":"📦 空木箱！一分没有");
+    try{vibrate();}catch(e){}
+  }
+  try{it.el.classList.add("got");}catch(e){}
+  setTimeout(()=>{try{it.el.remove();}catch(e){}},320);
+  rbState.items=rbState.items.filter(x=>!x.claimed);
+  rbHud();
+}
+function rbTick(ts){
+  if(!rbState.on)return;
+  const now=(typeof ts==="number")?ts:Date.now();
+  const dt=rbState.last?Math.min(60,now-rbState.last):16;
+  rbState.last=now;
+  rbState.t-=dt;
+  const W=rbState.W||360;
+  /* 小猫不停移动（撞边反弹） */
+  for(let i=0;i<rbState.items.length;i++){
+    const it=rbState.items[i];
+    if(it.type==="cat"&&it.vx&&!it.claimed&&it!==rbState.carry){
+      it.x+=it.vx*dt/1000;
+      if(it.x<26){it.x=26;it.vx=Math.abs(it.vx);}
+      if(it.x>W-26){it.x=W-26;it.vx=-Math.abs(it.vx);}
+      try{it.el.style.left=it.x.toFixed(1)+"px";}catch(e){}
+    }
+  }
+  if(rbState.phase==="swing"){
+    rbState.angT+=dt;
+    rbState.ang=GM_AMPL*Math.sin(2*Math.PI*rbState.angT/GM_SWING);
+  }else if(rbState.phase==="extend"){
+    rbState.len+=GM_OUT*dt/1000;
+    const mx=rbMaxLen();
+    const g=(rbState.len>=mx)?null:rbHitTest();
+    if(g){
+      if(g.type==="bomb"){rbCatch(g);}
+      else{rbState.carry=g;}
+      rbState.phase="back";
+    }else if(rbState.len>=mx){
+      rbState.len=mx;rbState.phase="back";
+    }
+  }else if(rbState.phase==="back"){
+    rbState.len-=GM_BACK*dt/1000;
+    if(rbState.carry){
+      const p=rbTipPos();
+      try{rbState.carry.el.style.left=p.x.toFixed(1)+"px";rbState.carry.el.style.top=Math.max(0,p.y-16).toFixed(1)+"px";}catch(e){}
+    }
+    if(rbState.len<=GM_BASE){
+      rbState.len=GM_BASE;
+      const c=rbState.carry;rbState.carry=null;
+      rbState.phase="swing";rbState.angT=0;
+      if(c){c.y=GM_TOP+42;rbCatch(c);}
+    }
+  }
+  rbRope();
+  rbHud();
+  if(rbState.t<=0){rbFinish();return;}
+  rbState.raf=RB_RAF(rbTick);
+}
+function rbStart(){
+  rbStop();
+  const tip=document.getElementById("rbTip");
+  rbState.on=true;rbState.t=RB_PLAY;rbState.caught=0;rbState.dia=0;rbState.drops=0;
+  rbState.phase="swing";rbState.ang=0;rbState.angT=0;rbState.len=GM_BASE;rbState.carry=null;rbState.last=0;
+  rbState.plan=rbPlan();
+  rbHud();
+  rbLayout();
+  const arena=document.getElementById("rbArena");
+  if(arena){
+    const h=e=>{if(e&&e.preventDefault)e.preventDefault();rbTap();};
+    rbState.arenaTap=h;
+    try{
+      if(typeof window!=="undefined"&&window.PointerEvent)arena.addEventListener("pointerdown",h,{passive:false});
+      else{arena.addEventListener("touchstart",h,{passive:false});arena.addEventListener("mousedown",h,{passive:false});}
+    }catch(e){}
+  }
+  let n=3;
+  if(tip){tip.style.display="flex";tip.innerHTML=n+"<small>矿机预热中，看好红包位置…</small>";}
+  rbState.timer=setInterval(()=>{
+    n--;
+    if(n>0){if(tip)tip.innerHTML=n+"<small>矿机预热中…</small>";return;}
+    clearInterval(rbState.timer);rbState.timer=0;
+    if(tip)tip.innerHTML="开挖！<small>点屏幕放爪：🧧×1.2元 💎+8元，小心💣</small>";
+    setTimeout(()=>{if(tip)tip.style.display="none";},550);
+    rbState.last=0;
+    rbState.raf=RB_RAF(rbTick);
+  },1000);
+}
+function rbFinish(){
+  const c=rbState.carry;rbState.carry=null;
+  if(c){c.y=GM_TOP+42;rbCatch(c);}
+  rbState.on=false;
+  if(rbState.timer){clearInterval(rbState.timer);rbState.timer=0;}
+  if(rbState.raf){if(typeof cancelAnimationFrame==="function")cancelAnimationFrame(rbState.raf);rbState.raf=0;}
+  const tip=document.getElementById("rbTip");
+  rbState.t=0;rbHud();
+  if(tip){tip.style.display="flex";tip.innerHTML="收工！<small>抓到 "+rbState.caught+" 个红包"+(rbState.dia?" + 1 颗💎":"")+"</small>";}
+  setTimeout(()=>rbSettle(rbState.caught,rbState.dia),750);
+}
+/* 一轮结束后结算：红包个数 × 1.2 元（封顶 10 个 = 12 元）+ 钻石 8 元，记入当日战绩并上传 */
+if(typeof toast!=="function")window.toast=function(){};
+</script>
+</body>
+</html>
