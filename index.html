@@ -127,28 +127,29 @@ a{color:var(--pri)}
 .rb-hud{display:flex;gap:7px;margin:10px 0 8px}
 .rb-hud-i{flex:1;background:#fff6f5;border:1px solid #ffdcd6;border-radius:10px;padding:5px 2px;font-size:11px;color:#b0453a;line-height:1.4}
 .rb-hud-i b{display:block;font-size:19px;font-weight:900;color:#e02020;line-height:1.35;font-variant-numeric:tabular-nums}
-.rb-arena{position:relative;height:300px;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,#33241466,transparent),linear-gradient(180deg,#3a2a18 0%,#5c421f 42%,#7d5c2d 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+.rb-arena{position:relative;height:330px;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,#33241466,transparent),linear-gradient(180deg,#3a2a18 0%,#5c421f 42%,#7d5c2d 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
 .rb-arena:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% -12%,rgba(255,214,130,.32),transparent 60%)}
-.rb{position:absolute;width:38px;height:46px;margin-left:-19px;z-index:2;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;background:linear-gradient(180deg,#ffe08a,#f6a623);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 3px 8px rgba(0,0,0,.26)}
-.rb i{position:absolute;top:-7px;left:50%;margin-left:-13px;width:26px;height:13px;background:#ffdf7a;border-radius:14px 14px 4px 4px}
+.rb{position:absolute;width:30px;height:32px;margin-left:-15px;z-index:2;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;background:linear-gradient(180deg,#ffe08a,#f6a623);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 6px rgba(0,0,0,.26)}
+.rb i{position:absolute;top:-6px;left:50%;margin-left:-10px;width:20px;height:10px;background:#ffdf7a;border-radius:12px 12px 4px 4px}
 .rb span{position:relative;z-index:1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.2))}
 .rb.got{animation:rbPop .26s ease-out forwards;pointer-events:none}
 @keyframes rbPop{0%{transform:scale(1)}100%{transform:scale(1.7);opacity:0}}
 /* 矿洞物件：炸弹 / 小猫（会跑） / 空木箱 / 钻石（最深处） */
-.rb-bomb{background:linear-gradient(180deg,#6d7683,#2b323b);width:42px;height:42px;border-radius:50%;margin-left:-21px;box-shadow:0 3px 10px rgba(0,0,0,.4)}
+.rb-bomb{background:linear-gradient(180deg,#6d7683,#2b323b);width:34px;height:34px;border-radius:50%;margin-left:-17px;box-shadow:0 2px 8px rgba(0,0,0,.4)}
 .rb-bomb i{display:none}
-.rb-bomb span{font-size:22px}
+.rb-bomb span{font-size:17px}
 .rb-cat{background:linear-gradient(180deg,#ffe9c9,#f0c07c)}
-.gm-crate{background:linear-gradient(180deg,#c99a5b,#8f6a35);border:2px solid #6d4d22;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 3px 8px rgba(0,0,0,.3)}
-.gm-crate span{font-size:18px;opacity:.85}
-.gm-dia{background:linear-gradient(180deg,#d6f4ff,#4fc3f7);border:2px solid #1e88e5;box-shadow:0 0 14px rgba(79,195,247,.9),0 3px 10px rgba(0,0,0,.3);animation:gmDia 1.1s ease-in-out infinite alternate}
-.gm-dia span{font-size:24px}
+.gm-crate{background:linear-gradient(180deg,#c99a5b,#8f6a35);border:2px solid #6d4d22;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 2px 6px rgba(0,0,0,.3)}
+.gm-crate span{font-size:15px;opacity:.85}
+.gm-dia{background:linear-gradient(180deg,#d6f4ff,#4fc3f7);border:2px solid #1e88e5;box-shadow:0 0 12px rgba(79,195,247,.9),0 2px 8px rgba(0,0,0,.3);animation:gmDia 1.1s ease-in-out infinite alternate}
+.gm-dia span{font-size:18px}
 @keyframes gmDia{0%{transform:scale(1)}100%{transform:scale(1.18)}}
-/* 黄金矿工：绞盘钢索 + 爪头 */
-.gm-rig{position:absolute;top:0;left:50%;width:0;height:0;z-index:3;pointer-events:none}
-.gm-rig:before{content:"⛏";position:absolute;top:-2px;left:-14px;font-size:18px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+/* 黄金矿工：矿工小人 + 绞盘钢索 + 爪头（枢轴 y=30，小人头顶不被裁） */
+.gm-rig{position:absolute;top:30px;left:50%;width:0;height:0;z-index:3;pointer-events:none}
+.gm-man{position:absolute;top:-25px;left:-17px;width:34px;height:28px;line-height:28px;text-align:center;font-size:23px;filter:drop-shadow(0 1px 3px rgba(0,0,0,.55))}
+.gm-man:after{content:"⛏";position:absolute;right:-9px;top:2px;font-size:14px}
 .gm-rope{position:absolute;left:-1.5px;top:0;width:3px;height:30px;transform-origin:50% 0;background:linear-gradient(180deg,#e3c078,#8a6a2f);border-radius:2px;will-change:transform,height}
-.gm-claw{position:absolute;bottom:-13px;left:50%;transform:translateX(-50%);font-size:21px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
+.gm-claw{position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);font-size:15px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
 /* 特效层：爆炸闪光 + 烟雾遮挡 + 飘字 */
 .rb-fx{position:absolute;z-index:5;pointer-events:none}
 .rb-smoke{inset:0;background:radial-gradient(circle at 50% 55%,rgba(255,246,214,.94),rgba(255,178,110,.62) 45%,rgba(90,70,55,.5) 100%);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);animation:rbSmoke 1.2s ease-out forwards}
@@ -364,7 +365,7 @@ a{color:var(--pri)}
         <div class="rb-hud-i"><span>金额</span><b id="rbAmt">0.00</b><span>元</span></div>
       </div>
       <div class="rb-arena" id="rbArena">
-        <div class="gm-rig"><div class="gm-rope" id="gmRope"><span class="gm-claw">⚓</span></div></div>
+        <div class="gm-rig"><div class="gm-man">👷</div><div class="gm-rope" id="gmRope"><span class="gm-claw">⚓</span></div></div>
         <div class="rb-tip" id="rbTip"></div>
       </div>
       <div class="rb-foot">🧧 红包 1.2 元/个（共 10 个）｜ 💎 钻石在最深处 +8 元 ｜ 💣 倒扣 1 元挡视线 ｜ 🐱 会跑 📦 空箱，白费一爪</div>
@@ -1457,8 +1458,8 @@ const GM_AMPL=58;             /* 摆角幅度（度） */
 const GM_OUT=1150;            /* 放爪速度 px/s */
 const GM_BACK=880;            /* 收爪速度 px/s */
 const GM_BASE=30;             /* 钢索基长 px */
-const GM_TOP=10;              /* 绞盘枢轴 y 坐标 */
-const GM_HIT=46;              /* 爪尖抓取判定半径 px */
+const GM_TOP=30;              /* 绞盘枢轴 y 坐标（矿工小人下方） */
+const GM_HIT=30;              /* 爪尖抓取判定半径 px（小判定 = 指哪打哪，方向准） */
 const GM_CAT_V=95;            /* 小猫移动速度 px/s */
 const rbState={on:false,t:0,caught:0,dia:0,drops:0,phase:"swing",ang:0,angT:0,len:GM_BASE,carry:null,items:[],last:0,raf:0,timer:0,plan:[],W:360,H:300,arenaTap:0};
 /* 一轮物件构成：10 红包 + 4 炸弹 + 3 小猫 + 3 空木箱 + 1 钻石 = 21 件 */
@@ -1536,19 +1537,19 @@ function rbHud(){
   if(a)a.textContent=rbAmtText(rbTotalMoney());
 }
 function rbTotalMoney(){return Math.round((rbMoney(rbState.caught)+rbState.dia*DIA_VALUE)*100)/100;}
-/* 摆矿图：钻石埋最深一层正中 ±14%（近垂直才够得着、爪扫正中角速度最快 → 最难抓），两颗炸弹贴身护卫 */
+/* 摆矿图：钻石埋最深一层正中 ±14%（钢索加深后近垂直够得着、爪扫正中角速度最快 → 最难抓），两颗炸弹贴身护卫 */
 function rbLayout(){
   const arena=document.getElementById("rbArena");if(!arena)return;
   const W=(arena.clientWidth||360),H=(arena.clientHeight||300);
   rbState.W=W;rbState.H=H;
   const types=(rbState.plan&&rbState.plan.length)?rbState.plan.slice():rbPlan();
-  const placed=[];const minD=54;
-  const okPos=(x,y)=>x>=26&&x<=W-26&&y>=68&&y<=H-26&&placed.every(p=>Math.hypot(p.x-x,p.y-y)>=minD);
-  const randPos=()=>{for(let k=0;k<600;k++){const x=26+Math.random()*(W-52),y=68+Math.random()*(H-94);if(okPos(x,y))return{x:x,y:y};}return{x:W/2,y:110+Math.random()*(H-160)};};
+  const placed=[];const minD=46;
+  const okPos=(x,y)=>x>=20&&x<=W-20&&y>=66&&y<=H-24&&placed.every(p=>Math.hypot(p.x-x,p.y-y)>=minD);
+  const randPos=()=>{for(let k=0;k<600;k++){const x=20+Math.random()*(W-40),y=66+Math.random()*(H-90);if(okPos(x,y))return{x:x,y:y};}return{x:W/2,y:110+Math.random()*(H-160)};};
   const diaX=Math.max(44,Math.min(W-44,W/2+(Math.random()*0.28-0.14)*W));
-  placed.push({type:"dia",x:diaX,y:H-28});
-  placed.push({type:"bomb",x:Math.max(26,diaX-58),y:H-38});
-  placed.push({type:"bomb",x:Math.min(W-26,diaX+58),y:H-38});
+  placed.push({type:"dia",x:diaX,y:H-30});
+  placed.push({type:"bomb",x:Math.max(20,diaX-52),y:H-34});
+  placed.push({type:"bomb",x:Math.min(W-20,diaX+52),y:H-34});
   /* 钻石和 2 颗护卫炸弹已特殊摆放，从随机池剔除，避免重复 */
   let di=types.indexOf("dia");if(di>=0)types.splice(di,1);
   for(let k=0;k<2;k++){di=types.indexOf("bomb");if(di>=0)types.splice(di,1);}
@@ -1581,8 +1582,9 @@ function rbMaxLen(){
   const W=rbState.W||360,H=rbState.H||300;
   const a=rbState.ang*Math.PI/180;
   const s=Math.abs(Math.sin(a));
-  let m=H-GM_TOP-30;
-  if(s>0.02)m=Math.min(m,(W/2-16)/s);
+  /* 最大绳长：爪尖最深可达 y=H-10 —— 钻石判定中心 y≈H-14，近垂直角度刚好够得着（难但不是够不到） */
+  let m=H-GM_TOP-10;
+  if(s>0.02)m=Math.min(m,(W/2-14)/s);
   return Math.max(GM_BASE+40,m);
 }
 function rbRope(){
@@ -1602,7 +1604,7 @@ function rbHitTest(){
   for(let i=0;i<rbState.items.length;i++){
     const it=rbState.items[i];
     if(it.claimed||it===rbState.carry)continue;
-    if(Math.hypot(it.x-p.x,it.y+22-p.y)<GM_HIT)return it;
+    if(Math.hypot(it.x-p.x,it.y+16-p.y)<GM_HIT)return it;   /* 16 = 缩小后物件半高（32px 高的物体中心） */
   }
   return null;
 }
@@ -1690,7 +1692,7 @@ function rbTick(ts){
     rbState.len-=GM_BACK*dt/1000;
     if(rbState.carry){
       const p=rbTipPos();
-      try{rbState.carry.el.style.left=p.x.toFixed(1)+"px";rbState.carry.el.style.top=Math.max(0,p.y-22).toFixed(1)+"px";}catch(e){}
+      try{rbState.carry.el.style.left=p.x.toFixed(1)+"px";rbState.carry.el.style.top=Math.max(0,p.y-16).toFixed(1)+"px";}catch(e){}
     }
     if(rbState.len<=GM_BASE){
       rbState.len=GM_BASE;
@@ -1929,7 +1931,7 @@ async function regSw(){
     }
     /* 注册 URL 带版本号：URL 一变，浏览器必定重新拉取 SW 并触发更新 + 自动刷新，
        否则 SW 脚本被缓存住时，用户会一直停留在旧页面、点了新按钮也没反应 */
-    return await navigator.serviceWorker.register("sw.js?v=13");
+    return await navigator.serviceWorker.register("sw.js?v=14");
   }catch(e){return null;}
 }
 function phoneNotify(title,body){

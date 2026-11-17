@@ -1,4 +1,4 @@
-const CACHE_NAME = "sanya-work-v13";
+const CACHE_NAME = "sanya-work-v14";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
 
 self.addEventListener("install", e => {
