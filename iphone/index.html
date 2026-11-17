@@ -126,23 +126,32 @@ a{color:var(--pri)}
 .lk-item .lk-no{font-size:11px;opacity:.92;line-height:1.3;padding:0 2px}
 .lk-item.open{background:#fff;color:var(--txt);box-shadow:inset 0 0 0 2px var(--pri)}
 .lk-prize-n{font-size:17px;font-weight:800;color:var(--pri-deep);margin-top:6px;line-height:1.5}
-/* ===== 5 秒接红包挑战 ===== */
+/* ===== 黄金矿工挖宝挑战 ===== */
 .rb-hud{display:flex;gap:7px;margin:10px 0 8px}
 .rb-hud-i{flex:1;background:#fff6f5;border:1px solid #ffdcd6;border-radius:10px;padding:5px 2px;font-size:11px;color:#b0453a;line-height:1.4}
 .rb-hud-i b{display:block;font-size:19px;font-weight:900;color:#e02020;line-height:1.35;font-variant-numeric:tabular-nums}
-.rb-arena{position:relative;height:300px;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,#ff7a5e 0%,#e02d12 55%,#b3140a 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
-.rb-arena:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% -10%,rgba(255,226,150,.4),transparent 62%)}
-.rb{position:absolute;width:38px;height:46px;margin-left:-19px;z-index:2;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;background:linear-gradient(180deg,#ffe08a,#f6a623);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 3px 8px rgba(0,0,0,.26)}
+.rb-arena{position:relative;height:300px;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,#33241466,transparent),linear-gradient(180deg,#3a2a18 0%,#5c421f 42%,#7d5c2d 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+.rb-arena:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% -12%,rgba(255,214,130,.32),transparent 60%)}
+.rb{position:absolute;width:38px;height:46px;margin-left:-19px;z-index:2;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;background:linear-gradient(180deg,#ffe08a,#f6a623);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 3px 8px rgba(0,0,0,.26)}
 .rb i{position:absolute;top:-7px;left:50%;margin-left:-13px;width:26px;height:13px;background:#ffdf7a;border-radius:14px 14px 4px 4px}
 .rb span{position:relative;z-index:1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.2))}
 .rb.got{animation:rbPop .26s ease-out forwards;pointer-events:none}
 @keyframes rbPop{0%{transform:scale(1)}100%{transform:scale(1.7);opacity:0}}
-/* 掉落物类型：炸弹 / 小猫 / 白菜（干扰项） */
+/* 矿洞物件：炸弹 / 小猫（会跑） / 空木箱 / 钻石（最深处） */
 .rb-bomb{background:linear-gradient(180deg,#6d7683,#2b323b);width:42px;height:42px;border-radius:50%;margin-left:-21px;box-shadow:0 3px 10px rgba(0,0,0,.4)}
 .rb-bomb i{display:none}
 .rb-bomb span{font-size:22px}
 .rb-cat{background:linear-gradient(180deg,#ffe9c9,#f0c07c)}
-.rb-cab{background:linear-gradient(180deg,#dcf7cd,#8fce6a)}
+.gm-crate{background:linear-gradient(180deg,#c99a5b,#8f6a35);border:2px solid #6d4d22;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12),0 3px 8px rgba(0,0,0,.3)}
+.gm-crate span{font-size:18px;opacity:.85}
+.gm-dia{background:linear-gradient(180deg,#d6f4ff,#4fc3f7);border:2px solid #1e88e5;box-shadow:0 0 14px rgba(79,195,247,.9),0 3px 10px rgba(0,0,0,.3);animation:gmDia 1.1s ease-in-out infinite alternate}
+.gm-dia span{font-size:24px}
+@keyframes gmDia{0%{transform:scale(1)}100%{transform:scale(1.18)}}
+/* 黄金矿工：绞盘钢索 + 爪头 */
+.gm-rig{position:absolute;top:0;left:50%;width:0;height:0;z-index:3;pointer-events:none}
+.gm-rig:before{content:"⛏";position:absolute;top:-2px;left:-14px;font-size:18px;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+.gm-rope{position:absolute;left:-1.5px;top:0;width:3px;height:30px;transform-origin:50% 0;background:linear-gradient(180deg,#e3c078,#8a6a2f);border-radius:2px;will-change:transform,height}
+.gm-claw{position:absolute;bottom:-13px;left:50%;transform:translateX(-50%);font-size:21px;line-height:1;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
 /* 特效层：爆炸闪光 + 烟雾遮挡 + 飘字 */
 .rb-fx{position:absolute;z-index:5;pointer-events:none}
 .rb-smoke{inset:0;background:radial-gradient(circle at 50% 55%,rgba(255,246,214,.94),rgba(255,178,110,.62) 45%,rgba(90,70,55,.5) 100%);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);animation:rbSmoke 1.2s ease-out forwards}
@@ -358,30 +367,31 @@ a{color:var(--pri)}
   </div>
 </div>
 
-<!-- ===== 签单惊喜 · 5 秒接红包挑战 ===== -->
+<!-- ===== 签单惊喜 · 黄金矿工挖宝挑战 ===== -->
 <div class="lucky" id="luckyModal">
   <div class="lucky-box">
     <!-- 第一步：恭喜 -->
     <div id="lkCele">
       <div class="lk-title">🎉 恭喜签单！</div>
       <div class="lk-confetti" id="lkConfetti"></div>
-      <div class="lk-sub" id="lkCeleSub">今日签单达成，完成率 <b>100%</b><br>老板给你准备了一份惊喜，来接红包吧！</div>
-      <button class="btn block" onclick="lkGoDraw()">🧧 开始接红包挑战</button>
+      <div class="lk-sub" id="lkCeleSub">今日签单达成，完成率 <b>100%</b><br>老板给你准备了一份惊喜，来矿洞挖宝吧！</div>
+      <button class="btn block" onclick="lkGoDraw()">⛏️ 开始挖宝挑战</button>
       <button class="btn ghost block" style="margin-top:8px" onclick="lkClose()">稍后再玩</button>
     </div>
-    <!-- 第二步：5 秒接红包 -->
+    <!-- 第二步：黄金矿工挖宝 -->
     <div id="lkDraw" class="hidden">
-      <div class="lk-title">🧧 5 秒接红包挑战</div>
-      <div class="lk-sub" id="lkDrawSub">🧧 点红包越多金额越大<br>小心 <b>💣 炸弹</b>（倒扣 1 个 + 挡视线），<b>🐱 🥬</b> 是来捣乱的</div>
+      <div class="lk-title">⛏️ 黄金矿工 · 挖宝挑战</div>
+      <div class="lk-sub" id="lkDrawSub">🧧 点屏幕放爪，钩子摆到哪就挖到哪<br>小心 <b>💣 炸弹</b>（倒扣 1 元 + 挡视线），<b>🐱</b> 会跑、<b>📦</b> 是空箱</div>
       <div class="rb-hud">
-        <div class="rb-hud-i"><span>剩余</span><b id="rbTime">5.0</b><span>秒</span></div>
-        <div class="rb-hud-i"><span>接到</span><b id="rbCnt">0</b><span>个</span></div>
+        <div class="rb-hud-i"><span>剩余</span><b id="rbTime">30.0</b><span>秒</span></div>
+        <div class="rb-hud-i"><span>红包</span><b id="rbCnt">0</b><span>个</span></div>
         <div class="rb-hud-i"><span>金额</span><b id="rbAmt">0.00</b><span>元</span></div>
       </div>
       <div class="rb-arena" id="rbArena">
+        <div class="gm-rig"><div class="gm-rope" id="gmRope"><span class="gm-claw">⚓</span></div></div>
         <div class="rb-tip" id="rbTip"></div>
       </div>
-      <div class="rb-foot">🧧 接到 +1 ｜ 💣 炸弹倒扣并挡视线 ｜ 🐱🥬 白点，不计分</div>
+      <div class="rb-foot">🧧 红包 1.2 元/个（共 10 个）｜ 💎 钻石在最深处 +8 元 ｜ 💣 倒扣 1 元挡视线 ｜ 🐱 会跑 📦 空箱，白费一爪</div>
     </div>
     <!-- 第三步：开奖 -->
     <div id="lkResult" class="hidden">
@@ -1453,30 +1463,40 @@ async function confirmDel(){
   }catch(e){toast("核销失败："+(((e&&e.message)||"").slice(0,24)));}
 }
 
-/* ============ 签单惊喜 · 5 秒接红包挑战 ============ */
-/* 规则：5 秒内天上掉落 15 个红包，接到 1 个 = 0.8 元，接得越多金额越大；开始前 3 秒倒计时 */
-const RB_TOTAL=15;            /* 一轮掉落的红包总数 */
-const RB_UNIT=0.8;            /* 每个红包对应金额（不在页面展示） */
-const RB_BOMB=4;              /* 炸弹个数：点到倒扣 1 个，并短暂遮挡视线 */
-const RB_TRAP=3;              /* 干扰项：小猫、白菜各 3 个，点到不计分 */
-const RB_PLAY=5000;           /* 游戏时长 5 秒 */
+/* ============ 签单惊喜 · 黄金矿工挖宝挑战 ============ */
+/* 规则：30 秒限时，钩爪左右摆动、点屏幕放爪。10 个红包 ×1.2 元（上限 12 元）；
+   💎 钻石埋在最深一层正中附近（只有近垂直角度够得着，且爪扫过正中时角速度最快 → 最难抓），抓到直接 +8 元；
+   💣 炸弹倒扣 1 元并挡视线；🐱 小猫不停移动、📦 空木箱是干扰。
+   摆动 + 收放最坏周期 ≈1.9 秒 → 30 秒保底可下爪 15 次。 */
+const RB_TOTAL=10;            /* 一轮红包总数（10 × 1.2 = 上限 12 元） */
+const RB_UNIT=1.2;            /* 每个红包金额（不在页面展示） */
+const RB_BOMB=4;              /* 炸弹个数：抓到倒扣 1 个，并短暂遮挡视线 */
+const RB_TRAP=3;              /* 小猫个数：不停移动的干扰项，不计分 */
+const RB_CRATE=3;             /* 空木箱个数：不计分 */
+const DIA_VALUE=8;            /* 钻石：抓到直接 +8 元 */
+const RB_PLAY=30000;          /* 游戏时长 30 秒 */
 const RB_READY=3000;          /* 开始前准备时间 3 秒 */
-const RB_SPAWN=150;           /* 掉落间隔（含干扰项，节奏更密） */
-const RB_V0=170,RB_V1=235;    /* 掉落速度 px/s（比原来更快） */
-const rbState={on:false,t:0,spawn:0,caught:0,seq:0,items:[],last:0,raf:0,timer:0,plan:[]};
-/* 一轮的掉落序列：15 红包 + 4 炸弹 + 3 小猫 + 3 白菜，打乱后保证第一个是红包 */
+const GM_SWING=1300;          /* 钩爪单摆全周期 ms */
+const GM_AMPL=58;             /* 摆角幅度（度） */
+const GM_OUT=1150;            /* 放爪速度 px/s */
+const GM_BACK=880;            /* 收爪速度 px/s */
+const GM_BASE=30;             /* 钢索基长 px */
+const GM_TOP=10;              /* 绞盘枢轴 y 坐标 */
+const GM_HIT=46;              /* 爪尖抓取判定半径 px */
+const GM_CAT_V=95;            /* 小猫移动速度 px/s */
+const rbState={on:false,t:0,caught:0,dia:0,drops:0,phase:"swing",ang:0,angT:0,len:GM_BASE,carry:null,items:[],last:0,raf:0,timer:0,plan:[],W:360,H:300,arenaTap:0};
+/* 一轮物件构成：10 红包 + 4 炸弹 + 3 小猫 + 3 空木箱 + 1 钻石 = 21 件 */
 function rbPlan(){
   const a=[];
   for(let i=0;i<RB_TOTAL;i++)a.push("rb");
   for(let i=0;i<RB_BOMB;i++)a.push("bomb");
   for(let i=0;i<RB_TRAP;i++)a.push("cat");
-  for(let i=0;i<RB_TRAP;i++)a.push("cabbage");
-  const p=shuffleArr(a);
-  if(p[0]!=="rb"){const k=p.indexOf("rb");if(k>0){const t=p[0];p[0]=p[k];p[k]=t;}}
-  return p;
+  for(let i=0;i<RB_CRATE;i++)a.push("crate");
+  a.push("dia");
+  return shuffleArr(a);
 }
 const RB_RAF=(typeof requestAnimationFrame==="function")?requestAnimationFrame.bind(window):(f=>setTimeout(()=>f(Date.now()),16));
-function rbMoney(cnt){return Math.round((Number(cnt)||0)*RB_UNIT*100)/100;}   /* 接到个数 → 金额 */
+function rbMoney(cnt){return Math.round((Math.min(Math.max(0,Math.round(Number(cnt)||0)),RB_TOTAL))*RB_UNIT*100)/100;}   /* 红包个数 → 金额（封顶 10 个 = 12 元） */
 function rbAmtText(v){return (Math.round((Number(v)||0)*100)/100).toFixed(2);} /* 金额 → 两位小数文本 */
 function shuffleArr(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[j];a[j]=t;}return a;}
 /* ===== 签几单玩几次：挑战次数 = 当日「签单」的实际完成数 ===== */
@@ -1495,8 +1515,8 @@ function lkStep(s){["lkCele","lkDraw","lkResult"].forEach(id=>{const el=document
 function lkOpen(){
   const m=document.getElementById("luckyModal");if(!m)return;
   const cs=document.getElementById("lkCeleSub"),ds=document.getElementById("lkDrawSub"),qt=lkQuotaText();
-  if(cs)cs.innerHTML="今日签单达成，完成率 <b>100%</b><br>"+(qt||"老板给你准备了一份惊喜，来接红包吧！");
-  if(ds)ds.innerHTML=(qt?qt+"<br>":"")+"🧧 点红包越多金额越大，小心 💣 炸弹，🐱🥬 是来捣乱的";
+  if(cs)cs.innerHTML="今日签单达成，完成率 <b>100%</b><br>"+(qt||"老板给你准备了一份惊喜，来矿洞挖宝吧！");
+  if(ds)ds.innerHTML=(qt?qt+"<br>":"")+"⛏️ 点屏幕放爪挖宝：🧧红包 ×1.2 元，💎 钻石 +8 元，小心 💣，🐱 会跑 📦 是空箱";
   if(lkLeft()>0){lkStep("lkCele");lkConfetti();}
   else{const tip=document.getElementById("rbTip");if(tip)tip.style.display="none";lkShowResult(null,true);}
   m.classList.add("on");
@@ -1513,7 +1533,7 @@ function lkConfetti(){
   }
   el.innerHTML=h;
 }
-/* ===== 游戏：5 秒接红包 ===== */
+/* ===== 黄金矿工：矿图布局 / 绞盘 / 抓取 ===== */
 function rbClear(){
   rbState.items.forEach(it=>{try{it.el.remove();}catch(e){}});
   rbState.items=[];
@@ -1522,11 +1542,14 @@ function rbClear(){
     const old=arena.querySelectorAll(".rb,.rb-fx");
     for(let i=0;i<old.length;i++){try{old[i].remove();}catch(e){}}
   }
+  const rope=document.getElementById("gmRope");
+  if(rope){rope.style.height=GM_BASE+"px";rope.style.transform="rotate(0deg)";}
 }
 function rbStop(){
   rbState.on=false;
   if(rbState.timer){clearInterval(rbState.timer);rbState.timer=0;}
   if(rbState.raf){if(typeof cancelAnimationFrame==="function")cancelAnimationFrame(rbState.raf);rbState.raf=0;}
+  if(rbState.arenaTap){const ar=document.getElementById("rbArena");if(ar&&ar.removeEventListener){try{ar.removeEventListener("pointerdown",rbState.arenaTap);}catch(e){}}rbState.arenaTap=0;}
   rbClear();
 }
 function rbHud(){
@@ -1534,29 +1557,78 @@ function rbHud(){
   const sec=Math.max(0,rbState.t/1000);
   if(t)t.textContent=sec.toFixed(1);
   if(c)c.textContent=String(rbState.caught);
-  if(a)a.textContent=rbAmtText(rbMoney(rbState.caught));
+  if(a)a.textContent=rbAmtText(rbTotalMoney());
 }
-function rbSpawn(){
+function rbTotalMoney(){return Math.round((rbMoney(rbState.caught)+rbState.dia*DIA_VALUE)*100)/100;}
+/* 摆矿图：钻石埋最深一层正中 ±14%（近垂直才够得着、爪扫正中角速度最快 → 最难抓），两颗炸弹贴身护卫 */
+function rbLayout(){
   const arena=document.getElementById("rbArena");if(!arena)return;
-  const type=(rbState.plan&&rbState.plan[rbState.seq])||"rb";
+  const W=(arena.clientWidth||360),H=(arena.clientHeight||300);
+  rbState.W=W;rbState.H=H;
+  const types=(rbState.plan&&rbState.plan.length)?rbState.plan.slice():rbPlan();
+  const placed=[];const minD=54;
+  const okPos=(x,y)=>x>=26&&x<=W-26&&y>=68&&y<=H-26&&placed.every(p=>Math.hypot(p.x-x,p.y-y)>=minD);
+  const randPos=()=>{for(let k=0;k<600;k++){const x=26+Math.random()*(W-52),y=68+Math.random()*(H-94);if(okPos(x,y))return{x:x,y:y};}return{x:W/2,y:110+Math.random()*(H-160)};};
+  const diaX=Math.max(44,Math.min(W-44,W/2+(Math.random()*0.28-0.14)*W));
+  placed.push({type:"dia",x:diaX,y:H-28});
+  placed.push({type:"bomb",x:Math.max(26,diaX-58),y:H-38});
+  placed.push({type:"bomb",x:Math.min(W-26,diaX+58),y:H-38});
+  /* 钻石和 2 颗护卫炸弹已特殊摆放，从随机池剔除，避免重复 */
+  let di=types.indexOf("dia");if(di>=0)types.splice(di,1);
+  for(let k=0;k<2;k++){di=types.indexOf("bomb");if(di>=0)types.splice(di,1);}
+  shuffleArr(types).forEach(t=>{const p=randPos();placed.push({type:t,x:p.x,y:p.y});});
+  rbClear();
+  placed.forEach(p=>rbCreate(p));
+  rbState.items=placed;
+}
+function rbCreate(p){
+  const arena=document.getElementById("rbArena");if(!arena)return;
   const el=document.createElement("div");
-  let inner="<i></i><span>🧧</span>";
-  if(type==="bomb"){el.className="rb rb-bomb";inner="<span>💣</span>";}
-  else if(type==="cat"){el.className="rb rb-cat";inner="<i></i><span>🐱</span>";}
-  else if(type==="cabbage"){el.className="rb rb-cab";inner="<i></i><span>🥬</span>";}
-  else el.className="rb";
-  el.style.left=(6+Math.random()*82).toFixed(1)+"%";
-  el.style.top="-46px";
+  let inner="";
+  if(p.type==="bomb"){el.className="rb rb-bomb";inner="<span>💣</span>";}
+  else if(p.type==="cat"){el.className="rb rb-cat";inner="<span>🐱</span>";}
+  else if(p.type==="crate"){el.className="rb gm-crate";inner="<span>📦</span>";}
+  else if(p.type==="dia"){el.className="rb gm-dia";inner="<span>💎</span>";}
+  else{el.className="rb";inner="<i></i><span>🧧</span>";}
+  el.style.left=p.x.toFixed(1)+"px";
+  el.style.top=p.y.toFixed(1)+"px";
   el.innerHTML=inner;
-  const it={el:el,type:type,y:-46,v:RB_V0+Math.random()*(RB_V1-RB_V0),got:false};
-  const hit=e=>{if(e&&e.preventDefault)e.preventDefault();rbCatch(it);};
-  try{
-    if(typeof window!=="undefined"&&window.PointerEvent)el.addEventListener("pointerdown",hit,{passive:false});
-    else{el.addEventListener("touchstart",hit,{passive:false});el.addEventListener("mousedown",hit,{passive:false});}
-  }catch(e){el.onclick=hit;}
   arena.appendChild(el);
-  rbState.items.push(it);
-  rbState.seq++;
+  p.el=el;
+  if(p.type==="cat")p.vx=(Math.random()<0.5?-1:1)*GM_CAT_V;
+}
+function rbTipPos(){
+  const a=rbState.ang*Math.PI/180;
+  return {x:(rbState.W||360)/2+Math.sin(a)*rbState.len,y:GM_TOP+Math.cos(a)*rbState.len};
+}
+function rbMaxLen(){
+  const W=rbState.W||360,H=rbState.H||300;
+  const a=rbState.ang*Math.PI/180;
+  const s=Math.abs(Math.sin(a));
+  let m=H-GM_TOP-30;
+  if(s>0.02)m=Math.min(m,(W/2-16)/s);
+  return Math.max(GM_BASE+40,m);
+}
+function rbRope(){
+  const r=document.getElementById("gmRope");if(!r)return;
+  r.style.height=rbState.len.toFixed(1)+"px";
+  r.style.transform="rotate("+rbState.ang.toFixed(1)+"deg)";
+}
+/* 点屏幕 = 放爪（只在摆动中有效；收放中点了不响应） */
+function rbTap(){
+  if(!rbState.on||rbState.phase!=="swing")return;
+  rbState.phase="extend";
+  rbState.drops++;
+  try{vibrate();}catch(e){}
+}
+function rbHitTest(){
+  const p=rbTipPos();
+  for(let i=0;i<rbState.items.length;i++){
+    const it=rbState.items[i];
+    if(it.claimed||it===rbState.carry)continue;
+    if(Math.hypot(it.x-p.x,it.y+22-p.y)<GM_HIT)return it;
+  }
+  return null;
 }
 /* 飘字提示（+1 / -1 / 不是红包） */
 function rbFloat(it,txt){
@@ -1583,43 +1655,75 @@ function rbBoom(it){
   rbFloat(it,"💥 -1");
 }
 function rbCatch(it){
-  if(!it||it.got||!rbState.on)return;
-  it.got=true;
+  if(!it||it.claimed)return;
+  it.claimed=true;
   const type=it.type||"rb";
   if(type==="rb"){
-    rbState.caught++;
-    rbFloat(it,"+1");
+    rbState.caught=Math.min(RB_TOTAL,rbState.caught+1);
+    rbFloat(it,"+1.2元");
     try{vibrate();}catch(e){}
   }else if(type==="bomb"){
     rbState.caught=Math.max(0,rbState.caught-1);
     rbBoom(it);
+  }else if(type==="dia"){
+    rbState.dia=1;
+    rbFloat(it,"💎 +8元！");
+    try{if(navigator.vibrate)navigator.vibrate([30,50,30,50,120]);}catch(e){}
   }else{
-    /* 小猫 / 白菜：干扰项，不计分也不扣分，但白白浪费一次手速 */
-    rbFloat(it,type==="cat"?"🐱 不是红包~":"🥬 白菜不算钱~");
+    /* 小猫 / 空木箱：干扰项，不计分不扣分，但白白浪费一爪 */
+    rbFloat(it,type==="cat"?"🐱 溜了~ 白忙一爪":"📦 空木箱！一分没有");
     try{vibrate();}catch(e){}
   }
   try{it.el.classList.add("got");}catch(e){}
   setTimeout(()=>{try{it.el.remove();}catch(e){}},320);
-  rbState.items=rbState.items.filter(x=>!x.got);
+  rbState.items=rbState.items.filter(x=>!x.claimed);
   rbHud();
 }
 function rbTick(ts){
   if(!rbState.on)return;
   const now=(typeof ts==="number")?ts:Date.now();
-  const dt=rbState.last?Math.min(140,now-rbState.last):16;
+  const dt=rbState.last?Math.min(60,now-rbState.last):16;
   rbState.last=now;
   rbState.t-=dt;
-  rbState.spawn+=dt;
-  while(rbState.spawn>=RB_SPAWN&&rbState.seq<rbState.plan.length){rbState.spawn-=RB_SPAWN;rbSpawn();}
-  const arena=document.getElementById("rbArena");
-  const H=(arena&&arena.clientHeight)||300;
-  rbState.items=rbState.items.filter(it=>{
-    if(it.got)return false;
-    it.y+=it.v*dt/1000;
-    if(it.y>H){try{it.el.remove();}catch(e){}return false;}
-    it.el.style.top=it.y.toFixed(1)+"px";
-    return true;
-  });
+  const W=rbState.W||360;
+  /* 小猫不停移动（撞边反弹） */
+  for(let i=0;i<rbState.items.length;i++){
+    const it=rbState.items[i];
+    if(it.type==="cat"&&it.vx&&!it.claimed&&it!==rbState.carry){
+      it.x+=it.vx*dt/1000;
+      if(it.x<26){it.x=26;it.vx=Math.abs(it.vx);}
+      if(it.x>W-26){it.x=W-26;it.vx=-Math.abs(it.vx);}
+      try{it.el.style.left=it.x.toFixed(1)+"px";}catch(e){}
+    }
+  }
+  if(rbState.phase==="swing"){
+    rbState.angT+=dt;
+    rbState.ang=GM_AMPL*Math.sin(2*Math.PI*rbState.angT/GM_SWING);
+  }else if(rbState.phase==="extend"){
+    rbState.len+=GM_OUT*dt/1000;
+    const mx=rbMaxLen();
+    const g=(rbState.len>=mx)?null:rbHitTest();
+    if(g){
+      if(g.type==="bomb"){rbCatch(g);}
+      else{rbState.carry=g;}
+      rbState.phase="back";
+    }else if(rbState.len>=mx){
+      rbState.len=mx;rbState.phase="back";
+    }
+  }else if(rbState.phase==="back"){
+    rbState.len-=GM_BACK*dt/1000;
+    if(rbState.carry){
+      const p=rbTipPos();
+      try{rbState.carry.el.style.left=p.x.toFixed(1)+"px";rbState.carry.el.style.top=Math.max(0,p.y-22).toFixed(1)+"px";}catch(e){}
+    }
+    if(rbState.len<=GM_BASE){
+      rbState.len=GM_BASE;
+      const c=rbState.carry;rbState.carry=null;
+      rbState.phase="swing";rbState.angT=0;
+      if(c){c.y=GM_TOP+42;rbCatch(c);}
+    }
+  }
+  rbRope();
   rbHud();
   if(rbState.t<=0){rbFinish();return;}
   rbState.raf=RB_RAF(rbTick);
@@ -1627,41 +1731,54 @@ function rbTick(ts){
 function rbStart(){
   rbStop();
   const tip=document.getElementById("rbTip");
-  rbState.on=true;rbState.t=RB_PLAY;rbState.spawn=0;rbState.caught=0;rbState.seq=0;rbState.last=0;
+  rbState.on=true;rbState.t=RB_PLAY;rbState.caught=0;rbState.dia=0;rbState.drops=0;
+  rbState.phase="swing";rbState.ang=0;rbState.angT=0;rbState.len=GM_BASE;rbState.carry=null;rbState.last=0;
   rbState.plan=rbPlan();
   rbHud();
+  rbLayout();
+  const arena=document.getElementById("rbArena");
+  if(arena){
+    const h=e=>{if(e&&e.preventDefault)e.preventDefault();rbTap();};
+    rbState.arenaTap=h;
+    try{
+      if(typeof window!=="undefined"&&window.PointerEvent)arena.addEventListener("pointerdown",h,{passive:false});
+      else{arena.addEventListener("touchstart",h,{passive:false});arena.addEventListener("mousedown",h,{passive:false});}
+    }catch(e){}
+  }
   let n=3;
-  if(tip){tip.style.display="flex";tip.innerHTML=n+"<small>红包马上来，准备好…</small>";}
+  if(tip){tip.style.display="flex";tip.innerHTML=n+"<small>矿机预热中，看好红包位置…</small>";}
   rbState.timer=setInterval(()=>{
     n--;
-    if(n>0){if(tip)tip.innerHTML=n+"<small>红包马上来，准备好…</small>";return;}
+    if(n>0){if(tip)tip.innerHTML=n+"<small>矿机预热中…</small>";return;}
     clearInterval(rbState.timer);rbState.timer=0;
-    if(tip)tip.innerHTML="开始！<small>只点 🧧，别碰 💣</small>";
+    if(tip)tip.innerHTML="开挖！<small>点屏幕放爪：🧧×1.2元 💎+8元，小心💣</small>";
     setTimeout(()=>{if(tip)tip.style.display="none";},550);
     rbState.last=0;
     rbState.raf=RB_RAF(rbTick);
   },1000);
 }
 function rbFinish(){
+  const c=rbState.carry;rbState.carry=null;
+  if(c){c.y=GM_TOP+42;rbCatch(c);}
   rbState.on=false;
   if(rbState.timer){clearInterval(rbState.timer);rbState.timer=0;}
   if(rbState.raf){if(typeof cancelAnimationFrame==="function")cancelAnimationFrame(rbState.raf);rbState.raf=0;}
-  rbClear();
   const tip=document.getElementById("rbTip");
   rbState.t=0;rbHud();
-  if(tip){tip.style.display="flex";tip.innerHTML="时间到！<small>这轮接到 "+rbState.caught+" 个红包</small>";}
-  setTimeout(()=>rbSettle(rbState.caught),750);
+  if(tip){tip.style.display="flex";tip.innerHTML="收工！<small>抓到 "+rbState.caught+" 个红包"+(rbState.dia?" + 1 颗💎":"")+"</small>";}
+  setTimeout(()=>rbSettle(rbState.caught,rbState.dia),750);
 }
-/* 一轮结束后结算：接到几个 = 几个 × 0.8 元，记入当日战绩并上传 */
-function rbSettle(caught){
+/* 一轮结束后结算：红包个数 × 1.2 元（封顶 10 个 = 12 元）+ 钻石 8 元，记入当日战绩并上传 */
+function rbSettle(caught,dia){
   if(lkLeft()<=0)return null;
   const n=Math.max(0,Math.min(RB_TOTAL,Math.round(Number(caught)||0)));
-  const amount=rbMoney(n);
+  const d=Number(dia)?1:0;
+  const amount=Math.round((rbMoney(n)+d*DIA_VALUE)*100)/100;
   const rec={
-    date:TODAY_cur(),type:"redbag",caught:n,total:RB_TOTAL,amount:amount,
+    date:TODAY_cur(),type:"redbag",caught:n,total:RB_TOTAL,dia:d,amount:amount,
     agent:(P&&P.name)||"",time:new Date().toLocaleString("zh-CN"),no:lkUsed()+1,quota:lkQuota(),
-    prize:{c:"🧧",n:rbAmtText(n)+" 元现金红包",
-      note:"5 秒接红包挑战：接到 "+n+" 个红包，共 "+rbAmtText(n)+" 元，凭本页找老板兑换 💰，当天有效，别客气！"}
+    prize:{c:d?"💎":"🧧",n:rbAmtText(n)+" 元现金红包"+(d?"（含钻石 8 元）":""),
+      note:"黄金矿工挑战：抓到 "+n+" 个红包"+(d?"，挖到 1 颗💎钻石":"")+"，共 "+rbAmtText(amount)+" 元，凭本页找老板兑换 💰，当天有效，别客气！"}
   };
   if(!Array.isArray(D.luckyList))D.luckyList=[];
   D.luckyList.push(rec);
@@ -1673,7 +1790,7 @@ function rbSettle(caught){
 function lkGoDraw(){
   if(lkLeft()<=0){toast("今天的挑战次数已经用完啦 🧧");lkShowResult(null,true);return;}
   const ds=document.getElementById("lkDrawSub"),qt=lkQuotaText();
-  if(ds)ds.innerHTML=(qt?qt+"<br>":"")+"天上掉红包啦，点得越多，金额越大！";
+  if(ds)ds.innerHTML=(qt?qt+"<br>":"")+"钩子摆到哪就往哪挖——🧧 红包 1.2 元/个，💎 钻石 +8 元！";
   lkStep("lkDraw");
   rbStart();
 }
@@ -1685,11 +1802,12 @@ function lkShowResult(rec,replay){
   }
   if(!r){lkStep("lkCele");return;}
   const n=(typeof r.caught==="number")?r.caught:0;
-  const amount=(typeof r.amount==="number")?r.amount:rbMoney(n);
+  const dia=r.dia?1:0;
+  const amount=(typeof r.amount==="number")?r.amount:Math.round((rbMoney(n)+dia*DIA_VALUE)*100)/100;
   const t=document.getElementById("lkResTitle"),pr=document.getElementById("lkResPrize"),no=document.getElementById("lkResNote");
-  if(t)t.textContent=replay?"🧧 你今天的红包战绩":"🧧 挑战结束！";
-  if(pr)pr.innerHTML=`<div style="font-size:46px">🧧</div><div class="rb-amt-big">¥ ${rbAmtText(amount)}</div><div class="lk-prize-n">接到 ${n} 个红包</div>`;
-  if(no)no.textContent="5 秒内接到 "+n+" 个红包，共 "+rbAmtText(amount)+" 元 —— 凭本页找老板兑换 💰，当天有效！";
+  if(t)t.textContent=replay?"⛏️ 你今天的挖宝战绩":"⛏️ 挑战结束！";
+  if(pr)pr.innerHTML=`<div style="font-size:46px">${dia?"💎":"🧧"}</div><div class="rb-amt-big">¥ ${rbAmtText(amount)}</div><div class="lk-prize-n">抓到 ${n} 个红包${dia?" + 💎×1":""}</div>`;
+  if(no)no.textContent="30 秒内抓到 "+n+" 个红包"+(dia?"并挖到钻石":"")+"，共 "+rbAmtText(amount)+" 元 —— 凭本页找老板兑换 💰，当天有效！";
   lkStep("lkResult");
   lkRenderResultExtra();
 }
@@ -1699,7 +1817,7 @@ function lkRenderResultExtra(){
   const list=lkTodayList(),q=lkQuota(),left=lkLeft();
   const box=document.getElementById("lkPrizeList"),btn=document.getElementById("lkAgainBtn");
   if(btn){
-    if(left>0){btn.style.display="block";btn.textContent="🧧 再来一次（还剩 "+left+" 次）";}
+    if(left>0){btn.style.display="block";btn.textContent="⛏️ 再挖一次（还剩 "+left+" 次）";}
     else btn.style.display="none";
   }
   if(box){
@@ -1716,10 +1834,10 @@ function lkEntryHTML(){
   const q=lkQuota(),list=lkTodayList(),left=lkLeft();
   const sum=rbSum(list);
   if(left>0){
-    return `<div class="q" style="text-align:center">🎉 今日签单 <b>${q}</b> 单，可玩 ${q} 轮，还剩 <b>${left}</b> 轮${list.length?"（已抢到 ¥"+rbAmtText(sum)+"）":""}<br><button class="btn sm" style="margin-top:8px" onclick="lkOpen()">🧧 去接红包</button></div>`;
+    return `<div class="q" style="text-align:center">🎉 今日签单 <b>${q}</b> 单，可玩 ${q} 轮，还剩 <b>${left}</b> 轮${list.length?"（已挖到 ¥"+rbAmtText(sum)+"）":""}<br><button class="btn sm" style="margin-top:8px" onclick="lkOpen()">⛏️ 去挖宝</button></div>`;
   }
   if(list.length){
-    return `<div class="q" style="text-align:center">🎉 今日签单 ${q} 单，${list.length} 轮挑战已玩完，共抢到 <b style="color:#e02020">¥ ${rbAmtText(sum)}</b><br><button class="btn sm" style="margin-top:8px" onclick="lkOpen()">查看红包</button></div>`;
+    return `<div class="q" style="text-align:center">🎉 今日签单 ${q} 单，${list.length} 轮挖宝已玩完，共挖到 <b style="color:#e02020">¥ ${rbAmtText(sum)}</b><br><button class="btn sm" style="margin-top:8px" onclick="lkOpen()">查看战绩</button></div>`;
   }
   return "";
 }
@@ -1835,7 +1953,7 @@ async function regSw(){
     }
     /* 注册 URL 带版本号：URL 一变，浏览器必定重新拉取 SW 并触发更新 + 自动刷新，
        否则 SW 脚本被缓存住时，用户会一直停留在旧页面、点了新按钮也没反应 */
-    return await navigator.serviceWorker.register("sw.js?v=12");
+    return await navigator.serviceWorker.register("sw.js?v=13");
   }catch(e){return null;}
 }
 function phoneNotify(title,body){
