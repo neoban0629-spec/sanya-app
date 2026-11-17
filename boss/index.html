@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b2d6b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>妙妙屋 · 经纪人管理后台</title>
+<style>
+:root{
+  --bg:#f2f5f9; --card:#ffffff; --line:#e5e9f0; --txt:#1f2733; --sub:#6b7280;
+  --pri:#1c52a8; --pri-deep:#0b2d6b; --pri-soft:#e8f1fe;
+  --gold:#b8860b; --gold-soft:#fdf3e3;
+  --ok:#16a34a; --ok-soft:#e8f7ee; --warn:#d97706; --warn-soft:#fdf3e3;
+  --bad:#dc2626; --bad-soft:#fdecec; --radius:14px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{font-size:16px}
+body{font-family:"PingFang SC","HarmonyOS Sans","Microsoft YaHei",system-ui,sans-serif;background:var(--bg);color:var(--txt);padding-bottom:calc(64px + var(--safe-b));overscroll-behavior-y:contain}
+/* ===== 顶部 ===== */
+header{background:linear-gradient(135deg,var(--pri-deep),var(--pri));color:#fff;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 14px;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(11,45,107,.25)}
+header .row1{display:flex;align-items:center;justify-content:space-between}
+header h1{font-size:17px;font-weight:700}
+header .datebox{display:flex;align-items:center;gap:8px}
+header input[type=date]{border:none;border-radius:8px;padding:5px 8px;font-size:13px;color:#1f2733;background:#fff}
+header .tag{font-size:11px;background:rgba(255,255,255,.22);padding:3px 9px;border-radius:10px}
+header .sub{font-size:11px;opacity:.85;margin-top:4px}
+/* ===== 主体 ===== */
+.page{display:none;padding:12px 12px 20px}
+.page.on{display:block;animation:fade .18s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(31,39,51,.04)}
+.card h3{font-size:15px;margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tag{font-size:11px;font-weight:normal;padding:3px 9px;border-radius:10px}
+.pri{background:var(--pri-soft);color:var(--pri)}
+.ok{background:var(--ok-soft);color:var(--ok)}
+.warn{background:var(--warn-soft);color:var(--warn)}
+.bad{background:var(--bad-soft);color:var(--bad)}
+.gold{background:var(--gold-soft);color:var(--gold)}
+input[type=text],input[type=number],textarea,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:15px;font-family:inherit;background:#fff;color:var(--txt)}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--pri)}
+.btn{display:inline-block;border:none;border-radius:10px;padding:11px 18px;font-size:14px;cursor:pointer;background:var(--pri);color:#fff;font-family:inherit}
+.btn:active{opacity:.82}
+.btn.ghost{background:#fff;color:var(--pri);border:1px solid var(--pri)}
+.btn.gray{background:#eef1f5;color:var(--txt)}
+.btn.danger{background:#fff;color:var(--bad);border:1px solid var(--bad)}
+.btn.sm{padding:6px 12px;font-size:13px;border-radius:8px}
+.btn.block{display:block;width:100%;text-align:center;font-size:15px;padding:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.bar{height:8px;background:#e8ecf2;border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok);border-radius:4px;transition:width .3s}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13px;line-height:1.6}
+.house{border:1px solid var(--line);border-radius:12px;padding:12px 13px;margin-bottom:10px;background:#fff;position:relative}
+.house .ht{font-size:14.5px;font-weight:700;line-height:1.5;margin-bottom:4px;padding-right:26px}
+.delbtn{position:absolute;top:6px;right:6px;border:none;background:transparent;font-size:15px;cursor:pointer;line-height:1;opacity:.55;padding:4px}
+.delbtn:active{opacity:1}
+.kv b{font-weight:600;flex-shrink:0}
+.note{font-size:12px;color:var(--sub);line-height:1.8;background:#f6f8fb;border-radius:10px;padding:10px 12px;margin-top:10px}
+.muted{color:var(--sub);font-size:12px}
+.q{background:#f6f8fb;border-left:3px solid var(--pri);padding:10px 12px;border-radius:0 10px 10px 0;margin:8px 0;font-size:13px;line-height:1.8;word-break:break-all}
+.hidden{display:none}
+.stat{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+.stat .s{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 10px;text-align:center}
+.stat .s .n{font-size:24px;font-weight:700}
+.stat .s .l{font-size:12px;color:var(--sub);margin-top:2px}
+.stat4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat4 .s{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 6px;text-align:center}
+.stat4 .s .n{font-size:19px;font-weight:700;line-height:1.3}
+.stat4 .s .l{font-size:10.5px;color:var(--sub);margin-top:2px}
+/* ===== 排行 ===== */
+.rank{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff;cursor:pointer}
+.rank:active{background:#f6f8fb}
+.rank .r1{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.rank .no{width:26px;height:26px;border-radius:50%;background:#eef1f5;color:var(--sub);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rank .no.top{background:var(--gold-soft);color:var(--gold)}
+.rank .nm{font-size:15px;font-weight:700;flex:1}
+.rank .rt{font-size:16px;font-weight:700;width:52px;text-align:right}
+.rank .r2{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.rank .r2 .bar{flex:1}
+.rank .r3{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-size:11px;color:var(--sub);text-align:center}
+.rank .r3 b{display:block;font-size:13px;color:var(--txt);font-weight:700}
+/* ===== 明细任务行 ===== */
+.tline{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.tline .tn{flex:1;font-weight:600}
+.tline .tv{font-size:13px;color:var(--sub);width:96px;text-align:right;flex-shrink:0}
+.tline .tb{width:74px;flex-shrink:0}
+.tline .tp{width:44px;text-align:right;font-weight:700;flex-shrink:0}
+/* ===== 趋势条 ===== */
+.trend{display:flex;align-items:flex-end;gap:8px;height:92px;padding:4px 0}
+.trend .td{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.trend .tb2{width:100%;background:var(--pri-soft);border-radius:4px 4px 0 0;position:relative;min-height:3px}
+.trend .tb2 i{position:absolute;left:0;right:0;bottom:0;border-radius:4px 4px 0 0;background:var(--pri)}
+.trend .tl{font-size:10px;color:var(--sub)}
+.trend .tv2{font-size:10px;color:var(--sub)}
+/* ===== 底部导航 ===== */
+nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);display:flex;z-index:30;padding-bottom:var(--safe-b)}
+nav .nv{flex:1;text-align:center;padding:7px 0 5px;font-size:10.5px;color:var(--sub);cursor:pointer}
+nav .nv .ic{font-size:21px;display:block;line-height:1.2}
+nav .nv.on{color:var(--pri);font-weight:700}
+.toast{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:rgba(31,39,51,.92);color:#fff;padding:9px 20px;border-radius:20px;font-size:13px;z-index:99;opacity:0;transition:opacity .3s;pointer-events:none;max-width:86%;text-align:center}
+.footer{text-align:center;color:var(--sub);font-size:11px;padding:14px 0 6px;line-height:1.7}
+a{color:var(--pri)}
+.empty{text-align:center;padding:26px 12px;color:var(--sub);font-size:13px;line-height:1.9}
+</style>
+</head>
+<body>
+<header>
+  <div class="row1">
+    <h1>📊 妙妙屋 · 经纪人管理后台</h1>
+    <div class="datebox"><input type="date" id="datePick"><span class="tag" id="todayTag">今天</span></div>
+  </div>
+  <div class="sub">团队数据汇总 · 完成率排行 · 日报明细 ｜ 数据保存在本机</div>
+</header>
+
+<!-- ================= 总览 ================= -->
+<div class="page on" id="p-overview">
+  <div class="card">
+    <h3>今日团队概览 <span class="tag pri" id="ovDate">—</span></h3>
+    <div class="stat4">
+      <div class="s"><div class="n" id="mAgents" style="color:var(--pri)">0</div><div class="l">团队人数</div></div>
+      <div class="s"><div class="n" id="mSubmit" style="color:var(--ok)">0</div><div class="l">已交日报</div></div>
+      <div class="s"><div class="n" id="mRate" style="color:var(--pri)">0%</div><div class="l">平均完成率</div></div>
+      <div class="s"><div class="n" id="mMiss" style="color:var(--bad)">0</div><div class="l">未交日报</div></div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn sm" onclick="cloudPull(curDate(),1)">☁️ 刷新云端数据</button>
+      <button class="btn sm gray" onclick="cloudPull7()">拉取近 7 天</button>
+    </div>
+    <div class="note" id="syncBar">未配置云端：请在「数据」页填入云开发环境 ID，配置后经纪人提交的数据会自动同步过来。</div>
+  </div>
+
+  <div class="card">
+    <h3>团队数据汇总 <span class="tag ok">当日合计</span></h3>
+    <div id="sumList"></div>
+  </div>
+
+  <div class="card">
+    <h3>完成率排行 <span class="tag gold">点击查看详情</span></h3>
+    <div id="rankList"></div>
+  </div>
+
+  <div class="card">
+    <h3>未提交日报 <span class="tag bad">22:00 截止</span></h3>
+    <div id="missList"></div>
+  </div>
+
+  <div class="card">
+    <h3>近 7 天团队完成率</h3>
+    <div class="trend" id="trend"></div>
+  </div>
+</div>
+
+<!-- ================= 明细 ================= -->
+<div class="page" id="p-detail">
+  <div class="card">
+    <h3>经纪人明细 <span class="tag pri" id="dtDate">—</span></h3>
+    <div class="field"><label>选择经纪人</label><select id="agentSel"></select></div>
+    <div id="dtBody"></div>
+  </div>
+</div>
+
+<!-- ================= 数据管理 ================= -->
+<div class="page" id="p-data">
+  <div class="card">
+    <h3>☁️ 云端同步 <span class="tag warn" id="cloudTag">未配置</span></h3>
+    <div class="field"><label>云开发环境 ID（与经纪人端填同一个）</label><input type="text" id="cloudEnv" placeholder="例如：miaomiaowu-1a2b3c4d"></div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn sm" onclick="cloudPull(curDate(),1)">测试并拉取今日</button>
+      <button class="btn sm gray" onclick="cloudPull7()">拉取近 7 天</button>
+    </div>
+    <div class="note" id="cloudNote">
+      配置后打开后台即从云端读取全员数据，无需人工收文件。<br>
+      <b>首次使用需要店长在腾讯云开发控制台做两件事：</b><br>
+      ① 数据库新建集合 <b>agent_daily</b>，权限设为「所有用户可读写」；<br>
+      ② 「安全配置 → 安全域名」中加入本后台网址和经纪人端网址。
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>今日内容录入 <span class="tag pri">推送给经纪人</span></h3>
+    <div class="note" style="margin-bottom:10px">录入后，经纪人在该「目标日期」当天打开 App，「知识」页的「今日新房知识 / 今日视频文案」会实时显示。可提前一天录入次日的楼盘与视频文案。</div>
+    <div class="field"><label>目标日期（经纪人端显示为「今日」的日期）</label><input type="date" id="nkDate"></div>
+    <div class="field"><label>今日新房知识（楼盘信息）</label><textarea id="nkNew" placeholder="楼盘名 / 板块 / 主力户型 / 价格 / 卖点…"></textarea></div>
+    <button class="btn sm ghost" onclick="autoFormat('nkNew')">✨ 一键排版</button>
+    <div class="field"><label>来源</label><input type="text" id="nkNewSrc" placeholder="如：ima楼盘库 2026-08-31"></div>
+    <button class="btn block" style="margin-top:4px" onclick="pushKnow('新房知识')">发布今日新房知识</button>
+    <div class="field" style="margin-top:12px"><label>今日视频文案</label><textarea id="nkVideo" placeholder="文案标题 / 口播结构 / 要点…"></textarea></div>
+    <button class="btn sm ghost" onclick="autoFormat('nkVideo')">✨ 一键排版</button>
+    <div class="field"><label>来源</label><input type="text" id="nkVideoSrc" placeholder="如：店长提供 2026-08-30"></div>
+    <button class="btn block" style="margin-top:4px" onclick="pushKnow('视频文案')">发布今日视频文案</button>
+    <div class="note" style="margin-top:14px;border-top:1px solid var(--line);padding-top:12px">
+      📚 <b>今日房产知识</b>与<b>考核题</b>已改为由资料库的「三亚房产知识」「三亚考核题目」两个资料夹<b>每日自动抽取下发</b>，无需在此录入。你只管往资料夹里补充内容，系统会每天轮换抽取、保证不重复。
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🏠 全店好房分享 <span class="tag pri">经纪人端实时同步</span></h3>
+    <div class="row" style="margin-top:8px">
+      <button class="btn sm" onclick="pullBossHouses(1)">🔄 刷新好房</button>
+    </div>
+    <div id="bossHouseList" style="margin-top:10px"><div class="muted">读取中…</div></div>
+    <div class="note">经纪人在 App 发布或核销房源后，这里约 25 秒自动同步一次，也可点上方按钮手动刷新。</div>
+  </div>
+
+  <div class="card">
+    <h3>导出与备份</h3>
+    <button class="btn ghost block" onclick="exportSummary()">📄 导出当日汇总报告（Markdown）</button>
+    <button class="btn ghost block" style="margin-top:8px" onclick="exportWeek()">📊 导出近 7 天汇总报告</button>
+    <button class="btn gray block" style="margin-top:8px" onclick="exportAll()">💾 导出后台全量数据（换机备份）</button>
+    <button class="btn gray block" style="margin-top:8px" onclick="importAll()">📤 导入后台全量数据</button>
+  </div>
+
+  <div class="card">
+    <h3>演示与清理</h3>
+    <button class="btn ghost block" onclick="loadDemo()">🎯 载入演示数据（先看效果）</button>
+    <button class="btn danger block" style="margin-top:8px" onclick="clearDay()">清空当日数据</button>
+    <button class="btn danger block" style="margin-top:8px" onclick="clearAll()">清空全部数据</button>
+    <div class="note">演示数据仅用于预览效果，导入真实数据前请先「清空全部数据」。</div>
+  </div>
+
+  <div class="card">
+    <h3>统计口径说明</h3>
+    <div class="note">
+      · <b>完成率</b> = Σ min(1, 实际/目标) ÷ 任务数，与经纪人 App 内口径一致<br>
+      · <b>已交日报</b> = 当日填写了总结内容或已生成复盘<br>
+      · <b>团队合计</b> = 当日所有已导入经纪人的实际完成值相加<br>
+      · 数据全部来自经纪人 App 导出的真实记录，后台不做任何修改与编造<br>
+      · 后台数据与经纪人手机本地数据相互独立，经纪人端数据仍需各自备份
+    </div>
+  </div>
+</div>
+
+<div class="footer">妙妙屋经纪人管理后台<br>数据来源：经纪人 App 每日导出 · 队长/店长汇总查看</div>
+
+<!-- ================= 底部导航 ================= -->
+<nav id="nav">
+  <div class="nv on" data-t="overview"><span class="ic">📊</span>总览</div>
+  <div class="nv" data-t="detail"><span class="ic">👤</span>明细</div>
+  <div class="nv" data-t="data"><span class="ic">⚙️</span>数据</div>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ 常量 ============ */
+const TODAY = new Date().toISOString().slice(0,10);
+/* 统计字段：显示名 → 经纪人端任务名前缀 */
+const SUM_FIELDS = [
+  ["电话开发（通）","电话开发"],["新增有效客户（个）","新增有效客户"],["客户跟进（组）","客户跟进"],
+  ["带看（组）","带看"],["空看（套）","空看"],["实勘（套）","实勘"],
+  ["新增有效房源（套）","新增有效房源"],["房源维护（套）","房源维护"],["业主沟通（组）","业主沟通"]
+];
+const TEXT_QS = ["今天完成最好的一件事情？","今天遇到的最大问题？","今天学会了什么？","今天哪个客户最值得继续跟进？","今天哪个房源最值得研究？","今天哪个环节做得不好？","明天准备重点完成什么？"];
+const PAN_FIELDS = [["name","小区名称"],["peitao","小区配套"],["fujin","附近配套"],["wuye","物业费"],["shuidian","水电费"],["tingche","停车费"],["tihu","梯户比"],["zongcen","总层高"],["zongdong","总栋数"],["huxing","户型"]];
+const DB_KEY = "mm_boss_v1";
+
+/* ============ 存储 ============ */
+let DB = {agents:{}, records:{}};
+function loadDB(){
+  try{const raw=localStorage.getItem(DB_KEY);if(raw)DB=JSON.parse(raw);}catch(e){}
+  if(!DB.agents)DB.agents={};
+  if(!DB.records)DB.records={};
+}
+function saveDB(){try{localStorage.setItem(DB_KEY,JSON.stringify(DB));}catch(e){toast("保存失败：存储空间不足");}}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.style.opacity=1;clearTimeout(t._h);t._h=setTimeout(()=>t.style.opacity=0,2200);}
+function curDate(){return document.getElementById("datePick").value||TODAY;}
+
+/* ============ 计算 ============ */
+function taskVal(tasks,prefix){
+  if(!tasks)return {t:0,a:0};
+  const hit=tasks.find(x=>String(x.n||"").startsWith(prefix));
+  return hit?{t:Number(hit.t)||0,a:Number(hit.a)||0}:{t:0,a:0};
+}
+function recRate(rec){
+  const ts=(rec&&rec.tasks)||[];
+  const valid=ts.filter(x=>(Number(x.t)||0)>0);
+  if(!valid.length)return 0;
+  return Math.round(valid.reduce((s,x)=>s+Math.min(1,(Number(x.a)||0)/(Number(x.t)||0)),0)/valid.length*100);
+}
+function recHasReport(rec){
+  if(!rec)return false;
+  if(rec.review)return true;
+  const tx=(rec.report&&rec.report.texts)||rec.texts||{};
+  return Object.values(tx).some(v=>String(v||"").trim());
+}
+function dayRecords(d){return DB.records[d]||{};}
+function agentNames(){
+  const set={};
+  Object.values(DB.records).forEach(day=>Object.keys(day).forEach(n=>set[n]=1));
+  Object.keys(DB.agents).forEach(n=>set[n]=1);
+  return Object.keys(set).sort();
+}
+
+/* ============ 渲染：总览 ============ */
+function renderOverview(){
+  const d=curDate();
+  document.getElementById("ovDate").textContent=d;
+  document.getElementById("dtDate").textContent=d;
+  const map=dayRecords(d);
+  const names=Object.keys(map);
+  const recs=names.map(n=>map[n]);
+
+  if(!names.length){
+    document.getElementById("mAgents").textContent=DB.agents?agentNames().length:0;
+    document.getElementById("mSubmit").textContent=0;
+    document.getElementById("mRate").textContent="0%";
+    document.getElementById("mMiss").textContent=0;
+    document.getElementById("sumList").innerHTML="<div class='empty'>当日暂无数据。<br>配置云端并拉取后，经纪人的日报会自动汇总到这里。</div>";
+    document.getElementById("rankList").innerHTML="<div class='empty'>暂无排行</div>";
+    document.getElementById("missList").innerHTML="<div class='muted'>—</div>";
+    renderTrend();
+    renderAgentSel();
+    return;
+  }
+
+  const submitted=recs.filter(recHasReport);
+  const avgRate=Math.round(recs.reduce((s,r)=>s+recRate(r),0)/recs.length);
+  document.getElementById("mAgents").textContent=names.length;
+  document.getElementById("mSubmit").textContent=submitted.length;
+  document.getElementById("mRate").textContent=avgRate+"%";
+  document.getElementById("mMiss").textContent=names.length-submitted.length;
+
+  /* 团队合计 */
+  let sumHtml="";
+  const totals={};
+  SUM_FIELDS.forEach(([label,prefix])=>{
+    let t=0,a=0;
+    recs.forEach(r=>{const v=taskVal(r.tasks,prefix);t+=v.t;a+=v.a;});
+    totals[label]={t,a};
+    const color=a>=t&&t>0?"var(--ok)":a>0?"var(--warn)":"var(--sub)";
+    sumHtml+=`<div class="kv"><b>${esc(label.replace(/（.*?）/g,""))}</b><span style="text-align:right;font-weight:700;color:${color}">${a} <span class="muted">/ 目标 ${t}</span></span></div>`;
+  });
+  let panCount=0;recs.forEach(r=>panCount+=((r.pans)||[]).length);
+  sumHtml+=`<div class="kv"><b>跑盘小区（个）</b><span style="text-align:right;font-weight:700;color:var(--pri)">${panCount}</span></div>`;
+  document.getElementById("sumList").innerHTML=sumHtml;
+
+  /* 排行 */
+  const rows=names.map(n=>({name:n,rec:map[n],rate:recRate(map[n])}))
+    .sort((a,b)=>b.rate-a.rate);
+  document.getElementById("rankList").innerHTML=rows.map((r,i)=>{
+    const c=r.rate>=80?"var(--ok)":r.rate>=50?"var(--warn)":"var(--bad)";
+    const tel=taskVal(r.rec.tasks,"电话开发").a;
+    const nc=taskVal(r.rec.tasks,"新增有效客户").a;
+    const dk=taskVal(r.rec.tasks,"带看").a;
+    const pn=(r.rec.pans||[]).length;
+    return `<div class="rank" onclick="viewAgent('${esc(r.name)}')">
+      <div class="r1">
+        <div class="no${i===0?" top":""}">${i+1}</div>
+        <div class="nm">${esc(r.name)}${recHasReport(r.rec)?'<span class="tag ok" style="margin-left:6px">已交</span>':'<span class="tag bad" style="margin-left:6px">未交</span>'}</div>
+        <div class="rt" style="color:${c}">${r.rate}%</div>
+      </div>
+      <div class="r2"><div class="bar"><i style="width:${r.rate}%;background:${c}"></i></div></div>
+      <div class="r3">
+        <div><b>${tel}</b>电话</div><div><b>${nc}</b>新客</div><div><b>${dk}</b>带看</div><div><b>${pn}</b>跑盘</div>
+      </div>
+    </div>`;
+  }).join("");
+
+  /* 未交名单 */
+  const miss=rows.filter(r=>!recHasReport(r.rec)).map(r=>r.name);
+  document.getElementById("missList").innerHTML=miss.length
+    ? miss.map(n=>`<span class="tag bad" style="margin:0 6px 6px 0;display:inline-block;font-size:13px;padding:6px 12px">${esc(n)}</span>`).join("")
+    : "<div class='muted' style='color:var(--ok)'>全部已提交 👍</div>";
+
+  renderTrend();
+  renderAgentSel();
+}
+
+/* 近 7 天趋势 */
+function renderTrend(){
+  const base=new Date(curDate()+"T00:00:00");
+  let html="";
+  for(let i=6;i>=0;i--){
+    const dt=new Date(base.getTime()-i*864e5);
+    const ds=dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0");
+    const map=dayRecords(ds);
+    const recs=Object.values(map);
+    const rate=recs.length?Math.round(recs.reduce((s,r)=>s+recRate(r),0)/recs.length):0;
+    const isCur=ds===curDate();
+    html+=`<div class="td">
+      <div class="tv2" style="color:${isCur?"var(--pri)":"var(--sub)"};font-weight:${isCur?700:400}">${rate?"":"-"}${rate?rate+"%":""}</div>
+      <div class="tb2" style="height:56px"><i style="height:${rate}%;background:${isCur?"var(--pri)":"#9dbbe8"}"></i></div>
+      <div class="tl">${ds.slice(5)}</div>
+    </div>`;
+  }
+  document.getElementById("trend").innerHTML=html;
+}
+
+/* ============ 渲染：明细 ============ */
+function renderAgentSel(){
+  const sel=document.getElementById("agentSel");
+  const names=Object.keys(dayRecords(curDate()));
+  const prev=sel.value;
+  sel.innerHTML=names.length?names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join(""):'<option value="">（当日无数据）</option>';
+  if(names.includes(prev))sel.value=prev;
+  renderDetail();
+}
+function viewAgent(name){
+  document.getElementById("agentSel").value=name;
+  goPage("detail");
+  renderDetail();
+}
+function renderDetail(){
+  const d=curDate(),name=document.getElementById("agentSel").value;
+  const box=document.getElementById("dtBody");
+  document.getElementById("dtDate").textContent=d;
+  const rec=dayRecords(d)[name];
+  if(!rec){box.innerHTML="<div class='empty'>该经纪人当日无数据</div>";return;}
+
+  const rate=recRate(rec);
+  const c=rate>=80?"var(--ok)":rate>=50?"var(--warn)":"var(--bad)";
+  let h=`<div class="stat" style="margin-bottom:12px">
+    <div class="s"><div class="n" style="color:${c}">${rate}%</div><div class="l">完成率</div></div>
+    <div class="s"><div class="n">${(rec.pans||[]).length}</div><div class="l">跑盘小区</div></div>
+  </div>`;
+
+  /* 任务 */
+  h+=`<h3 style="font-size:13px;color:var(--sub);margin:4px 0 2px">今日量化任务</h3>`;
+  if(!(rec.tasks||[]).length){h+=`<div class="muted">无任务数据</div>`;}
+  else{
+    rec.tasks.forEach(t=>{
+      const tt=Number(t.t)||0,aa=Number(t.a)||0;
+      const pct=tt>0?Math.min(100,Math.round(aa/tt*100)):0;
+      const cc=pct>=100?"var(--ok)":pct>=50?"var(--warn)":"var(--bad)";
+      h+=`<div class="tline">
+        <div class="tn">${esc(t.n)}</div>
+        <div class="tv">${aa} / ${tt}</div>
+        <div class="tb"><div class="bar"><i style="width:${pct}%;background:${cc}"></i></div></div>
+        <div class="tp" style="color:${cc}">${pct}%</div>
+      </div>`;
+    });
+  }
+
+  /* 跑盘 */
+  h+=`<h3 style="font-size:13px;color:var(--sub);margin:14px 0 2px">跑盘记录</h3>`;
+  if(!(rec.pans||[]).length){h+=`<div class="muted">当日无跑盘记录</div>`;}
+  else{
+    rec.pans.forEach((p,i)=>{
+      h+=`<div class="house" style="border:1px solid var(--line);border-radius:12px;padding:12px;margin:8px 0">
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px">跑盘 ${i+1}：${esc(p.name||"（未填小区名）")}</div>`;
+      PAN_FIELDS.forEach(([f,l])=>{
+        if(f==="name")return;
+        const v=String(p[f]||"").trim();
+        h+=`<div class="kv"><b>${l}</b><span style="text-align:right;color:${v?"var(--txt)":"var(--sub)"}">${esc(v||"未填写")}</span></div>`;
+      });
+      h+=`</div>`;
+    });
+  }
+
+  /* 日报总结 */
+  h+=`<h3 style="font-size:13px;color:var(--sub);margin:14px 0 2px">日报总结</h3>`;
+  const tx=(rec.report&&rec.report.texts)||rec.texts||{};
+  let any=false;
+  TEXT_QS.forEach((q,i)=>{
+    const v=String(tx[i]||"").trim();
+    if(v){any=true;h+=`<div class="q"><b>${esc(q)}</b><br>${esc(v)}</div>`;}
+  });
+  if(!any)h+=`<div class="muted">未提交日报总结</div>`;
+
+  /* 复盘 */
+  if(rec.review){
+    const r=rec.review;
+    h+=`<h3 style="font-size:13px;color:var(--sub);margin:14px 0 2px">AI 复盘</h3>`;
+    h+=`<div class="q"><b>今日最需改进：</b><br>${esc(r.worst||"—")}</div>`;
+    if((r.tomorrows||[]).length){
+      h+=`<div class="q"><b>明日重点任务：</b><br>${(r.tomorrows).map((x,i)=>`${i+1}. ${esc(x)}`).join("<br>")}</div>`;
+    }
+    if(r.time)h+=`<div class="muted" style="margin-top:6px">复盘生成时间：${esc(r.time)}</div>`;
+  }
+
+  box.innerHTML=h;
+}
+
+/* ============ 导出 ============ */
+function summaryMd(days){
+  let s=`# 妙妙屋经纪人团队日报汇总\n\n`;
+  s+=`生成时间：${new Date().toLocaleString("zh-CN")}\n\n`;
+  days.forEach(d=>{
+    const map=dayRecords(d);
+    const names=Object.keys(map);
+    s+=`\n---\n\n## ${d}\n\n`;
+    if(!names.length){s+=`（当日无导入数据）\n\n`;return;}
+    const recs=names.map(n=>map[n]);
+    const submitted=recs.filter(recHasReport).length;
+    const avg=Math.round(recs.reduce((a,r)=>a+recRate(r),0)/recs.length);
+    s+=`**团队 ${names.length} 人 ｜ 已交日报 ${submitted} 人 ｜ 平均完成率 ${avg}%**\n\n`;
+    s+=`### 团队数据汇总\n\n| 指标 | 实际合计 | 目标合计 |\n| --- | --- | --- |\n`;
+    SUM_FIELDS.forEach(([label,prefix])=>{
+      let t=0,a=0;recs.forEach(r=>{const v=taskVal(r.tasks,prefix);t+=v.t;a+=v.a;});
+      s+=`| ${label.replace(/（.*?）/g,"")} | ${a} | ${t} |\n`;
+    });
+    let pc=0;recs.forEach(r=>pc+=(r.pans||[]).length);
+    s+=`| 跑盘小区 | ${pc} | — |\n\n`;
+    s+=`### 完成率排行\n\n| 排名 | 经纪人 | 完成率 | 电话 | 新增客户 | 带看 | 跑盘 | 日报 |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n`;
+    names.map(n=>({n,r:recRate(map[n])})).sort((a,b)=>b.r-a.r).forEach((x,i)=>{
+      const rc=map[x.n];
+      s+=`| ${i+1} | ${x.n} | ${x.r}% | ${taskVal(rc.tasks,"电话开发").a} | ${taskVal(rc.tasks,"新增有效客户").a} | ${taskVal(rc.tasks,"带看").a} | ${(rc.pans||[]).length} | ${recHasReport(rc)?"已交":"未交"} |\n`;
+    });
+    s+=`\n### 个人明细\n\n`;
+    names.forEach(n=>{
+      const rc=map[n];
+      s+=`#### ${n}（完成率 ${recRate(rc)}%）\n\n`;
+      (rc.tasks||[]).forEach(t=>{const tt=Number(t.t)||0,aa=Number(t.a)||0;s+=`- ${t.n}：目标${tt}，实际${aa}${tt>0?`（${Math.min(100,Math.round(aa/tt*100))}%）`:""}\n`;});
+      if((rc.pans||[]).length){
+        s+=`\n**跑盘记录：**\n\n`;
+        rc.pans.forEach((p,i)=>{
+          s+=`- 跑盘${i+1}：${p.name||"（未填）"}`;
+          const parts=PAN_FIELDS.filter(([f])=>f!=="name").map(([f,l])=>`${l}：${String(p[f]||"").trim()||"未填写"}`);
+          if(parts.length)s+=`（${parts.join("；")}）`;
+          s+=`\n`;
+        });
+      }
+      const tx=(rc.report&&rc.report.texts)||rc.texts||{};
+      let any=false;
+      TEXT_QS.forEach((q,i)=>{const v=String(tx[i]||"").trim();if(v){if(!any){s+=`\n**日报总结：**\n\n`;any=true;}s+=`- ${q} ${v}\n`;}});
+      if(!any)s+=`\n（未提交日报总结）\n`;
+      if(rc.review){
+        s+=`\n**AI复盘：** 最需改进——${rc.review.worst||"—"}`;
+        if((rc.review.tomorrows||[]).length)s+=`；明日重点——${rc.review.tomorrows.join("；")}`;
+        s+=`\n`;
+      }
+      s+=`\n`;
+    });
+  });
+  return s;
+}
+function copyText(txt){
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(txt).then(()=>toast("已复制到剪贴板")).catch(()=>fallbackCopy(txt));
+  }else fallbackCopy(txt);
+}
+function fallbackCopy(txt){
+  const ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();
+  try{document.execCommand("copy");toast("已复制");}catch(e){prompt("长按全选复制：",txt);}
+  document.body.removeChild(ta);
+}
+function exportSummary(){copyText(summaryMd([curDate()]));}
+function exportWeek(){
+  const base=new Date(curDate()+"T00:00:00");const ds=[];
+  for(let i=6;i>=0;i--){const dt=new Date(base.getTime()-i*864e5);ds.push(dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0"));}
+  copyText(summaryMd(ds));
+}
+function exportAll(){
+  const blob=new Blob([JSON.stringify(DB,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="妙妙屋管理后台数据_"+curDate()+".json";a.click();
+  toast("后台数据已导出");
+}
+function importAll(){
+  const inp=document.createElement("input");inp.type="file";inp.accept=".json";
+  inp.onchange=()=>{
+    const f=inp.files[0];if(!f)return;
+    const rd=new FileReader();
+    rd.onload=()=>{
+      try{
+        const data=JSON.parse(rd.result);
+        if(!data.records&&!data.agents)throw new Error("格式不符");
+        DB.agents=Object.assign({},DB.agents,data.agents||{});
+        Object.entries(data.records||{}).forEach(([d,m])=>{
+          DB.records[d]=Object.assign({},DB.records[d]||{},m);
+        });
+        saveDB();renderOverview();toast("后台数据已导入");
+      }catch(e){toast("导入失败：文件格式不正确");}
+    };
+    rd.readAsText(f);
+  };
+  inp.click();
+}
+
+/* ============ 清理 / 演示 ============ */
+function clearDay(){
+  const d=curDate();
+  if(!confirm("确定清空 "+d+" 的全部经纪人数据？"))return;
+  delete DB.records[d];saveDB();renderOverview();renderDetail();toast("已清空当日数据");
+}
+function clearAll(){
+  if(!confirm("确定清空后台全部数据？此操作不可恢复。"))return;
+  if(!confirm("再次确认：所有导入的经纪人记录都会被删除。"))return;
+  DB={agents:{},records:{}};saveDB();renderOverview();renderDetail();toast("已清空全部数据");
+}
+function loadDemo(){
+  const d=curDate();
+  const mk=(n,tel,nc,fw,dk,kk,sf,fy,wh,gt,pans,texts,rate)=>{
+    const tasks=[
+      {n:"电话开发（通）",t:240,a:tel},{n:"新增有效客户（个）",t:2,a:nc},{n:"客户跟进（组）",t:10,a:fw},
+      {n:"带看（组）",t:1,a:dk},{n:"空看（套）",t:2,a:kk},{n:"实勘（套）",t:1,a:sf},
+      {n:"新增有效房源（套）",t:2,a:fy},{n:"房源维护（套）",t:5,a:wh},{n:"业主沟通（组）",t:3,a:gt}
+    ];
+    const has=texts&&Object.values(texts).some(v=>String(v||"").trim());
+    return {agent:n,date:d,tasks,pans,report:{nums:{},texts:texts||{}},
+      review:has?{rate,worst:"客户跟进量不足，重点客户跟进深度不够",
+        tomorrows:["优先补齐客户跟进：目标10组，明日上午集中回访","新增2套有效房源并完成实勘","完成1个小区的实地跑盘并填全10项信息"],
+        time:new Date().toLocaleString("zh-CN")}:null,
+      goal:"",importedAt:new Date().toISOString()};
+  };
+  if(!DB.records[d])DB.records[d]={};
+  DB.records[d]["张伟"]=mk("张伟",240,3,12,2,2,1,2,5,2,
+    [{name:"红树洲",peitao:"泳池、会所、儿童乐园",fujin:"丹州小区商业街、第三市场",wuye:"2.8元/㎡·月",shuidian:"民用水电",tingche:"地上150元/月",tihu:"2梯4户",zongcen:"26层",zongdong:"12栋",huxing:"75/95/120㎡两至三房"}],
+    {0:"电话开发240通全部打完，成功约到2组周末带看",1:"客户跟进只做了12组，重点客户深度沟通不够",2:"学会了用满五唯一房源做税费优势说服客户",3:"王姐，预算150万，看吉阳区三房，需求明确",4:"红树洲95㎡120万那套，单价明显低于小区均价",5:"客户跟进流于形式，没有挖掘真实需求",6:"重点回访5组意向客户，争取再约2组带看"},92);
+  DB.records[d]["李娜"]=mk("李娜",186,2,10,1,2,1,1,4,3,
+    [{name:"和泓·假日阳光",peitao:"中心花园、健身区",fujin:"吉阳大道商圈、农贸市场",wuye:"2.2元/㎡·月",shuidian:"民用水电",tingche:"地下200元/月",tihu:"2梯6户",zongcen:"18层",zongdong:"8栋",huxing:"78/89㎡两房"}],
+    {0:"空看2套新房并完成了1套实勘",1:"电话开发只打了186通，下午时间分配不合理",2:"熟悉了吉阳大道片区小区分布",3:"李先生，外地投资客，关注总价100万以内",4:"和泓假日阳光78㎡87万那套，单价约1.1万",5:"上午效率低，打电话断断续续",6:"上午专注打电话，目标200通以上"},71);
+  DB.records[d]["王强"]=mk("王强",95,0,4,0,1,0,0,2,1,[],{},0);
+  DB.agents["张伟"]={name:"张伟",pdate:"2026-06-01",stage:"入职第三个月"};
+  DB.agents["李娜"]={name:"李娜",pdate:"2026-07-15",stage:"入职第二个月"};
+  DB.agents["王强"]={name:"王强",pdate:"2026-08-25",stage:"新人第一周"};
+  saveDB();renderOverview();renderDetail();
+  toast("演示数据已载入，可在「数据」页清空");
+}
+
+/* ============ 交互 ============ */
+document.getElementById("nav").addEventListener("click",e=>{
+  const t=e.target.closest(".nv");if(!t)return;
+  document.querySelectorAll(".nv").forEach(x=>x.classList.remove("on"));t.classList.add("on");
+  ["overview","detail","data"].forEach(k=>{
+    document.getElementById("p-"+k).classList.toggle("on",k===t.dataset.t);
+  });
+  window.scrollTo({top:0});
+});
+function goPage(k){const el=document.querySelector('[data-t="'+k+'"]');if(el)el.click();}
+document.getElementById("datePick").addEventListener("change",()=>{
+  document.getElementById("todayTag").textContent=curDate()===TODAY?"今天":"历史";
+  renderOverview();renderDetail();
+});
+document.getElementById("agentSel").addEventListener("change",renderDetail);
+
+/* ============ 云端同步（腾讯云开发 CloudBase） ============ */
+const CLOUD_COLL = "agent_daily";
+let cApp=null,cDb=null,cReady=false;
+const CLOUD_ENV_DEFAULT = "agentdata-d3gy3iioa56710afc";
+function cCfg(){
+  try{
+    const o=JSON.parse(localStorage.getItem("mm_cloud")||'{}');
+    if(!o.env)o.env=CLOUD_ENV_DEFAULT;
+    return o;
+  }catch(e){return {env:CLOUD_ENV_DEFAULT};}
+}
+function cSave(o){try{localStorage.setItem("mm_cloud",JSON.stringify(o));}catch(e){}}
+/* 当前应用访问域名（用于云开发 Web 安全域名白名单） */
+function cloudDomain(){return location.hostname;}
+/* 把云端错误翻译成可操作的提示：安全域名未配置是最常见根因 */
+function cloudErrMsg(err){
+  const msg=((err&&err.message)?err.message:String(err||""));
+  if(/安全域名|not in|security|domain|allowlist|40103|未授权|授权|refused|blocked|not allowed/i.test(msg))
+    return "本网址未加入云开发「Web 安全域名」。请到云开发控制台 → 环境 → 安全配置，把 "+cloudDomain()+" 加入允许域名后重试";
+  return msg;
+}
+async function cInit(){
+  const env=(cCfg().env||"").trim();
+  if(!env)return false;
+  if(cReady&&cDb)return true;
+  if(!window.cloudbase){
+    await new Promise((res,rej)=>{
+      const s=document.createElement("script");
+      s.src="https://static.cloudbase.net/cloudbase-js-sdk/latest/cloudbase.full.js";
+      s.onload=res;s.onerror=()=>rej(new Error("云端 SDK 加载失败"));
+      document.head.appendChild(s);
+    });
+  }
+  if(!cApp)cApp=window.cloudbase.init({env:env});
+  const auth=cApp.auth({persistence:"local"});
+  if(!(await auth.hasLoginState()))await auth.signInAnonymously();
+  cDb=cApp.database();cReady=true;return true;
+}
+/* 拉取指定日期的全员记录，合并进本地库 */
+async function cloudPull(d,manual){
+  const env=(cCfg().env||"").trim();
+  if(!env){if(manual)toast("请先填写云开发环境 ID");return 0;}
+  try{
+    if(manual)toast("正在从云端读取…");
+    await cInit();
+    const res=await cDb.collection(CLOUD_COLL).where({date:d}).limit(100).get();
+    const list=(res&&res.data)||[];
+    if(!DB.records[d])DB.records[d]={};
+    list.forEach(r=>{
+      const name=(r.agent||"未命名").trim()||"未命名";
+      DB.records[d][name]={agent:name,date:d,tasks:r.tasks||[],pans:r.pans||[],
+        report:r.report||{nums:{},texts:{}},review:r.review||null,goal:r.goal||"",
+        importedAt:r.updatedAt||new Date().toISOString()};
+    });
+    const cfg=cCfg();cfg.lastPull=new Date().toLocaleString("zh-CN");cSave(cfg);
+    saveDB();renderOverview();renderDetail();renderCloud();
+    if(manual)toast(list.length?("已拉取 "+list.length+" 人的数据"):"云端当日暂无数据");
+    return list.length;
+  }catch(err){
+    const full=cloudErrMsg(err);
+    const cfg=cCfg();cfg.lastErr=full;cSave(cfg);
+    if(manual)toast("拉取失败："+full.slice(0,46));
+    renderCloud();
+    return 0;
+  }
+}
+/* 拉取近 7 天，便于看历史与趋势 */
+async function cloudPull7(){
+  if(!(cCfg().env||"").trim()){toast("请先填写云开发环境 ID");return;}
+  toast("正在拉取近 7 天…");
+  let n=0;
+  const base=new Date(curDate()+"T00:00:00");
+  for(let i=6;i>=0;i--){
+    const dt=new Date(base.getTime()-i*864e5);
+    const ds=dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0");
+    n+=await cloudPull(ds,0);
+  }
+  toast("已拉取近 7 天共 "+n+" 条记录");
+}
+/* 兜底：读取晚间自动化生成的静态汇总文件 */
+async function pullSummary(){
+  const d=curDate();
+  try{
+    const r=await fetch("./data/summary-"+d+".json",{cache:"no-store"});
+    if(!r.ok)return false;
+    const j=await r.json();
+    const recs=(j&&j.records)||null;
+    if(!recs)return false;
+    if(!DB.records[d])DB.records[d]={};
+    Object.entries(recs).forEach(([name,rec])=>{
+      DB.records[d][name]=Object.assign({agent:name,date:d,tasks:[],pans:[]},rec);
+    });
+    saveDB();renderOverview();renderDetail();renderCloud();
+    return true;
+  }catch(e){return false;}
+}
+function renderCloud(){
+  const cfg=cCfg();
+  const tag=document.getElementById("cloudTag"),note=document.getElementById("cloudNote"),bar=document.getElementById("syncBar");
+  const inp=document.getElementById("cloudEnv");
+  if(inp&&document.activeElement!==inp)inp.value=cfg.env||"";
+  if(!cfg.env){
+    if(tag){tag.textContent="未配置";tag.className="tag warn";}
+    if(bar)bar.innerHTML="未配置云端：请在「数据」页填入云开发环境 ID，配置后经纪人提交的数据会自动同步过来。";
+    return;
+  }
+  if(cfg.lastErr){
+    if(tag){tag.textContent="同步异常";tag.className="tag warn";}
+    if(bar)bar.innerHTML="⚠️ 云端同步失败：<b>"+esc(cfg.lastErr)+"</b><br>本应用访问域名：<b>"+cloudDomain()+"</b>（需加入云开发 Web 安全域名白名单）";
+    return;
+  }
+  if(tag){tag.textContent=cfg.lastPull?("已连接 · "+cfg.lastPull):"已配置";tag.className="tag ok";}
+  if(bar)bar.innerHTML="云端已连接"+(cfg.lastPull?("　最近同步：<b>"+cfg.lastPull+"</b>"):"")+"　实时同步：经纪人提交后约25秒内自动刷新。"+
+    "<br>本应用访问域名：<b>"+cloudDomain()+"</b>（需加入云开发 Web 安全域名白名单）";
+}
+document.getElementById("cloudEnv").addEventListener("change",e=>{
+  const cfg=cCfg();cfg.env=e.target.value.trim();cSave(cfg);
+  if(cfg.env){cReady=false;cApp=null;cDb=null;cloudPull(curDate(),1);}
+  renderCloud();
+});
+
+/* ============ 启动 ============ */
+document.getElementById("datePick").value=TODAY;
+(function(){const t=new Date();t.setDate(t.getDate()+1);const m=String(t.getMonth()+1).padStart(2,"0"),d=String(t.getDate()).padStart(2,"0");const el=document.getElementById("nkDate");if(el)el.value=t.getFullYear()+"-"+m+"-"+d;})();
+loadDB();renderOverview();renderDetail();renderCloud();
+/* 今日内容录入：写入云集合 agent_knowledge，经纪人端知识页实时读取 */
+/* 三类内容共用一个发布函数：新房知识 / 视频文案 / 房产知识 */
+const KNOW_FIELDS={"新房知识":["nkNew","nkNewSrc"],"视频文案":["nkVideo","nkVideoSrc"]};   /* 房产知识/考核题改由资料库每日抽取，不在后台录入 */
+/* 一键排版：把粘贴进来的一坨文字整理成「段落 / 列表 / 【小标题】」的清晰结构 */
+function autoFormat(id){
+  const el=document.getElementById(id);if(!el)return;
+  let s=String(el.value||"").replace(/\r\n/g,"\n").trim();
+  if(!s){toast("请先粘贴内容");return;}
+  s=s.replace(/[ \t]+/g," ").replace(/\n{3,}/g,"\n\n");
+  /* 一坨无换行文字：按句末标点断行 */
+  const nl=(s.match(/\n/g)||[]).length;
+  if(nl<2&&s.length>120)s=s.replace(/([。！？；])([""'」』）】]?)/g,"$1$2\n");
+  /* 序号前强制换行；【小标题】单独成行 */
+  s=s.replace(/([^\n])\s*([0-9]{1,2}[.、)）]|[(（][0-9]{1,2}[)）]|[①②③④⑤⑥⑦⑧⑨⑩])\s*/g,"$1\n$2 ");
+  s=s.replace(/([^\n])\s*(【)/g,"$1\n$2");
+  s=s.split("\n").map(x=>x.trim()).filter((x,i,a)=>!(x===""&&a[i-1]==="")).join("\n");
+  el.value=s;toast("已排版，请检查后发布");
+}
+async function pushKnow(cat){
+  const f=KNOW_FIELDS[cat]||KNOW_FIELDS["新房知识"];
+  const be=document.getElementById(f[0]),se=document.getElementById(f[1]);
+  const body=(be&&be.value||"").trim();
+  const src=(se&&se.value||"").trim();
+  if(!body){toast("请先填写内容");return;}
+  const doc={cat,title:"",body,src:src||"",date:(document.getElementById("nkDate").value||curDate()),createdAt:new Date().toISOString()};
+  try{
+    await cInit();await cDb.collection("agent_knowledge").add(doc);toast(cat+"已发布，经纪人端实时可见");
+    if(be)be.value="";if(se)se.value="";
+  }catch(e){toast("发布失败："+(((e&&e.message)||"").slice(0,30)));}
+}
+
+/* ============ 全店好房分享（读云端 agent_houses，与经纪人端同源） ============ */
+let bossHouses=[];
+function bossHouseKey(h){
+  const c=String((h&&h.code)||"").trim();
+  if(c)return "c:"+c.toLowerCase();
+  return "k:"+[String((h&&h.community)||"").trim(),String((h&&h.price)||"").trim(),String((h&&h.layout)||"").trim()].join("|").toLowerCase();
+}
+function dedupeBoss(arr){
+  const m=new Map();
+  (arr||[]).forEach(h=>{
+    if(!h)return;
+    const k=bossHouseKey(h),o=m.get(k);
+    if(!o)m.set(k,h);
+    else if(String(h.createdAt||"")>String(o.createdAt||""))m.set(k,h);
+  });
+  return Array.from(m.values()).sort((a,b)=>String(b.createdAt||"").localeCompare(String(a.createdAt||"")));
+}
+function bossHouseCard(h){
+  const rent=h.type==="rent",col=rent?"#1f6feb":"#dc2626",bg=rent?"#e8f1fe":"#fdeaea";
+  return `<div class="house" style="border-left:4px solid ${col}">
+    <button class="delbtn" title="删除该房源" onclick="delBossHouse('${h._id||""}')">❌️</button>
+    <div class="ht">${esc(h.community||h.code||"")} <span class="tag" style="background:${bg};color:${col}">${rent?"出租":"出售"}</span></div>
+    <div class="kv"><b>房源编码</b><span style="text-align:right">${esc(h.code||"")}</span></div>
+    ${h.layout?`<div class="kv"><b>户型</b><span style="text-align:right">${esc(h.layout)}</span></div>`:""}
+    <div class="kv"><b>价格</b><span style="text-align:right;color:${col};font-weight:700">${esc(h.price||"")}</span></div>
+    <div class="kv"><b>发布人</b><span style="text-align:right">${esc(h.publisher||h.agent||"")}</span></div>
+  </div>`;
+}
+function renderBossHouses(){
+  const el=document.getElementById("bossHouseList");if(!el)return;
+  if(!bossHouses.length){el.innerHTML="<div class='muted'>暂无经纪人分享的房源。</div>";return;}
+  const g=(isRent,title)=>{
+    const arr=bossHouses.filter(h=>(h.type==="rent")===isRent);
+    return `<div style="font-weight:700;margin:10px 0 6px">${title}（${arr.length}）</div>`+(arr.length?arr.map(bossHouseCard).join(""):"<div class='muted'>暂无</div>");
+  };
+  el.innerHTML=g(false,"🔴 出售房源")+g(true,"🔵 出租房源");
+}
+async function pullBossHouses(manual){
+  try{
+    await cInit();
+    const res=await cDb.collection("agent_houses").limit(500).get();
+    bossHouses=dedupeBoss((res&&res.data)||[]);
+    renderBossHouses();
+    if(manual)toast("好房已刷新（共 "+bossHouses.length+" 套）");
+  }catch(e){
+    const el=document.getElementById("bossHouseList");
+    if(el)el.innerHTML="<div class='muted'>读取失败："+esc(((e&&e.message)||"").slice(0,40))+"</div>";
+    if(manual)toast("读取失败："+(((e&&e.message)||"").slice(0,30)));
+  }
+}
+async function delBossHouse(id){
+  if(!id){toast("该房源缺少云端 ID，无法删除");return;}
+  if(!confirm("确认删除这套房源？删除后所有经纪人端都会移除。"))return;
+  try{await cInit();await cDb.collection("agent_houses").doc(id).remove();toast("已删除");pullBossHouses(0);}
+  catch(e){toast("删除失败："+(((e&&e.message)||"").slice(0,30)));}
+}
+
+/* 启动后：云端优先，未配置则回落到静态汇总文件；并开启实时轮询 */
+(async function bootSync(){
+  const env=(cCfg().env||"").trim();
+  if(env){await cloudPull(curDate(),0);await pullBossHouses(0);}
+  else{await pullSummary();}
+  setInterval(()=>{
+    if((cCfg().env||"").trim()){cloudPull(curDate(),0);pullBossHouses(0);}
+  },25000);
+})();
+</script>
+</body>
+</html>

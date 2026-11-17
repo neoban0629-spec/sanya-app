@@ -1,0 +1,1904 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b4a9e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="妙妙屋经纪人">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>妙妙屋经纪人日程管理</title>
+<style>
+:root{
+  --bg:#f2f5f9; --card:#ffffff; --line:#e5e9f0; --txt:#1f2733; --sub:#6b7280;
+  --pri:#1f6feb; --pri-deep:#0b4a9e; --pri-soft:#e8f1fe;
+  --ok:#16a34a; --ok-soft:#e8f7ee; --warn:#d97706; --warn-soft:#fdf3e3;
+  --bad:#dc2626; --bad-soft:#fdecec; --radius:14px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{font-size:16px}
+body{font-family:"PingFang SC","HarmonyOS Sans","Microsoft YaHei",system-ui,sans-serif;background:var(--bg);color:var(--txt);padding-bottom:calc(64px + var(--safe-b));overscroll-behavior-y:contain}
+/* ===== 顶部 ===== */
+header{background:linear-gradient(135deg,var(--pri-deep),var(--pri));color:#fff;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 14px;position:sticky;top:0;z-index:20;box-shadow:0 2px 10px rgba(11,74,158,.25)}
+header .row1{display:flex;align-items:center;justify-content:space-between}
+header h1{font-size:17px;font-weight:700}
+header .datebox{display:flex;align-items:center;gap:8px}
+header input[type=date]{border:none;border-radius:8px;padding:5px 8px;font-size:13px;color:#1f2733;background:#fff}
+header .tag{font-size:11px;background:rgba(255,255,255,.22);padding:3px 9px;border-radius:10px}
+header .sub{font-size:11px;opacity:.85;margin-top:4px}
+/* ===== 主体 ===== */
+.page{display:none;padding:12px 12px 20px}
+.page.on{display:block;animation:fade .18s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(31,39,51,.04)}
+.card h3{font-size:15px;margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tag{font-size:11px;font-weight:normal;padding:3px 9px;border-radius:10px}
+.pri{background:var(--pri-soft);color:var(--pri)}
+.dy{background:#f5ecfd;color:#8b3fbf}
+.ok{background:var(--ok-soft);color:var(--ok)}
+.warn{background:var(--warn-soft);color:var(--warn)}
+.bad{background:var(--bad-soft);color:var(--bad)}
+input[type=text],input[type=number],textarea,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:15px;font-family:inherit;background:#fff;color:var(--txt)}
+input:focus,textarea:focus{outline:none;border-color:var(--pri)}
+textarea{resize:vertical;min-height:64px;line-height:1.6}
+.btn{display:inline-block;border:none;border-radius:10px;padding:11px 18px;font-size:14px;cursor:pointer;background:var(--pri);color:#fff;font-family:inherit}
+.btn:active{opacity:.82}
+.btn.ghost{background:#fff;color:var(--pri);border:1px solid var(--pri)}
+.btn.gray{background:#eef1f5;color:var(--txt)}
+.btn.sm{padding:6px 12px;font-size:13px;border-radius:8px}
+.btn.block{display:block;width:100%;text-align:center;font-size:15px;padding:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bar{height:8px;background:#e8ecf2;border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok);border-radius:4px;transition:width .3s}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13px;line-height:1.6}
+.kv b{font-weight:600;flex-shrink:0}
+.big{font-size:26px;font-weight:700;color:var(--pri)}
+.note{font-size:12px;color:var(--sub);line-height:1.8;background:#f6f8fb;border-radius:10px;padding:10px 12px;margin-top:10px}
+.muted{color:var(--sub);font-size:12px}
+.q{background:#f6f8fb;border-left:3px solid var(--pri);padding:10px 12px;border-radius:0 10px 10px 0;margin:8px 0;font-size:13px;line-height:1.8;word-break:break-all}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:13px;color:var(--sub);margin-bottom:5px;font-weight:600}
+.hidden{display:none}
+.stat{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+.stat .s{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 10px;text-align:center}
+.stat .s .n{font-size:24px;font-weight:700}
+.stat .s .l{font-size:12px;color:var(--sub);margin-top:2px}
+/* ===== 任务条目（移动端卡片式） ===== */
+.trow{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;background:#fff}
+.trow .t1{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.trow .tname{font-size:14px;font-weight:600}
+.trow .ttarget{font-size:12px;color:var(--sub)}
+.trow .t2{display:flex;align-items:center;gap:10px}
+.stepbtn{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:#fff;font-size:20px;color:var(--pri);flex-shrink:0;font-family:inherit}
+.stepbtn:active{background:var(--pri-soft)}
+.trow input[type=number]{width:84px;text-align:center;font-weight:700;padding:8px 4px}
+.trow .tpct{font-size:13px;font-weight:700;width:44px;text-align:right;flex-shrink:0}
+.trow .bar{flex:1}
+/* ===== 房源/知识卡片 ===== */
+.house{border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:11px;background:#fff;position:relative}
+.house .ht{font-weight:700;font-size:14px;margin-bottom:6px;line-height:1.5}
+.house .hprice{color:var(--bad);font-weight:700;font-size:13px;display:block;margin:2px 0 6px}
+.price{color:var(--bad);font-weight:700}
+/* ===== 底部导航 ===== */
+nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);display:flex;z-index:30;padding-bottom:var(--safe-b)}
+nav .nv{flex:1;text-align:center;padding:7px 0 5px;font-size:10.5px;color:var(--sub);cursor:pointer}
+nav .nv .ic{font-size:21px;display:block;line-height:1.2}
+nav .nv.on{color:var(--pri);font-weight:700}
+.toast{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);background:rgba(31,39,51,.92);color:#fff;padding:9px 20px;border-radius:20px;font-size:13px;z-index:99;opacity:0;transition:opacity .3s;pointer-events:none;max-width:86%;text-align:center}
+.footer{text-align:center;color:var(--sub);font-size:11px;padding:14px 0 6px;line-height:1.7}
+a{color:var(--pri)}
+.dimrow{padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.dimrow .d1{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.dimrow .d1 b{font-weight:600}
+.dimrow .d1 .sc{font-weight:700;color:var(--pri)}
+.dimrow input[type=range]{width:100%;height:32px}
+.notify{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:10px;right:10px;z-index:98;background:linear-gradient(135deg,#0b4a9e,#1f6feb);color:#fff;padding:12px 14px;border-radius:12px;font-size:13.5px;line-height:1.5;box-shadow:0 4px 16px rgba(11,74,158,.35);display:flex;align-items:center;gap:10px}
+.notify #notifyText{flex:1}
+.notify button{flex-shrink:0;border:none;background:rgba(255,255,255,.25);color:#fff;width:26px;height:26px;border-radius:50%;font-size:16px;cursor:pointer;line-height:1}
+/* ===== 房源删除按钮 + 核销确认弹窗 ===== */
+.delbtn{position:absolute;top:8px;right:8px;border:none;background:transparent;font-size:16px;cursor:pointer;line-height:1;opacity:.6;padding:4px}
+.delbtn:active{opacity:1}
+.btn.bad{background:var(--bad);color:#fff}
+.btn.bad:active{opacity:.82}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
+.modal.on{display:flex}
+.modal-box{background:#fff;border-radius:14px;padding:18px;max-width:340px;width:100%}
+.modal-t{font-size:16px;font-weight:700;margin-bottom:10px}
+.modal-m{font-size:14px;line-height:1.8;color:var(--txt);white-space:pre-line}
+/* ===== 签单惊喜 · 盲盒抽奖 ===== */
+.lucky{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:70;padding:18px}
+.lucky.on{display:flex}
+.lucky-box{background:#fff;border-radius:18px;padding:20px 18px;max-width:360px;width:100%;text-align:center;max-height:86vh;overflow:auto}
+.lk-title{font-size:20px;font-weight:800;color:var(--pri-deep);margin:4px 0 8px}
+.lk-sub{font-size:13px;color:var(--sub);line-height:1.9;margin-bottom:8px}
+.lk-confetti{position:relative;height:64px;overflow:hidden;margin:4px 0 8px}
+.lk-confetti span{position:absolute;top:-24px;font-size:20px;animation:lkfall linear infinite}
+@keyframes lkfall{0%{transform:translateY(-6px) rotate(0);opacity:0}15%{opacity:1}100%{transform:translateY(88px) rotate(320deg);opacity:0}}
+.lk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.lk-item{border:none;border-radius:12px;padding:12px 4px;background:linear-gradient(135deg,#ff9a3c,#ff5f6d);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px rgba(255,95,109,.28);min-height:84px}
+.lk-item:active{transform:scale(.96)}
+.lk-item .lk-no{font-size:11px;opacity:.92;line-height:1.3;padding:0 2px}
+.lk-item.open{background:#fff;color:var(--txt);box-shadow:inset 0 0 0 2px var(--pri)}
+.lk-prize-n{font-size:17px;font-weight:800;color:var(--pri-deep);margin-top:6px;line-height:1.5}
+/* ===== 5 秒接红包挑战 ===== */
+.rb-hud{display:flex;gap:7px;margin:10px 0 8px}
+.rb-hud-i{flex:1;background:#fff6f5;border:1px solid #ffdcd6;border-radius:10px;padding:5px 2px;font-size:11px;color:#b0453a;line-height:1.4}
+.rb-hud-i b{display:block;font-size:19px;font-weight:900;color:#e02020;line-height:1.35;font-variant-numeric:tabular-nums}
+.rb-arena{position:relative;height:300px;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,#ff7a5e 0%,#e02d12 55%,#b3140a 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)}
+.rb-arena:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% -10%,rgba(255,226,150,.4),transparent 62%)}
+.rb{position:absolute;width:38px;height:46px;margin-left:-19px;z-index:2;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;background:linear-gradient(180deg,#ffe08a,#f6a623);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 3px 8px rgba(0,0,0,.26)}
+.rb i{position:absolute;top:-7px;left:50%;margin-left:-13px;width:26px;height:13px;background:#ffdf7a;border-radius:14px 14px 4px 4px}
+.rb span{position:relative;z-index:1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.2))}
+.rb.got{animation:rbPop .26s ease-out forwards;pointer-events:none}
+@keyframes rbPop{0%{transform:scale(1)}100%{transform:scale(1.7);opacity:0}}
+/* 掉落物类型：炸弹 / 小猫 / 白菜（干扰项） */
+.rb-bomb{background:linear-gradient(180deg,#6d7683,#2b323b);width:42px;height:42px;border-radius:50%;margin-left:-21px;box-shadow:0 3px 10px rgba(0,0,0,.4)}
+.rb-bomb i{display:none}
+.rb-bomb span{font-size:22px}
+.rb-cat{background:linear-gradient(180deg,#ffe9c9,#f0c07c)}
+.rb-cab{background:linear-gradient(180deg,#dcf7cd,#8fce6a)}
+/* 特效层：爆炸闪光 + 烟雾遮挡 + 飘字 */
+.rb-fx{position:absolute;z-index:5;pointer-events:none}
+.rb-smoke{inset:0;background:radial-gradient(circle at 50% 55%,rgba(255,246,214,.94),rgba(255,178,110,.62) 45%,rgba(90,70,55,.5) 100%);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);animation:rbSmoke 1.2s ease-out forwards}
+@keyframes rbSmoke{0%{opacity:0}10%{opacity:1}100%{opacity:0}}
+.rb-flash{inset:0;background:#fff;animation:rbFlash .5s ease-out forwards}
+@keyframes rbFlash{0%{opacity:.9}100%{opacity:0}}
+.rb-float{font-size:14px;font-weight:900;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,.55);white-space:nowrap;animation:rbFloatUp .72s ease-out forwards}
+@keyframes rbFloatUp{0%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-40px)}}
+.rb-tip{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-size:58px;font-weight:900;text-shadow:0 4px 14px rgba(0,0,0,.38);pointer-events:none}
+.rb-tip small{font-size:13px;font-weight:700;opacity:.95;margin-top:4px;letter-spacing:1px}
+.rb-foot{font-size:12px;color:var(--sub);margin-top:8px;line-height:1.7}
+.rb-amt-big{font-size:44px;font-weight:900;color:#e02020;line-height:1.2;font-variant-numeric:tabular-nums}
+.lk-note{font-size:12.5px;color:var(--sub);line-height:1.9;background:#f6f8fb;border-radius:10px;padding:10px 12px;margin-top:10px}
+
+/* ===== iPhone 专属：引导条 + 备份提醒 ===== */
+.iosbar{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:70;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;box-shadow:0 6px 20px rgba(0,0,0,.12);display:none}
+.iosbar.on{display:block}
+.iosbar .x{position:absolute;top:8px;right:10px;border:none;background:none;font-size:18px;color:var(--sub);cursor:pointer;line-height:1}
+.iosbar h4{margin:0 0 6px;font-size:14px}
+.iosbar p{margin:0;font-size:13px;color:var(--sub);line-height:1.6}
+.iosbar .btn{margin-top:8px}
+</style>
+</head>
+<body>
+<header>
+  <div class="row1">
+    <h1>🏠 妙妙屋经纪人日程管理</h1>
+    <div class="datebox"><input type="date" id="datePick"><span class="tag" id="todayTag">今天</span></div>
+  </div>
+  <div class="sub">任务 → 执行 → 数据 → 总结 → AI复盘 → 明日任务 ｜ 数据保存在本机</div>
+</header>
+
+<div class="iosbar" id="iosGuide">
+  <button class="x" onclick="dismissBackup('iosGuide')">×</button>
+  <h4>📲 添加到主屏幕，体验最佳</h4>
+  <p>iPhone 用户建议：点 Safari 底部「分享」→「添加到主屏幕」，即可全屏使用、接收系统通知，数据也更不容易丢。</p>
+  <button class="btn block" onclick="dismissBackup('iosGuide')">我知道了</button>
+</div>
+<div class="iosbar" id="iosBackup">
+  <button class="x" onclick="dismissBackup('iosBackup')">×</button>
+  <h4>💾 记得每周备份一次</h4>
+  <p>Safari 本地数据可能被系统清理。建议：进「复盘」页定期「导出全部数据（备份）」存到微信/文件 App，换机或重装可一键恢复。</p>
+  <button class="btn block" onclick="dismissBackup('iosBackup')">已了解</button>
+</div>
+
+<!-- ================= 今日任务 ================= -->
+<div class="page on" id="p-task">
+  <div class="card">
+    <h3>经纪人信息 <span class="tag pri">统计必填</span></h3>
+    <div class="field"><label>经纪人姓名</label><input type="text" id="agentName" placeholder="请填写经纪人姓名，日报与统计将自动署名"></div>
+    <div class="note" style="margin-top:4px">姓名填写一次即可自动保存；日报导出、复盘报告、跑盘记录与能力统计均自动署名，便于门店汇总统计。</div>
+    <div class="row" style="margin-top:8px;align-items:center">
+      <button class="btn sm" onclick="enableNotify()">🔔 开启每日提醒通知</button>
+      <span class="muted" id="notifyState" style="font-size:12px"></span>
+    </div>
+  </div>
+  <div class="card">
+    <h3>今日核心目标 <span class="tag pri">AI 每日设定</span></h3>
+    <textarea id="goal" readonly style="background:#f6f8fb;color:var(--txt)" placeholder="例如：建立三亚市场基本盘认知，能对客户讲清市区刚需盘与湾区旅居盘的价格差异"></textarea>
+  </div>
+  <div class="card">
+    <h3>今日量化任务 <span class="tag pri">目标 vs 实际</span></h3>
+    <div id="taskList"></div>
+    <div class="note" style="margin-top:6px">任务内容每日由 AI 固定下发，经纪人只需记录实际完成（＋/－ 计数），不能增删改任务。</div>
+    <div class="row" style="margin-top:12px">
+      <div class="bar" style="flex:1;height:14px"><i id="taskBar"></i></div>
+      <span id="taskPct" class="big" style="font-size:18px">0%</span>
+    </div>
+    <div class="note">「实际完成」用 ＋/－ 按钮随时快速计数，提交日报时数据自动带入，无需重复填写。</div>
+  </div>
+  <div class="card">
+    <h3>今日完成标准</h3>
+    <div class="note">所有任务量化可检验，禁止「多开发客户」这类模糊表述。当日未达标项将在晚间复盘中重点分析。</div>
+  </div>
+</div>
+
+<!-- ================= 今日好房 ================= -->
+<div class="page" id="p-house">
+  <div class="card">
+    <h3>经纪人好房分享 <span class="tag pri">实时·全店可见</span></h3>
+    <div class="muted" style="margin-bottom:10px;line-height:1.7">全店经纪人共享，出租蓝 / 出售红。点击「＋ 新增好房分享」发布，所有经纪人打开即见。</div>
+    <button class="btn block" onclick="openHouseForm()">＋ 新增好房分享</button>
+    <!-- 表单紧随按钮下方，且位于房源列表之前：房源再多也不会被淹没 -->
+    <div class="hidden" id="houseForm" style="margin-top:10px;padding:12px;background:var(--pri-soft);border-radius:12px">
+      <h3 style="font-size:14px;margin-bottom:2px">新增好房分享</h3>
+      <div class="muted" style="font-size:12px;margin-bottom:8px">请先选择房源类型（必选），点哪个哪个高亮</div>
+      <div class="row" style="margin-bottom:10px">
+        <button class="btn sm ghost" id="hfRent" onclick="setHouseType('rent')">出租（蓝）</button>
+        <button class="btn sm ghost" id="hfSale" onclick="setHouseType('sale')">出售（红）</button>
+      </div>
+      <div class="field"><label>发布人</label><input type="text" id="hfPublisher" placeholder="填写发布人姓名"></div>
+      <div class="grid2">
+        <div class="field"><label>房源编码</label><input type="text" id="hfCode" placeholder="如：FY20260831-01"></div>
+        <div class="field"><label>小区名称</label><input type="text" id="hfCommunity" placeholder="如：红树洲"></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>户型</label><input type="text" id="hfLayout" placeholder="如：3室2厅"></div>
+        <div class="field"><label>面积</label><input type="text" id="hfArea" placeholder="如：95㎡"></div>
+      </div>
+      <div class="field"><label>价格</label><input type="text" id="hfPrice" placeholder="如：120万 或 4500元/月"></div>
+      <div class="row" style="margin-top:4px">
+        <button class="btn block" onclick="submitHouse()">发布到全店</button>
+        <button class="btn gray block" onclick="closeHouseForm()">取消</button>
+      </div>
+    </div>
+    <div id="shareSyncBar" class="note" style="margin-top:8px"></div>
+    <div id="shareList" style="margin-top:12px"></div>
+  </div>
+  <div class="card">
+    <h3>今日好房（每日 10 套 · AI 精选）</h3>
+    <div class="muted" style="margin-bottom:10px;line-height:1.7">房源由 AI 每日检索固定下发，经纪人不能增删改。</div>
+    <div id="houseList"></div>
+  </div>
+</div>
+
+<!-- ================= 跑盘 ================= -->
+<div class="page" id="p-pan">
+  <div class="card">
+    <h3>跑盘记录 <span class="tag pri">实地踩盘填写</span></h3>
+    <div class="muted" style="margin-bottom:10px;line-height:1.7">每跑一个小区就新增一条记录，实地逐项填写。如实填写、禁止编造。<b style="color:var(--bad)">「小区名称」为必填项</b>（不填无法提交），物业电话等其余项鼓励补全但不强制；填完一定要点<b>「✓ 提交该条跑盘」</b>才算完成；未提交的跑盘不会录入公司资料库，日报也会拦住不让交。</div>
+    <div id="panList"></div>
+    <button class="btn gray block" style="margin-top:4px" onclick="addPan()">＋ 新增跑盘小区</button>
+  </div>
+
+  <!-- ===== 跑盘信息查询：查全店已录入的小区 ===== -->
+  <div class="card" style="margin-top:10px">
+    <h3>🔍 跑盘信息查询 <span class="tag ok">全店共享</span></h3>
+    <div class="muted" style="margin-bottom:10px;line-height:1.7">查全店已提交并录入资料库的跑盘记录，支持小区名称模糊搜索（也可搜配套、户型等任意字段）。<b>不填关键词点查询</b>，可浏览最近 20 条录入。</div>
+    <div class="field"><label>小区名称 / 关键词</label>
+      <input type="text" id="panQuery" placeholder="如：凤凰水城、一山湖" onkeydown="if(event.key==='Enter')panSearch()">
+    </div>
+    <div class="row">
+      <button class="btn block" style="flex:1" onclick="panSearch()">🔍 查询已录入跑盘</button>
+      <button class="btn ghost sm" onclick="panSearchRefresh()">↻ 刷新</button>
+    </div>
+    <div id="panSearchResult" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<!-- ================= 房产知识 ================= -->
+<div class="page" id="p-know">
+  <div class="card">
+    <h3>知识与文案 <span class="tag pri">可看往期</span></h3>
+    <div class="field"><label>内容分类</label>
+      <select id="knowCat" onchange="renderKnowCat()">
+        <option value="prop">房产知识</option>
+        <option value="new">新房知识</option>
+        <option value="video">视频文案</option>
+      </select>
+    </div>
+    <div class="field"><label>查看日期（可往前翻看往期内容）</label>
+      <div class="row">
+        <button class="btn sm ghost" onclick="knowShift(-1)">‹ 前一天</button>
+        <input type="date" id="knowDate" onchange="renderKnowCat()" style="flex:1;min-width:120px;border:1px solid var(--line);border-radius:8px;padding:7px 8px;font-size:14px">
+        <button class="btn sm ghost" onclick="knowShift(1)">后一天 ›</button>
+      </div>
+    </div>
+    <div class="row" style="justify-content:space-between;margin-top:2px">
+      <span class="muted" id="knowDateHint" style="font-size:12px"></span>
+      <button class="btn sm ghost" onclick="knowToday()">回到今天</button>
+    </div>
+    <div id="knowCatBody" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<!-- ================= 日报提交 ================= -->
+<div class="page" id="p-report">
+  <div class="card">
+    <h3>新人每日工作总结 <span class="tag warn">22:00 前提交</span></h3>
+    <h3 style="font-size:13px;color:var(--sub)">一、今日总结</h3>
+    <div id="reportTexts" style="margin-top:8px"></div>
+    <h3 style="font-size:13px;color:var(--sub);margin-top:14px">二、今日房产知识测验 <span class="tag pri" id="quizCount"></span></h3>
+    <div class="note" style="margin-top:6px">结合今日房产知识出题，提交日报后显示正确答案；最终 AI 复盘会统计正确率。请独立完成。</div>
+    <div id="quizBox" style="margin-top:8px"></div>
+    <button class="btn block" style="margin-top:8px" onclick="submitReport()">提交日报 · 生成AI复盘</button>
+    <button class="btn ghost block" style="margin-top:8px" onclick="copyReport()">复制为 Markdown</button>
+  </div>
+</div>
+
+<!-- ================= AI复盘 ================= -->
+<div class="page" id="p-review">
+  <div class="card">
+    <h3>AI 复盘 <span class="tag pri" id="rvStatus">待日报提交</span></h3>
+    <div class="stat" id="rvStat"></div>
+    <div id="rvBody"></div>
+    <button class="btn ghost block" style="margin-top:8px" onclick="genReview()">重新生成复盘</button>
+    <button class="btn ghost block" style="margin-top:8px" onclick="copyReview()">复制复盘报告</button>
+  </div>
+  <div class="note" style="text-align:center;font-size:12px;color:var(--ok)">✅ 数据已自动同步至云端，店长在管理后台实时查看，无需手动操作。</div>
+</div>
+
+<div class="footer">妙妙屋经纪人日程管理<br>闭环：任务→执行→数据→总结→AI复盘→明日任务</div>
+
+<!-- ================= 底部导航 ================= -->
+<nav id="nav">
+  <div class="nv on" data-t="task"><span class="ic">📋</span>任务</div>
+  <div class="nv" data-t="house"><span class="ic">🏡</span>好房</div>
+  <div class="nv" data-t="know"><span class="ic">📚</span>知识</div>
+  <div class="nv" data-t="pan"><span class="ic">🧭</span>跑盘</div>
+  <div class="nv" data-t="report"><span class="ic">📝</span>日报</div>
+  <div class="nv" data-t="review"><span class="ic">🔍</span>复盘</div>
+</nav>
+<!-- 每日提醒已改为系统通知，不再使用站内横幅 -->
+<div class="toast" id="toast"></div>
+<div class="modal" id="delModal">
+  <div class="modal-box">
+    <div class="modal-t">删除房源确认</div>
+    <div class="modal-m" id="delMsg">是否已联系业主核实，确认核销？</div>
+    <div class="row" style="justify-content:flex-end;margin-top:14px">
+      <button class="btn gray" onclick="closeDel()">取消</button>
+      <button class="btn bad" onclick="confirmDel()">确认核销</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 签单惊喜 · 5 秒接红包挑战 ===== -->
+<div class="lucky" id="luckyModal">
+  <div class="lucky-box">
+    <!-- 第一步：恭喜 -->
+    <div id="lkCele">
+      <div class="lk-title">🎉 恭喜签单！</div>
+      <div class="lk-confetti" id="lkConfetti"></div>
+      <div class="lk-sub" id="lkCeleSub">今日签单达成，完成率 <b>100%</b><br>老板给你准备了一份惊喜，来接红包吧！</div>
+      <button class="btn block" onclick="lkGoDraw()">🧧 开始接红包挑战</button>
+      <button class="btn ghost block" style="margin-top:8px" onclick="lkClose()">稍后再玩</button>
+    </div>
+    <!-- 第二步：5 秒接红包 -->
+    <div id="lkDraw" class="hidden">
+      <div class="lk-title">🧧 5 秒接红包挑战</div>
+      <div class="lk-sub" id="lkDrawSub">🧧 点红包越多金额越大<br>小心 <b>💣 炸弹</b>（倒扣 1 个 + 挡视线），<b>🐱 🥬</b> 是来捣乱的</div>
+      <div class="rb-hud">
+        <div class="rb-hud-i"><span>剩余</span><b id="rbTime">5.0</b><span>秒</span></div>
+        <div class="rb-hud-i"><span>接到</span><b id="rbCnt">0</b><span>个</span></div>
+        <div class="rb-hud-i"><span>金额</span><b id="rbAmt">0.00</b><span>元</span></div>
+      </div>
+      <div class="rb-arena" id="rbArena">
+        <div class="rb-tip" id="rbTip"></div>
+      </div>
+      <div class="rb-foot">🧧 接到 +1 ｜ 💣 炸弹倒扣并挡视线 ｜ 🐱🥬 白点，不计分</div>
+    </div>
+    <!-- 第三步：开奖 -->
+    <div id="lkResult" class="hidden">
+      <div class="lk-title" id="lkResTitle">🎉 恭喜！</div>
+      <div class="lk-prize" id="lkResPrize"></div>
+      <div class="lk-note" id="lkResNote"></div>
+      <div id="lkPrizeList" style="margin-top:10px;text-align:left"></div>
+      <button class="btn block" id="lkAgainBtn" style="margin-top:12px;display:none" onclick="lkGoDraw()">🎁 再抽一次</button>
+      <button class="btn block" style="margin-top:12px" onclick="lkClose()">收下啦，谢谢老板！</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ 数据模型 ============ */
+const TODAY = new Date().toISOString().slice(0,10);
+const DIMS = ["客户开发","电话沟通","客户跟进","房源开发","房源维护","房源分析","带看能力","议价能力","新房知识","二手房知识","三亚区域知识","房产政策知识","销售话术","执行力","学习能力"];
+const NUM_FIELDS = ["电话开发量","新增有效客户","有效客户跟进","带看量","空看房源","新增有效房源","收取业主钥匙","有效实勘","贝壳分变化","业主议价","客户好评","自媒体内容"];
+const TEXT_QS = ["今天完成最好的一件事情？","今天遇到的最大问题？","今天学会了什么？","今天哪个客户最值得继续跟进？","今天哪个房源最值得研究？","今天哪个环节做得不好？","明天准备重点完成什么？"];
+const TASK_MAP = {"电话开发量":"电话开发","新增有效客户":"新增有效客户","有效客户跟进":"客户跟进","带看量":"带看","空看房源":"空看","新增有效房源":"新增有效房源","有效实勘":"实勘"};
+
+function defaultTasks(){return [
+  {n:"电话开发（通）",t:240},{n:"新增有效客户（个）",t:2},{n:"客户跟进（组）",t:10},
+  {n:"带看（组）",t:1},{n:"空看（套）",t:2},{n:"实勘（套）",t:1},
+  {n:"新增有效房源（套）",t:2},{n:"房源维护（套）",t:5},{n:"业主沟通（组）",t:30},
+  {n:"视频拍摄（条）",t:1},{n:"AGC拍摄（条）",t:1},{n:"签单（单）",t:1}
+].map(x=>({...x,a:0}));}
+/* 任务升级：保留已记录的实际值 a，补齐新增任务并同步最新目标 t。
+   —— 已存在（已存储）的某天数据不会因任务模板更新而丢失进度，也能拿到新任务。 */
+function mergeTasks(){
+  const def=defaultTasks(),cur=D.tasks||[];
+  const map={};cur.forEach(t=>{map[t.n]=t;});
+  const defNames=new Set(def.map(d=>d.n));
+  const out=def.map(d=>{
+    const old=map[d.n];
+    return old?{n:d.n,t:d.t,a:Math.max(0,Number(old.a)||0)}:d;
+  });
+  cur.forEach(t=>{if(!defNames.has(t.n))out.push(t);});
+  D.tasks=out;save();
+}
+
+/* 房源池（30套）：每天从中轮转展示不同房源，避免「今天就是前天的房子」。
+   注意：此为内部练习参考数据，带看前须核实在售状态与产权，勿直接用于报价。 */
+function defaultHouses(){return [
+  {name:"红树洲",info:"吉阳区 · 3室2厅 · 95㎡ · 120万（12,632元/㎡）",pros:"大社区、绿化好、管理到位；3房刚需户型",cons:"楼龄楼层需核实；小区维护情况待确认",why:"单价约为全市均价的57%，120万在吉阳区拿下95㎡三房",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"和泓·假日阳光",info:"吉阳区吉阳大道 · 2室2厅 · 78㎡ · 87万（11,099元/㎡）",pros:"小区大、绿化好；市区成熟配套",cons:"楼龄相对老；2房不适合大家庭",why:"总价87万、单价约1.1万/㎡，预算有限刚需的重点选择",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"万科湖畔度假公园二期",info:"吉阳区 · 2室2厅 · 63㎡ · 82万（13,021元/㎡）",pros:"万科品牌、新装修拎包入住、诚心出售好议价",cons:"面积小；度假社区入住率季节性波动",why:"同小区可比最低价，一期同面积挂牌88-92万",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"鸿坤山海墅",info:"吉阳区迎宾路 · 2室2厅 · 63㎡ · 109万（17,302元/㎡）",pros:"精装两室、采光好、满五唯一（免个税）、急售好谈价",cons:"山景非海景；小区挂牌量较多需核实竞争",why:"急售+满五唯一双重谈判筹码，练议价的优质标的",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"三亚山水国际",info:"吉阳区 · 3室2厅 · 118㎡ · 165万（13,983元/㎡）",pros:"大三房、社区成熟、靠近市区配套",cons:"总价偏高；需核实产权与抵押情况",why:"118㎡三房165万，改善型家庭自住的实用面积段",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"卓达东方巴哈马",info:"吉阳区 · 2室2厅 · 88㎡ · 128万（14,545元/㎡）",pros:"社区环境好、户型方正、配套齐全",cons:"楼龄约十年以上；单价在同区偏高",why:"88㎡两房128万，吉阳区中间价位段的稳妥选择",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"金鸡岭花园",info:"吉阳区 · 2室1厅 · 70㎡ · 78万（11,143元/㎡）",pros:"总价低、刚需上车门槛低、生活配套近",cons:"小区偏旧；户型一般",why:"78万买市区两房，预算极有限客户的过渡首选",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"海螺馨苑",info:"吉阳区 · 3室2厅 · 105㎡ · 142万（13,524元/㎡）",pros:"三房户型、社区密度低、居住舒适",cons:"位置略偏；通勤需考量",why:"105㎡三房142万，同面积段里单价有优势",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"荔枝苑小区",info:"吉阳区 · 2室2厅 · 82㎡ · 96万（11,707元/㎡）",pros:"单价低、生活便利、出租需求稳定",cons:"小区较老；升值空间有限",why:"82㎡两房96万，兼顾自住与出租的性价比盘",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"万科森林度假公园",info:"吉阳区 · 1室1厅 · 48㎡ · 62万（12,917元/㎡）",pros:"品牌物业、总价低、度假氛围好",cons:"一房功能单一；不适合家庭居住",why:"62万低总价，适合单身过冬或投资出租",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"西沙海景花园",info:"天涯区三亚湾 · 1室0厅 · 64㎡ · 65万（10,166元/㎡）",pros:"住宅产权、朝南看海、拎包入住",cons:"一室功能单一；三亚湾淡季空置率高",why:"全市单价最低梯队+朝南海景+住宅产权，65万海景过冬房",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"三亚湾美丽新海岸",info:"天涯区 · 2室2厅 · 85㎡ · 135万（15,882元/㎡）",pros:"近三亚湾、看海、社区较新",cons:"单价偏高；旅游区相对嘈杂",why:"85㎡两房135万，海景与实用性兼顾",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"鲁能三亚湾新城",info:"天涯区 · 3室2厅 · 120㎡ · 188万（15,667元/㎡）",pros:"大三房、品牌开发商、配套完善",cons:"总价高；持有成本较高",why:"120㎡三房188万，改善型一步到位",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"海坡度假村",info:"天涯区 · 1室1厅 · 45㎡ · 58万（12,889元/㎡）",pros:"总价低、近海、出租灵活",cons:"面积小；产权性质需重点核实",why:"58万一房，最低门槛的海景投资标的",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"金水湾",info:"天涯区 · 2室2厅 · 76㎡ · 105万（13,816元/㎡）",pros:"两房实用、生活配套成熟、价格中等",cons:"非一线海景；小区偏旧",why:"76㎡两房105万，自住刚需的务实选择",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"汇凯花园",info:"天涯区 · 2室2厅 · 89㎡ · 118万（13,258元/㎡）",pros:"户型方正、社区安静、适合长住",cons:"离海较远；度假属性弱",why:"89㎡两房118万，本地生活型客户优选",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"蓝色海岸小区",info:"天涯区 · 1室1厅 · 52㎡ · 70万（13,462元/㎡）",pros:"小户型、低总价、易出租",cons:"一房局限；升值空间一般",why:"52㎡一房70万，投资出租的入门款",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"三亚湾红树林",info:"天涯区 · 2室2厅 · 92㎡ · 158万（17,174元/㎡）",pros:"一线海湾、品牌社区、度假感强",cons:"单价高；淡旺季差异大",why:"92㎡两房158万，度假+出租双属性",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"海棠湾仁恒皇冠",info:"海棠区 · 2室2厅 · 110㎡ · 420万（38,182元/㎡）",pros:"顶豪配置、管家服务、免税城配套",cons:"总价极高；持有成本高",why:"110㎡两房420万，高端度假客户的标杆盘",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"保利海棠湾",info:"海棠区 · 3室2厅 · 145㎡ · 560万（38,620元/㎡）",pros:"品牌豪宅、园林好、私密性高",cons:"总价高；流动性较弱",why:"145㎡三房560万，顶豪改善一步到位",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"海棠华著",info:"海棠区 · 2室2厅 · 98㎡ · 350万（35,714元/㎡）",pros:"品质社区、户型合理、近海棠湾",cons:"单价高；出租回报一般",why:"98㎡两房350万，预算中等的度假升级选择",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"亚特兰蒂斯公寓",info:"海棠区 · 1室1厅 · 68㎡ · 320万（47,059元/㎡）",pros:"地标配套、酒店式服务、稀缺性强",cons:"单价最高；面积偏小",why:"68㎡一房320万，稀缺地标资产",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"海棠湾阳光壹",info:"海棠区 · 2室2厅 · 105㎡ · 385万（36,667元/㎡）",pros:"品牌开发商、社区新、配套全",cons:"总价高；需核实交付标准",why:"105㎡两房385万，度假自住的平衡选择",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"海棠湾君御",info:"海棠区 · 3室2厅 · 160㎡ · 680万（42,500元/㎡）",pros:"大三房、一线资源、圈层纯粹",cons:"总价极高；受众面窄",why:"160㎡三房680万，顶豪客户的终极改善",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"崖州湾科技城公寓",info:"崖州区 · 2室2厅 · 78㎡ · 88万（11,282元/㎡）",pros:"产业人口支撑、租赁需求稳、总价低",cons:"离市区远；配套尚在完善",why:"78㎡两房88万，租售比有支撑的产业盘",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"保利崖州湾",info:"崖州区 · 3室2厅 · 98㎡ · 125万（12,755元/㎡）",pros:"品牌开发商、户型好、社区较新",cons:"位置偏远；通勤时间长",why:"98㎡三房125万，产业人口自住首选",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"招商崖州湾花园",info:"崖州区 · 2室2厅 · 85㎡ · 102万（12,000元/㎡）",pros:"央企开发、配套在建、价格低",cons:"成熟度不足；需长期持有",why:"85㎡两房102万，看产业落地的提前布局",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"南繁安居房",info:"崖州区 · 2室1厅 · 68㎡ · 72万（10,588元/㎡）",pros:"总价最低、刚需上车、政策支持",cons:"交易限制需核实；位置偏",why:"68㎡两房72万，预算极有限的入场券",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"崖州古城小区",info:"崖州区 · 3室2厅 · 110㎡ · 118万（10,727元/㎡）",pros:"面积大、单价低、生活成本低",cons:"楼龄老；增值较慢",why:"110㎡三房118万，大家庭自住的实用选择",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"},
+  {name:"深海科技城人才房",info:"崖州区 · 1室1厅 · 55㎡ · 65万（11,818元/㎡）",pros:"人才政策倾斜、总价低、出租稳",cons:"购买资格有限制；面积小",why:"55㎡一房65万，产业客户的小额投资",link:"https://m.ke.com/san/bangdan/ibd1",src:"内部房源池·练习参考"}
+];}
+
+function defaultKnows(){return [
+  {cat:"交易知识",t:"契税新税率（2026年现行）",c:"家庭唯一住房140㎡及以下按1%、以上1.5%；二套140㎡及以下1%、以上2%；三套及以上一律3%",w:"契税直接算进买房成本，客户常问「我这套到底交几个点」",m:"能按客户套数和面积当场口算契税金额",u:"报价谈单时主动帮客户算清税费总账，体现专业度",q:"①二套房95㎡总价120万契税多少？②三套契税几个点？③唯一住房150㎡税率？",src:"国家税务总局三亚市税务局12345工单 2026-05-26"},
+  {cat:"交易知识",t:"二手房卖方税费：增值税与个税",c:"增值税及附加满2年免征（未满一般5.6%）；个税有原值凭证按差额20%、无凭证核定2%，住宅满五唯一免征；注意满五唯一减免只适用住宅，非住宅（商铺、办公、产权式酒店、车位等）即使满五唯一也不可减免",w:"满不满二、满不满五直接差好几个点，客户会拿这个压价",m:"快速核对房产证时间计算满二/满五唯一",u:"优先找满五唯一房源，帮客户把税费优势变成下offer理由",q:"①满五唯一的「唯一」按什么口径？②满二不满五免哪项交哪项？③个税两种方式适用什么情况？",src:"三亚市税务局12345工单 2026-06-15"},
+  {cat:"交易知识",t:"三亚买房三大坑",c:"远郊海景房（配套缺失无人接盘）、托管返租公寓（回报兑现不了）、小产权房（不受法律保护）；懂行看三点：市区核心地段、品牌开发商、产业人口支撑",w:"外地客户对三亚不熟，最怕「花海景的钱买鬼城」",m:"讲清各板块配套差异；会回应「一线海景是不是更好」",u:"用「离海距离与潮湿腐蚀」利弊分析建立信任，而不是只顺着客户夸海景",q:"①托管返租的核心风险？②小产权为什么不能碰？③「离海800—1500米」说法解决什么矛盾？",src:"今日头条·三亚嘉和地产 2026-06-19（从业者观点，非官方口径）"},
+  {cat:"交易知识",t:"三亚二手房过户四步流程",c:"①房源核验及购房资格（海易办申请资格码）→②网签合同、资金监管→③缴纳税费→④不动产转移登记，一般3个工作日内办结；卖方不到场需公证委托（不可公证给买方）",w:"外地客户最担心「钱付了证办不下来」",m:"记住四步顺序、资金监管意义、公证委托规则、地点（迎宾路285号）",u:"带看后主动给客户画「签约→过户→拿证」时间轴",q:"①资金监管在哪一步？②卖方不能到场怎么办？③办结要几个工作日？",src:"三亚市不动产登记中心12345工单 2026-08-07"},
+  {cat:"海南政策",t:"海南购房资格与落户政策（限购口径）",c:"人才引进落户：持人才引进落户凭证，以家庭为单位全省限购两套；普通落户：2018-04-22前落户且海南无房可购两套，之后落户需累计2年社保/个税且无房限购一套；非本省户籍：非主城区需2年社保/个税、主城区（含海棠湾、亚龙湾等沿海地带）需5年，以家庭为单位海南无房限购一套",w:"外地客户第一句几乎必问「我有没有资格买」，资格决定能不能成单",m:"按客户户籍/落户/社保情况分四类判断购房资格；记住主城区与非主城区年限区别",u:"接待外地客户先花2分钟梳理资格再推盘，避免带看后才发现无资格白忙",q:"①人才引进落户最多买几套？②2019年普通落户的客户需要什么条件？③非本省户籍买主城区要几年社保？",src:"三亚市住建局12345工单 2026-06-01；海南房产网 2026-05（综合，建议以住建局最新口径为准）"},
+  {cat:"区域板块",t:"三亚四区楼市格局：一城四逻辑",c:"海棠区顶豪3.5—5.5万/㎡（25公里原生海岸线+免税城+301医院）；吉阳区城居2.8—4.2万/㎡（市中心+免税城步行可达，全年均匀去化）；崖州区产业2.2—3.2万/㎡（崖州湾科技城/南繁/深海所，唯一有产业人口支撑）；天涯区大众2.2—4.2万/㎡（三亚湾所在地，城市化最成熟）。四区互不竞争、各自锁客",w:"客户说预算150万和说预算800万，推的板块完全不同，说错板块直接流失客户",m:"能按客户预算+需求（度假/自住/投资）30秒内锁定1—2个板块；记住各区价格带",u:"接待时先问「预算+用途+是否要海景」再定板块，把四区逻辑讲给客户听建立专业形象",q:"①预算200万左右的刚需首选哪个区？②崖州区和其他三区最大的逻辑差异？③海棠区的价格支撑是什么？",src:"58安居客研究院《2026三亚楼市：封关元年的价值重估》2026-03；吉屋网三亚区域分析 2026-08"},
+  {cat:"楼盘介绍",t:"保利天珺：吉阳区月川CBD年度销冠盘",c:"位于吉阳区月川中路（三亚河滨水CBD正芯），113—238㎡三至五房纯板楼大平层，一梯一户独立私梯入户，精装交付，配套恒温泳池、会所、保龄球馆；一二期现房，均价约2.7—3.3万/㎡；2025年以64.33亿/1103套拿下三亚年度销冠，日均去化3.02套、全年无峰值依赖",w:"三亚新房标杆盘，客户拿它对标全城，说不清天珺等于不懂三亚楼市",m:"记住位置（月川）、户型段（113—238㎡）、价格带（2.7—3.3万）、销冠数据（64.33亿/1103套）四大要点",u:"接待改善型客户时用天珺做价格锚点：「同预算在天珺只能买113㎡，在观岚可以上130㎡」",q:"①保利天珺在哪个单元板块？②主力户型面积段？③2025年成交金额和套数？",src:"58同城/安居客楼盘页 2026-08；58安居客研究院2026报告（销冠数据）"},
+  {cat:"交易知识",t:"三亚房贷首付比例与贷款年限",c:"首套首付最低一般15%（限购区以银行执行为准），二套普遍30%—40%；贷款年限受房龄与年龄约束，常见「房龄+贷款年限≤40年」且不超过借款人65岁",w:"客户最关心「能贷多少、月供多少」，算错直接丢单",m:"能按首付比例、年限、利率粗算月供；记住房龄对贷款年限的限制",u:"接待时先用「首付+月供」两笔账筛出客户真实承受力再推盘",q:"①二套首付一般多少？②老房子的贷款年限会怎样？",src:"银行普遍执行口径，以贷款行最新政策为准"},
+  {cat:"交易知识",t:"公积金贷款与异地公积金",c:"三亚支持异地公积金贷款（需缴存地开具证明并满足连续缴存要求）；利率低于商贷但额度受限，可用组合贷补足",w:"外地客户常问「老家交的公积金三亚能用吗」",m:"记住异地公积金需缴存证明与连续缴存要求；会解释组合贷",u:"客户有公积金时主动提组合贷方案，能明显降低月供促成成交",q:"①异地公积金三亚能用吗？②公积金额度不够怎么办？",src:"三亚住房公积金管理局口径，以最新规定为准"},
+  {cat:"交易知识",t:"签约前房屋查档四项",c:"查档重点：①产权人是否与卖方一致 ②是否有抵押 ③是否被查封 ④是否有异议登记；任一项有问题都要先解决再签约",w:"查档是防止「钱付了房过不了户」的第一道闸",m:"记住查档四项；知道到不动产登记中心查询",u:"签合同前带客户做一次查档，既建立信任也保护自己",q:"①查档查哪四项？②发现房子被抵押怎么办？",src:"三亚市不动产登记中心"},
+  {cat:"交易知识",t:"「定金」与「订金」的法律差别",c:"定金具担保性质，适用定金罚则（买方违约定金不退、卖方违约双倍返还）；订金视为预付款，一般可退。合同上写哪个字差别巨大",w:"客户交钱时最怕「退不了」，写错字会引发纠纷",m:"记住定金罚则；签约时反复确认用哪个「ding」",u:"收客户钱时明确告知法律后果，避免事后扯皮",q:"①定金违约怎么处理？②订金一定能退吗？",src:"《民法典》合同编相关规定"},
+  {cat:"交易知识",t:"资金监管的作用与流程",c:"资金监管是买方把房款存入监管账户，过户完成后才划给卖方，防止「钱付了证不过」或「过了户拿不到钱」",w:"外地客户最担心钱房两空，监管是说服客户的关键",m:"讲清监管的资金流向与时间节点",u:"带看后主动给客户讲资金监管，能显著降低客户戒备",q:"①资金监管防的是什么风险？②监管款何时划给卖方？",src:"三亚二手房交易流程"},
+  {cat:"交易知识",t:"网签的意义与撤销",c:"网签是网上签约备案，核心作用是锁定房源、防止一房多卖；网签后房源被锁定，撤销需买卖双方共同申请",w:"客户会问「网签了是不是就定了」",m:"记住网签锁定房源的作用；撤销需双方申请",u:"用「网签锁房」向客户解释为什么不能同时抢多套同一房源",q:"①网签的核心作用？②网签能单方面撤销吗？",src:"三亚市住建局"},
+  {cat:"交易知识",t:"物业交割与户口迁出",c:"过户后需做物业交割：结清物业费水电燃气、办理更名；若合同约定户口迁出，需留存尾款作为约束，避免卖方户口不迁走",w:"客户收房后才发现欠费或户口被占用会很恼火",m:"记住交割清单：物业、水、电、燃气、门禁、车位；户口尾款约束",u:"过户前列出交割清单逐项核对，是体现专业度的细节",q:"①物业交割要结清哪些费用？②怎么防止卖方不迁户口？",src:"二手房交易惯例"},
+  {cat:"交易知识",t:"中介服务费的收取与谈判",c:"中介费一般按成交价1%—3%（三亚市场常见双边或单边收取），可谈但不宜过度让价以免服务缩水；务必在合同中写明费用、服务内容与退费条件",w:"客户第一反应常是「能不能便宜点」",m:"能清楚报出费用与服务清单；会解释费用对应的具体服务",u:"把服务内容逐项列给客户看，比单纯降价更能成交",q:"①中介费一般多少？②客户嫌贵怎么应对？",src:"行业惯例，以门店公示标准为准"},
+  {cat:"交易知识",t:"二手房税费速算案例",c:"以95㎡、120万、满二不唯一、买方二套为例：契税1%（1.2万）、个税核定2%（2.4万）或差额20%，增值税满二免征；总税费约占成交价3%左右",w:"客户会拿着计算器跟你算总账",m:"能按「面积+套数+满几年」三要素速算契税、个税、增值税",u:"带看时现场给客户算清税费总账，是最快的专业度证明",q:"①满二不唯一要交哪些税？②个税两种算法怎么选？",src:"税务部门口径，以实际申报为准"},
+  {cat:"交易知识",t:"二手房买卖合同六大要点",c:"①房屋基本情况与产权状况 ②成交价与付款方式（定金、首付、贷款、尾款）③过户时间与违约责任 ④房屋交付与物业交割 ⑤户口迁出 ⑥税费承担方",w:"合同是纠纷的唯一依据，含糊条款最容易出事",m:"记住六大必备条款；不把「口头承诺」留在纸面之外",u:"签约时逐条与客户过一遍，把口头承诺全部落到合同里",q:"①合同必须写清哪几项？②税费由谁承担要写明吗？",src:"二手房买卖合同惯例"},
+  {cat:"海南政策",t:"人才落户通道与购房资格",c:"55周岁以下、符合学历或职称条件可走人才引进落户；落户后按本地户籍认定购房资格，以家庭为单位全省限购两套（普通落户口径另计）",w:"「先落户再买房」是外地客户的常见路径",m:"记住人才落户的年龄与学历门槛；会区分落户前后资格差异",u:"客户无资格时，先判断能否走人才落户再决定是否继续带看",q:"①人才落户年龄上限？②落户后能买几套？",src:"海南省人才引进政策，以最新口径为准"},
+  {cat:"海南政策",t:"海南住房限售规定",c:"海南实行限售：新购住房取得不动产权证后一定年限内不得转让（年限以市县政策为准）；会直接影响投资客的流动性预期",w:"投资客最关心「几年能卖」，限售直接决定回报预期",m:"记住限售年限与起算时点（取得不动产权证）",u:"对投资型客户主动说明限售，避免事后被投诉误导",q:"①限售从什么时候起算？②限售对投资客意味着什么？",src:"海南省及三亚市调控政策，以最新为准"},
+  {cat:"海南政策",t:"社保/个税年限与补缴认定",c:"非本省户籍购房需连续缴纳社保或个税（主城区5年、非主城区2年）；注意补缴一般不计入连续年限，断缴会影响资格认定",w:"客户以为「补缴一下就行」，实际多数不被认可",m:"记住主城区与非主城区年限差别；明确补缴通常无效",u:"审查资格时逐月核对社保记录，别让客户误判",q:"①补缴算不算连续年限？②主城区要几年？",src:"三亚市住建局资格审核口径"},
+  {cat:"海南政策",t:"自贸港封关与房地产的关系",c:"封关是海关监管概念（一线放开、二线管住），不改变现行住房限购政策；不得向客户承诺「封关后限购取消」",w:"客户常被短视频误导，以为封关就等于放开限购",m:"能解释封关与限购是两回事；不做政策承诺",u:"遇到客户问封关，明确回答「限购不变」，避免合规风险",q:"①封关会取消限购吗？②封关实际改变什么？",src:"海南自贸港政策与住建部门口径"},
+  {cat:"海南政策",t:"法拍房的机会与风险",c:"法拍房可能低于市场价，但风险高：需一次性付款、税费可能由买方承担、原房主占用难以清退、户口与欠费问题复杂",w:"客户看到「便宜一半」就想买，风险常被低估",m:"能列出法拍房主要风险；不主动向新手客户推荐",u:"客户问法拍房时先讲风险再讲价格，守住专业底线",q:"①法拍房最大风险是什么？②法拍房能贷款吗？",src:"司法拍卖实务，以法院公告为准"},
+  {cat:"海南政策",t:"房屋赠与与继承的税费差异",c:"直系亲属赠与免征个税与增值税但需缴契税（一般3%）；继承免征契税。赠与/继承取得的房屋再次出售时，个税按差额20%计征，税负重",w:"客户想用赠与避税，但后续出售成本可能更高",m:"记住赠与免个税增值税但缴契税；再次出售个税高",u:"客户咨询赠与时要提示未来出售的税负，别只看眼前",q:"①赠与要交什么税？②赠与房再卖有什么后果？",src:"税务部门口径"},
+  {cat:"海南政策",t:"多孩家庭与特殊群体购房",c:"部分市县对多孩家庭、人才、引进人员有购房支持政策；三亚具体标准以住建部门最新文件为准，不要凭经验臆断",w:"客户会问「我有两个孩子能不能多买一套」",m:"不臆断政策，统一口径「以住建局最新文件为准」并代为核实",u:"遇到特殊资格问题，承诺帮客户向住建部门核实，而不是随口回答",q:"①多孩家庭一定多一套资格吗？②不确定的政策怎么处理？",src:"三亚市住建局，政策可能调整"},
+  {cat:"海南政策",t:"以家庭为单位的限购认定",c:"限购以家庭（夫妻双方及未成年子女）为单位认定，不是以个人；家庭成员名下已有房产会占用购房套数",w:"客户以为「写我老婆名字就还能买」是典型误解",m:"记住认定单位是家庭；会解释夫妻共有产对套数的影响",u:"审查资格时必须问清配偶与未成年子女名下房产",q:"①限购按个人还是家庭？②夫妻一方有房另一方还能买吗？",src:"三亚市住建局"},
+  {cat:"区域板块",t:"吉阳区：刚需与改善的主战场",c:"吉阳区是三亚市中心（迎宾路、月川、荔枝沟），配套成熟、学校医院齐全，均价2.8—4.2万/㎡；去化均匀，适合刚需自住与改善型客户",w:"预算150—300万的客户基本都在吉阳区找房",m:"记住吉阳区价格带与客户画像；能区分月川CBD与荔枝沟差异",u:"接待刚需客户优先带看吉阳区，成交概率最高",q:"①吉阳区适合什么客户？②价格带大概多少？",src:"58安居客研究院2026报告"},
+  {cat:"区域板块",t:"天涯区：城市化成熟的价格洼地",c:"天涯区含三亚湾，城市化成熟、生活便利，均价2.2—4.2万/㎡，跨度大；三亚湾一线海景溢价高但配套偏度假，刚需更适合非一线",w:"预算有限又想要市区的客户常落在天涯区",m:"能区分三亚湾海景房与内陆生活盘的差异",u:"预算150万左右客户可重点看天涯区非一线房源",q:"①天涯区海景房与内陆盘怎么选？②价格带多少？",src:"吉屋网三亚区域分析"},
+  {cat:"区域板块",t:"海棠区：顶豪与度假的天花板",c:"海棠区拥有25公里原生海岸线、免税城、301医院，均价3.5—5.5万/㎡，以顶豪与高端度假为主；客群窄但客单价高",w:"预算500万以上客户才看海棠区，推错板块直接流失",m:"记住海棠区价格带与顶豪属性；明确不适合刚需",u:"只有明确的高端度假/顶豪需求才带看海棠区",q:"①海棠区适合什么客户？②均价大概多少？",src:"58安居客研究院2026报告"},
+  {cat:"区域板块",t:"崖州区：唯一有产业人口支撑",c:"崖州区有崖州湾科技城、南繁、深海所，是三亚唯一有产业人口支撑的区，均价2.2—3.2万/㎡，租赁需求稳定、租售比相对好",w:"预算有限且看重租售比的客户适合崖州区",m:"记住崖州区的产业逻辑与租赁优势；通勤远是主要缺点",u:"投资出租型客户可推荐崖州区，但需说明通勤与成熟度",q:"①崖州区最大优势是什么？②主要缺点是什么？",src:"58安居客研究院2026报告"},
+  {cat:"区域板块",t:"三亚学区房的选择逻辑",c:"三亚学区资源集中在吉阳区，学区房溢价明显；学区政策可能调整，购房前须核实当年划片",w:"为了孩子上学的客户愿意为学区付溢价",m:"不承诺学区，统一口径「以当年教育部门划片为准」",u:"带看学区房时提供划片查询方式，不做确定性承诺",q:"①能向客户承诺学区吗？②学区划片以什么为准？",src:"三亚市教育部门划片政策，以当年公布为准"},
+  {cat:"区域板块",t:"交通与生活配套的评估",c:"评估配套看四项：菜市场/商超、医院、学校、公交与主干道；三亚无地铁，通达度决定日常便利，海景房常牺牲配套",w:"客户住进去才后悔「买菜都要开车」",m:"带看时主动指出最近菜市场、医院、公交站的距离",u:"把配套距离量化（步行几分钟）讲给客户，比说「方便」更可信",q:"①评估配套看哪四项？②海景房常牺牲什么？",src:"经纪人实务经验"},
+  {cat:"区域板块",t:"需谨慎推荐的板块特征",c:"需谨慎：远郊旅居盘（入住率低、转手难）、非核心湾区伪海景（溢价泡沫）、无产业无配套的冷淡区域；判断标准是「有没有常住人口与流动性」",w:"客户被低价吸引买远郊，最后卖不掉会归咎于经纪人",m:"用「入住率、转手流动性、人口支撑」三把尺子判断板块",u:"客户问远郊低价盘时，用三把尺子给出客观劝退",q:"①判断板块的三把尺子？②远郊盘最大问题是什么？",src:"从业者观点，非官方口径"},
+  {cat:"区域板块",t:"三亚四区价格带速记",c:"海棠区3.5—5.5万、吉阳区2.8—4.2万、天涯区2.2—4.2万、崖州区2.2—3.2万（2026年参考）；全市二手均价约2.2万/㎡",w:"客户开口就问「三亚房子多少钱一平」，答不出显得不专业",m:"背下四区价格带与全市均价",u:"报价时先报区间再报具体房源，避免客户被单一数字误导",q:"①全市二手均价约多少？②四区各是什么价格带？",src:"58同城2026-08数据"},
+  {cat:"楼盘介绍",t:"看新房必问的五要素",c:"①开发商（品牌与交付履历）②交付时间（与资金安排匹配）③交付标准（精装/毛坯及品牌）④物业费（持有成本）⑤车位配比（居住体验）",w:"客户容易被样板间打动而忽略交付风险",m:"背下五要素；带看时逐项记录",u:"带看新房时拿五要素清单逐项询问，形成专业看盘记录",q:"①五要素是哪五项？②为什么要问物业费？",src:"新房销售实务"},
+  {cat:"楼盘介绍",t:"板楼与塔楼的区别",c:"板楼一梯两户、南北通透、采光通风好、公摊小；塔楼密度高、朝向差异大、公摊相对大，但单价常更低",w:"客户问「为什么这两套单价差这么多」",m:"能解释板楼塔楼的采光通风与公摊差异",u:"推荐自住客户优先板楼，预算受限再谈塔楼的价格优势",q:"①板楼相比塔楼好在哪？②塔楼的优势是什么？",src:"建筑常识与销售实务"},
+  {cat:"楼盘介绍",t:"得房率与公摊",c:"得房率＝套内面积÷建筑面积；得房率高说明同样建筑面积能用的套内更多。多层一般85%—90%，高层75%—85%",w:"客户问「95㎡怎么感觉没那么大」",m:"会计算得房率；能解释公摊构成",u:"带看时主动算得房率，帮客户建立合理的面积预期",q:"①得房率怎么算？②高层得房率大概多少？",src:"建筑常识"},
+  {cat:"楼盘介绍",t:"期房与现房的风险对比",c:"现房所见即所得、风险低但价格高；期房价格有优势但存在延期交付、减配、烂尾风险，需重点核查开发商资金与交付履历",w:"客户担心「交不了房」，尤其外地客户",m:"能列出期房三类风险；会查开发商过往交付情况",u:"推荐期房时主动核查并告知开发商交付记录，不回避风险",q:"①期房主要风险？②怎么降低期房风险？",src:"新房销售实务"},
+  {cat:"楼盘介绍",t:"精装房的验收要点",c:"精装房验房重点：厨卫防水、瓷砖空鼓、门窗密封、五金品牌是否与合同一致、隐蔽工程（水电）；务必留存验房清单",w:"客户收房发现精装缩水会直接投诉",m:"记住精装验房要点；会核对合同约定的品牌型号",u:"陪客户验房时逐项核对合同品牌，是体现专业度的关键时刻",q:"①精装验房看哪几项？②品牌不符怎么办？",src:"验房实务"},
+  {cat:"楼盘介绍",t:"容积率与绿化率的意义",c:"容积率越低居住密度越小、舒适度越高；绿化率影响小区环境。两者是判断小区品质的硬指标，常被销售话术弱化",w:"客户问「这个小区住着舒服吗」",m:"会看容积率与绿化率；能解释其对居住体验的影响",u:"带看时主动报出容积率与绿化率，与竞品做对比",q:"①容积率高低意味着什么？②绿化率影响什么？",src:"建筑规划常识"},
+  {cat:"楼盘介绍",t:"新房与二手房的取舍",c:"新房：户型新、税费少（契税+维修基金）、可贷款比例高，但有期房风险与配套未成熟；二手：所见即所得、配套成熟、可议价，但税费与中介费高、房龄影响贷款",w:"客户纠结「买新还是买旧」",m:"能从税费、风险、配套、贷款四个维度对比",u:"先问客户「看重确定性还是性价比」，再决定推新还是推旧",q:"①新房税费优势在哪？②二手房最大优势是什么？",src:"经纪人实务经验"},
+  {cat:"抖音文案",t:"知识分享类高赞拆解：《三亚购房避坑指南》（区域篇+房源类型篇）",c:"避坑类知识分享文案结构：①按区域点名坑点（远郊旅居盘80㎡以下小户型慎买、伪海景房非核心湾区溢价全是泡沫、红塘湾远郊盘5年跌35%—45%）②按房源类型拉黑5类房（远郊小户型、伪海景、产权瑕疵、低价促销、非央企期房）③每条都是「坑点+后果+正确做法」三段式，信息密度高、句句戳客户焦虑点",w:"外地客户最怕被骗，避坑类内容是评论区提问最多、转发收藏最高的选题；客户拿着视频里的坑来问你，你必须答得比视频更细",m:"掌握「坑点→后果→正确做法」表达框架；记住5类拉黑房源和远郊跌幅数据；能针对视频里每个坑给出更本地化的补充",u:"直接把这套框架用到客户接待中：客户犹豫远郊低价盘时，用「入住率、转手流动性、5年跌幅」三个事实劝退，比笼统说「不好」更有说服力",q:"①哪5类房源直接拉黑？②伪海景房为什么溢价是泡沫？③劝退远郊盘用哪三个事实？",src:"今日头条《三亚购房避坑指南（2025封关前必看）》m.toutiao.com/a1852162430858304/，2026-08-29检索"},
+  {cat:"抖音文案",t:"知识分享类高赞拆解：《在海南买房可以落户吗？》",c:"政策科普类文案结构：①开门见山给结论（单纯买房不能直接落户，房子只是落户的地址载体）②分人群展开（普通外地人：居住证+养老医疗社保；引进人才：55周岁以下硕士/高级技师直接申请；省内居民：有住所即可落）③每类补「依据+办理要点」，结尾提醒政策以住建部门最新口径为准",w:"「买房能不能落户」是外地客户高频问题，政策科普类视频评论区全是精准购房意向客户，是获客最优质的选题",m:"记住三类人群的落户条件和差别；记住结论句式「房子只是地址载体」；掌握「结论先行→分人群展开→官方依据收尾」结构",u:"客户问到落户时直接套用三通道回答；自己拍视频时把「人群」换成客户画像（如「50岁想带父母养老的」），结论先行30秒讲清",q:"①单纯买房能落户吗？②普通外地人落户的硬性条件？③人才落户的年龄和学历门槛？",src:"大律师网《在海南买房可以落户吗》2026-05-18；三亚市住建局口径，2026-08-29检索"}
+];}
+
+/* ============ 存储 ============ */
+let D=null,P=null;
+function key(){return "sanya_"+TODAY_cur();}
+function load(){
+  const raw=localStorage.getItem(key());
+  D=raw?JSON.parse(raw):null;
+  if(!D){
+    D={goal:"建立三亚市场基本盘认知：能对客户讲清三亚市区刚需盘与湾区旅居盘的价格差异（参考：三亚8月二手均价约22,089元/㎡，来源58同城2026-08）",
+      tasks:defaultTasks(),houses:defaultHouses(),pans:[],
+      knows:defaultKnows(),report:null,review:null,dyv2:1};
+    save();
+  }
+  if(!D.tasks)D.tasks=defaultTasks(); else mergeTasks();
+  if(!D.houses)D.houses=[];
+  if(!D.knows)D.knows=[];
+  if(!D.pans)D.pans=[];
+  if(!D.dyv2){
+    const _d=new Date(),_today=_d.getFullYear()+"-"+String(_d.getMonth()+1).padStart(2,"0")+"-"+String(_d.getDate()).padStart(2,"0");
+    if(key()==="sanya_"+_today){
+      D.knows=D.knows.filter(k=>k.cat!=="抖音文案");
+      D.knows.push(...defaultKnows().filter(k=>k.cat==="抖音文案"));
+      D.dyv2=1;save();
+    }
+  }
+  if(!D.report)D.report={nums:{},texts:{}};
+  if(!D.review)D.review=null;
+  applyDailyHouses();  /* 每日轮换房源：当天只算一次，保证每天房源不同 */
+  applyDailyKnows();   /* 每日轮换房产知识：当天只算一次，保证知识稳定且每天不同 */
+}
+function TODAY_cur(){return document.getElementById("datePick").value;}
+function save(){localStorage.setItem(key(),JSON.stringify(D));}
+function loadProfile(){
+  const raw=localStorage.getItem("sanya_profile");
+  P=raw?JSON.parse(raw):{name:"",pdate:"",stage:"",dims:{},growth:[]};
+  DIMS.forEach(d=>{if(!(d in P.dims))P.dims[d]=5;});
+}
+function saveProfile2(){localStorage.setItem("sanya_profile",JSON.stringify(P));}
+
+/* ============ 工具 ============ */
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.opacity=1;clearTimeout(t._tm);t._tm=setTimeout(()=>t.style.opacity=0,1800);}
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function vibrate(){if(navigator.vibrate)navigator.vibrate(10);}
+document.getElementById("nav").addEventListener("click",e=>{
+  const t=e.target.closest(".nv");if(!t)return;
+  document.querySelectorAll(".nv").forEach(x=>x.classList.remove("on"));t.classList.add("on");
+  ["task","house","know","pan","report","review"].forEach(k=>{
+    document.getElementById("p-"+k).classList.toggle("on",k===t.dataset.t);
+  });
+  window.scrollTo({top:0});
+  if(t.dataset.t==="house")pullHouses();
+  if(t.dataset.t==="know"){renderKnowCat();pullKnow();}
+  /* 进日报页时重算考题：云端当天若推送了新考核题，保证切过去就能看到，而不是沿用早上缓存的旧题 */
+  if(t.dataset.t==="report"){renderReport();pullKnow();}
+});
+function goPage(k){document.querySelector('[data-t="'+k+'"]').click();}
+
+/* ============ 任务 ============ */
+function renderTasks(){
+  const el=document.getElementById("taskList");el.innerHTML="";
+  D.tasks.forEach((task,i)=>{
+    const pct=task.t>0?Math.min(100,Math.round(task.a/task.t*100)):0;
+    const color=pct>=100?"var(--ok)":pct>=60?"var(--warn)":"var(--bad)";
+    el.insertAdjacentHTML("beforeend",`<div class="trow">
+      <div class="t1"><span class="tname">${esc(task.n)}</span><span class="ttarget">目标 <b>${task.t}</b></span></div>
+      <div class="t2">
+        <button class="stepbtn" onclick="stepTask(${i},-1)">－</button>
+        <input type="number" value="${task.a}" min="0" onchange="setTaskA(${i},this.value)">
+        <button class="stepbtn" onclick="stepTask(${i},1)">＋</button>
+        <div class="bar"><i style="width:${pct}%;background:${color}"></i></div>
+        <span class="tpct" style="color:${color}">${pct}%</span>
+      </div></div>`);
+  });
+  const total=D.tasks.reduce((s,x)=>s+(x.t>0?Math.min(1,x.a/x.t):0),0);
+  const pct=signDone()?100:(D.tasks.length?Math.round(total/D.tasks.length*100):0);
+  document.getElementById("taskBar").style.width=pct+"%";
+  document.getElementById("taskPct").textContent=pct+"%";
+  document.getElementById("goal").value=D.goal||"";
+}
+function setTaskA(i,v){D.tasks[i].a=Math.max(0,Number(v)||0);save();renderTasks();cloudAuto();}
+function stepTask(i,d){D.tasks[i].a=Math.max(0,(D.tasks[i].a||0)+d);save();renderTasks();vibrate();cloudAuto();}
+/* 签单任务完成，则当日完成率默认 100% */
+function signDone(){const t=D.tasks.find(x=>x.n.indexOf("签单")>=0);return !!(t&&t.t>0&&t.a>=t.t);}
+
+/* ============ 好房 ============ */
+function renderHouses(){
+  const el=document.getElementById("houseList");el.innerHTML="";
+  D.houses.forEach((h,i)=>{
+    el.insertAdjacentHTML("beforeend",`<div class="house">
+      <div class="ht">${esc(h.name)}</div>
+      <span class="hprice">${esc(h.info)}</span>
+      <div class="kv"><b>优势</b><span style="text-align:right">${esc(h.pros)}</span></div>
+      <div class="kv"><b>缺点</b><span style="text-align:right">${esc(h.cons)}</span></div>
+      <div class="kv"><b>推荐理由</b><span style="text-align:right">${esc(h.why)}</span></div>
+      <div class="kv"><b>来源</b><span style="text-align:right">${esc(h.src)}</span></div>
+      ${h.link?`<a href="${esc(h.link)}" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;font-size:13px">🔗 查看房源链接</a>`:""}
+    </div>`);
+  });
+}
+/* 房源内容固定，由 AI 每日下发，经纪人不可编辑 */
+
+/* ============ 跑盘 ============ */
+const PAN_FIELDS=[["name","小区名称"],["peitao","小区配套"],["fujin","附近配套"],["wuye","物业费"],["wuyetel","物业电话"],["shuidian","水电费"],["tingche","停车费"],["tihu","梯户比"],["zongcen","总层高"],["zongdong","总栋数"],["huxing","户型"]];
+const PAN_REQUIRED=[["name","小区名称"]];   /* 提交前必须填齐的项；物业电话为选填 */
+function renderPans(){
+  const el=document.getElementById("panList");el.innerHTML="";
+  if(!D.pans||!D.pans.length){el.innerHTML="<div class='muted' style='padding:6px 2px'>今日暂无跑盘记录，点击下方「新增跑盘小区」开始记录。</div>";return;}
+  D.pans.forEach((p,i)=>{
+    const done=!!p.submitted;
+    el.insertAdjacentHTML("beforeend",`<div class="house"${done?' style="border-left:4px solid var(--ok)"':''}>
+      <div class="ht">跑盘 ${i+1}：<span id="panTitle${i}">${esc(p.name||"（小区名称待填）")}</span>
+        ${done?'<span style="float:right;font-size:11px;color:var(--ok);font-weight:600">已提交 ✓</span>':'<button class="btn gray sm" style="float:right" onclick="delPan('+i+')">删</button>'}</div>
+      ${PAN_FIELDS.map(([f,l])=>`<div class="field"><label>${PAN_REQUIRED.some(r=>r[0]===f)?l+' <span style="color:var(--bad)">*</span>':l}</label><input type="text" value="${esc(p[f]||"")}" placeholder="待填写"${done?' disabled':' '}oninput="setPan(${i},'${f}',this.value)${f==="name"?';setPanTitle('+i+',this.value)':''}"></div>`).join("")}
+      ${done?'<div class="note" style="margin-top:6px">已提交，将录入公司跑盘资料库供全店查询。</div>':'<button class="btn block" style="margin-top:8px" onclick="submitPan('+i+')">✓ 提交该条跑盘</button>'}
+    </div>`);
+  });
+}
+function setPan(i,f,v){if(D.pans[i]&&D.pans[i].submitted)return;D.pans[i][f]=v;save();cloudAuto();}
+/* 标题实时联动：单独成函数，禁止在内联 oninput 属性里拼引号——那会提前闭合 HTML 属性导致整段 JS 失效 */
+function setPanTitle(i,v){const el=document.getElementById("panTitle"+i);if(el)el.textContent=String(v||"").trim()||"（小区名称待填）";}
+function addPan(){if(!D.pans)D.pans=[];D.pans.push({});save();renderPans();cloudAuto();}
+function delPan(i){
+  const p=D.pans[i];
+  if(p&&p.submitted){ if(!confirm("该条跑盘已提交，删除后将不会录入公司资料库。确定删除？"))return; }
+  else if(!confirm("删除该跑盘记录？"))return;
+  D.pans.splice(i,1);save();renderPans();cloudAuto();
+}
+/* 提交单条跑盘：必填项齐了才允许提交；提交后锁定，并写入提交时间 */
+function submitPan(i){
+  const p=D.pans[i];if(!p)return;
+  if(p.submitted){toast("该条跑盘已经提交过了");return;}
+  for(const [f,l] of PAN_REQUIRED){
+    if(!String(p[f]||"").trim()){toast("请先填写「"+l+"」再提交");return;}
+  }
+  p.submitted=true;p.submitAt=new Date().toISOString();
+  save();renderPans();cloudAuto();
+  toast("跑盘已提交 ✓ 将录入公司资料库");vibrate();
+}
+
+/* ============ 跑盘信息查询（查全店已录入的小区） ============ */
+let panCloudRows=null,panCloudAt=0;
+function panRowKey(r){return [r.agent,r.date,PAN_FIELDS.map(([f])=>String(r.p[f]||"").trim()).join("|")].join("##");}
+async function panFetchDaily(){
+  let r=null;
+  try{ r=await cloudDb.collection(CLOUD_COLL).limit(1000).get(); }
+  catch(e){ try{ r=await cloudDb.collection(CLOUD_COLL).limit(100).get(); }catch(e2){ throw e2; } }
+  return (r&&r.data)||[];
+}
+async function panLoadRows(force){
+  const now=Date.now();
+  if(!force&&panCloudRows&&now-panCloudAt<120000)return panCloudRows;   /* 2 分钟内复用，避免每次点都拉全表 */
+  await cloudInit();
+  const list=await panFetchDaily();
+  const rows=[];
+  list.forEach(x=>{
+    const agent=String(x.agent||x.name||"未知").trim();
+    const date=String(x.date||"").trim();
+    (x.pans||[]).forEach(p=>{
+      if(!p)return;
+      if(p.submitted===false)return;                                   /* 没点提交的草稿不算已录入 */
+      if(!PAN_FIELDS.some(([f])=>String(p[f]||"").trim()))return;      /* 全空跳过 */
+      rows.push({agent:agent,date:date,p:p});
+    });
+  });
+  /* 本地当天已提交、但还没上传成功的，也一并纳入查询 */
+  (D.pans||[]).forEach(p=>{
+    if(!p||p.submitted===false)return;
+    if(!PAN_FIELDS.some(([f])=>String(p[f]||"").trim()))return;
+    rows.push({agent:(P&&P.name)||"我",date:TODAY_cur(),p:p});
+  });
+  const seen={},out=[];
+  rows.forEach(r=>{const k=panRowKey(r);if(seen[k])return;seen[k]=1;out.push(r);});
+  panCloudRows=out;panCloudAt=now;
+  return out;
+}
+function panCard(r){
+  const p=r.p||{};
+  const rowsHtml=PAN_FIELDS.filter(([f])=>String(p[f]||"").trim())
+    .map(([f,l])=>`<div class="kv"><b>${l}</b><span style="text-align:right">${esc(p[f])}</span></div>`).join("");
+  return `<div class="house" style="border-left:4px solid var(--pri)">
+    <div class="ht">${esc(p.name||"（未填小区名称）")}</div>
+    <div class="kv"><b>录入人 · 日期</b><span style="text-align:right">${esc(r.agent)} · ${esc(r.date)}</span></div>
+    ${rowsHtml}
+  </div>`;
+}
+async function panSearch(){
+  const box=document.getElementById("panSearchResult");if(!box)return;
+  const q=document.getElementById("panQuery");
+  const kw=String((q&&q.value)||"").trim();
+  box.innerHTML="<div class='muted'>正在查询…</div>";
+  try{
+    const all=await panLoadRows(false);
+    if(!kw){
+      const recent=all.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,20);
+      if(!recent.length){box.innerHTML="<div class='muted'>还没有已录入的跑盘记录。先在上面新增一条，填完点「✓ 提交该条跑盘」。</div>";return;}
+      box.innerHTML="<div class='note'>最近录入 "+recent.length+" 条（全店共 "+all.length+" 条）</div>"+recent.map(panCard).join("");
+      return;
+    }
+    const k=kw.toLowerCase();
+    const hit=all.filter(r=>PAN_FIELDS.some(([f])=>String(r.p[f]||"").toLowerCase().indexOf(k)>=0));
+    if(!hit.length){box.innerHTML="<div class='muted'>没找到包含「"+esc(kw)+"」的跑盘记录。换个关键词试试，也可能这个小区还没人跑过。</div>";return;}
+    box.innerHTML="<div class='note'>匹配到 "+hit.length+" 条</div>"+hit.map(panCard).join("");
+  }catch(e){
+    box.innerHTML="<div class='muted'>查询失败："+esc(String((e&&e.message)||e).slice(0,40))+"<br>请检查网络，或在「经纪人信息」确认云开发环境 ID 已填写。</div>";
+  }
+}
+function panSearchRefresh(){panCloudRows=null;panSearch();}
+
+/* ============ 知识 ============ */
+const KNOW_CATS = {"交易知识":"pri","海南政策":"warn","区域板块":"ok","楼盘介绍":"bad","抖音文案":"dy"};
+/* ===== 房产知识池：每日从中轮换，保证每天内容不重复 ===== */
+/* 每日下发文件里的房源并入房源池参与轮换，不再直接覆盖（否则每天都是同样几套旧房源） */
+const HOUSE_POOL_EXTRA=[];
+function housePool(){
+  const seen={},out=[];
+  defaultHouses().concat(HOUSE_POOL_EXTRA).forEach(h=>{
+    const key=(h.name||"")+"|"+(h.info||"");
+    if(!seen[key]){seen[key]=1;out.push(h);}
+  });
+  return out;
+}
+const KNOW_POOL_EXTRA=[
+{cat:"交易知识",t:"二手房增值税免征年限",c:"房产证满2年的普通住宅免征增值税，未满2年按全额5%缴纳",w:"直接关系到买方要多掏几万甚至十几万税费",m:"记住2年这个分水岭，看房本登记日期",u:"带看前先问房本年限，算进总购房成本里给客户算账",q:"二手房房产证满几年可免征增值税？",src:"三亚税务 2026"},
+{cat:"交易知识",t:"定金与订金的法律区别",c:"「定金」有担保性质，违约适用定金罚则；「订金」视为预付款，可退",w:"客户签认购书时最容易被这两个字坑",m:"签约时必须提醒客户看清是哪一个字",u:"帮客户审核认购书，发现「定金」要讲清违约后果",q:"「定金」与「订金」哪个违约时不可退？",src:"民法典 2026"},
+{cat:"交易知识",t:"首套房贷首付比例",c:"三亚首套住房商业贷款最低首付一般为20%-30%，二套相应提高",w:"首付比例决定客户能不能买得起",m:"按最新政策口径回答，不承诺具体数字",u:"先按资格与套数初判，再让客户向银行确认额度",q:"首套房贷首付比例通常比二套高还是低？",src:"三亚房贷政策 2026"},
+{cat:"交易知识",t:"网签与备案的作用",c:"网签是网上签约锁定房源，备案是向主管部门登记，二者共同防止一房多卖",w:"客户担心房子被重复出售",m:"讲清网签后房源被锁定，不能再次交易",u:"签约当天完成网签，同步告知客户可查",q:"网签的主要作用是防止什么风险？",src:"三亚房管 2026"},
+{cat:"交易知识",t:"房屋查档必查四项",c:"查产权人、查抵押、查查封、查异议登记",w:"买到被查封或抵押房会钱房两空",m:"签约前必须陪同客户完成查档",u:"把查档结果截图存档，作为签约前置条件",q:"签约前查档不需要关注哪一项？",src:"不动产登记中心 2026"},
+{cat:"海南政策",t:"海南自贸港购房影响",c:"自贸港封关运作预期带动关注度，但住房限购政策仍按现行规定执行",w:"客户担心政策变化影响买房资格",m:"不预测政策，只讲现行规则",u:"遇到政策类问题引导客户看官方文件",q:"自贸港封关后，三亚住房限购是否自动取消？",src:"海南自贸港 2026"},
+{cat:"海南政策",t:"人才落户购房通道",c:"符合条件的人才可先落户再按本地户籍购房，社保年限要求相应变化",w:"非本省户籍客户最关心能否绕开社保年限",m:"记住人才认定有学历/职称/社保等门槛",u:"先判断客户是否符合人才标准，再给路径建议",q:"人才落户后购房主要改变了什么条件？",src:"海南人才政策 2026"},
+{cat:"海南政策",t:"限购区域划分",c:"三亚主城区（含海棠湾、亚龙湾等沿海地带）限购更严，非主城区相对宽松",w:"决定客户有没有购房资格",m:"先分清主城区与非主城区",u:"报盘前先确认板块归属，避免带看无效",q:"三亚主城区与非主城区限购力度相同吗？",src:"三亚限购细则 2026"},
+{cat:"海南政策",t:"家庭为单位限购",c:"限购以家庭为单位认定，海南无房的家庭限购一套",w:"夫妻名下房产会互相影响资格",m:"问清家庭成员名下房产情况",u:"签约前让客户书面确认家庭住房套数",q:"海南限购认定的单位是个人还是家庭？",src:"三亚限购细则 2026"},
+{cat:"区域板块",t:"海棠湾定位",c:"海棠湾以高端度假与顶豪为主，单价高、配套偏度假属性",w:"投资客关注保值与出租回报",m:"明确其非刚需板块",u:"刚需客户不主推海棠湾，避免无效带看",q:"海棠湾更适合哪类客户？",src:"三亚板块研究 2026"},
+{cat:"区域板块",t:"三亚湾与市区差异",c:"三亚湾沿线以海景旅居为主，市区以生活配套与刚需为主",w:"客户纠结海景还是生活便利",m:"按客户自住还是度假来分流",u:"自住优先市区，度假再看三亚湾",q:"自住刚需客户更适合三亚湾海景房还是市区？",src:"三亚板块研究 2026"},
+{cat:"区域板块",t:"崖州区产业属性",c:"崖州湾科技城带动产业人口，刚需与租赁需求有支撑",w:"关注长期出租与接盘人群",m:"了解产业规划再推荐",u:"预算有限且看重租售比的客户可考虑",q:"崖州区的需求主要靠什么支撑？",src:"三亚板块研究 2026"},
+{cat:"区域板块",t:"吉阳区配套优势",c:"吉阳区属市中心，教育医疗商业成熟，去化稳定",w:"自住家庭最看重配套确定性",m:"首选刚需自住板块",u:"200万左右刚需预算优先吉阳区",q:"刚需自住首选哪个区？",src:"三亚板块研究 2026"},
+{cat:"楼盘介绍",t:"看新房必问五要素",c:"开发商、交付时间、交付标准、物业费、车位配比",w:"新房信息不透明，客户容易踩坑",m:"把这五项做成固定话术",u:"带看新房时逐项确认并记录",q:"看新房时不需要重点确认哪一项？",src:"新房销售实务 2026"},
+{cat:"楼盘介绍",t:"板楼与塔楼区别",c:"板楼采光通风好、公摊小；塔楼密度高、朝向差异大",w:"直接影响居住舒适度",m:"能说清两者差异",u:"带看时主动指出楼栋类型与朝向",q:"哪种楼型通常采光通风更好？",src:"房产基础知识 2026"},
+{cat:"楼盘介绍",t:"得房率怎么看",c:"得房率=套内面积/建筑面积，越高实际使用面积越大",w:"同样建筑面积实际能用的差很多",m:"会算套内面积",u:"给客户对比两个盘时换算成套内单价",q:"得房率越高，实际使用面积越大还是越小？",src:"房产基础知识 2026"},
+{cat:"客户经营",t:"带看动线设计",c:"先看小区环境与配套，再看户型，最后谈价格",w:"影响客户对房源的整体感受",m:"按由外到内的顺序带看",u:"每次带看前规划好路线与讲解重点",q:"带看时一般先看什么？",src:"经纪人实务 2026"},
+{cat:"客户经营",t:"异议处理三步骤",c:"先认同客户顾虑，再用事实回应，最后给出方案",w:"客户提出反对意见时不应对抗",m:"不与客户争辩",u:"把客户常见异议整理成应答话术",q:"处理客户异议的第一步是什么？",src:"经纪人实务 2026"}
+];
+/* 按日期生成稳定随机种子，保证同一天多次打开结果一致 */
+function daySeedInt(){
+  const s=String(TODAY_cur()||"");let h=0;
+  for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0;}
+  return h||1;
+}
+function pickBySeed(arr,n,seed){
+  const a=arr.slice();let s=seed||1;
+  const rnd=()=>{s=(s*1103515245+12345)>>>0;return s/4294967296;};
+  for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));const t=a[i];a[i]=a[j];a[j]=t;}
+  return a.slice(0,Math.min(n,a.length));
+}
+/* 日期序号：距 1970 的天数，用作轮转起点，保证每天顺序推进、可预期 */
+function dayIndex(){
+  const d=String(TODAY_cur()||"").split("-");
+  if(d.length!==3)return 0;
+  return Math.floor(Date.UTC(Number(d[0]),Number(d[1])-1,Number(d[2]))/86400000);
+}
+/* 每日抽取：顺序轮转 + 完整记录已展示 —— 保证「一轮之内每天内容/题目绝不重复」
+   旧实现用 slice 截断已展示记录，会导致每 4~5 天就绕回最早的内容（重复根因），已废弃。 */
+function pickDaily(arr,n,storeKey,idOf){
+  const size=(arr||[]).length;
+  if(!size)return [];
+  n=Math.min(n,size);
+  let shown=[];
+  try{shown=JSON.parse(localStorage.getItem(storeKey)||"[]");}catch(e){shown=[];}
+  if(!Array.isArray(shown))shown=[];
+  const used=new Set(shown);
+  let pool=arr.filter(x=>!used.has(idOf(x)));
+  let restarted=false;
+  if(pool.length<n){pool=arr.slice();shown=[];restarted=true;}   /* 一轮走完才重新开始 */
+  const out=pool.slice(0,n);
+  /* 关键：完整保留已展示列表，不截断，确保一轮之内不会绕回已出现过的内容 */
+  const next=(restarted?[]:shown).concat(out.map(idOf));
+  try{localStorage.setItem(storeKey,JSON.stringify(next));}catch(e){}
+  return out;
+}
+function knowPool(){
+  const base=(typeof defaultKnows==="function"?defaultKnows():[]).filter(k=>k.cat!=="抖音文案");
+  const seen={},out=[];
+  base.concat(KNOW_POOL_EXTRA).forEach(k=>{const key=(k.cat||"")+"|"+(k.t||"");if(!seen[key]){seen[key]=1;out.push(k);}});
+  return out;
+}
+/* 每日轮换：当天只算一次，保证题目与知识稳定 */
+/* 每日房源轮转：每天从房源池取 5 套，且与前几天不重复（解决「今天就是前天的房子」） */
+function applyDailyHouses(){
+  if(!D)return;
+  if(D.houseDate===TODAY_cur()&&(D.houses||[]).length)return;
+  const picked=pickDaily(housePool(),5,"mm_houses_shown",h=>(h.name||"")+"|"+(h.info||""));
+  D.houses=picked;
+  D.houseDate=TODAY_cur();
+  if(typeof save==="function")save();
+}
+/* 每日轮换：当天只算一次，保证题目与知识稳定 */
+function applyDailyKnows(){
+  if(!D)return;
+  if(D.knowDate===TODAY_cur()&&(D.knows||[]).length)return;
+  const picked=pickDaily(knowPool(),5,"mm_knows_shown",k=>k.t||k.q||"");
+  const dy=(typeof defaultKnows==="function"?defaultKnows():[]).filter(k=>k.cat==="抖音文案");
+  D.knows=picked.concat(dy);
+  D.knowDate=TODAY_cur();
+  if(typeof save==="function")save();
+}
+function catTag(c){const cls=KNOW_CATS[c]||"pri";return `<span class="tag ${cls}">${esc(c)}</span>`;}
+/* 知识正文智能排版：保留换行分段、识别列表项、小标题加粗，解决发布后挤成一坨 */
+function fmtBody(t){
+  let s=String(t==null?"":t).replace(/\r\n/g,"\n").trim();
+  if(!s)return "";
+  /* 一整坨无换行的文字（粘贴录入最常见）：先按句末标点智能断行，避免发布后挤成一坨 */
+  const nl=(s.match(/\n/g)||[]).length;
+  if(nl<2&&s.length>120)s=s.replace(/([。！？；])([""'」』）】]?)/g,"$1$2\n").replace(/\n{2,}/g,"\n");
+  const lines=s.split("\n").map(x=>x.trim());
+  const listRe=/^([0-9]{1,2}[.、)）]|[(（][0-9]{1,2}[)）]|[①②③④⑤⑥⑦⑧⑨⑩]|[-•·*＊◆●○■])\s*/;
+  let out="",inList=false;
+  lines.forEach(ln=>{
+    if(ln===""){ if(inList){out+="</div>";inList=false;} out+="<div style='height:7px'></div>"; return; }
+    const m=ln.match(listRe);
+    if(m){
+      if(!inList){out+="<div style='margin:5px 0'>";inList=true;}
+      const bullet=m[1],isNum=/^[0-9]/.test(bullet);
+      const txt=ln.slice(m[0].length).trim();
+      out+=`<div style="display:flex;gap:7px;margin:4px 0;line-height:1.72"><span style="flex-shrink:0;color:var(--pri);font-weight:${isNum?700:400};min-width:15px">${esc(bullet)}</span><span style="flex:1">${esc(txt)}</span></div>`;
+      return;
+    }
+    if(inList){out+="</div>";inList=false;}
+    const hm=ln.match(/^(【[^】]{1,20}】)\s*(.*)$/);
+    if(hm){
+      out+=`<div style="font-weight:700;color:var(--pri-deep);margin:10px 0 4px">${esc(hm[1])}</div>`;
+      if(hm[2].trim())out+=`<div style="line-height:1.75;margin:2px 0">${esc(hm[2].trim())}</div>`;
+      return;
+    }
+    const km=ln.match(/^([^：:]{2,12})[：:]\s*(.+)$/);
+    if(km&&ln.length<=70){
+      out+=`<div style="line-height:1.75;margin:4px 0"><b style="color:var(--pri-deep)">${esc(km[1])}：</b>${esc(km[2])}</div>`;
+      return;
+    }
+    out+=`<div style="line-height:1.75;margin:4px 0">${esc(ln)}</div>`;
+  });
+  if(inList)out+="</div>";
+  return out;
+}
+/* 知识页改为下拉4类（见 renderKnowCat），旧 renderKnows 已废弃 */
+
+/* ============ 今日房产知识测验 ============ */
+/* 每日有几条房产知识就生成几道题；题型：single 单选 / multi 多选 / bool 判断 / fill 填空 */
+const QUIZ=[
+  {type:"single",q:"三亚二套房、面积 95㎡（140㎡及以下）的住宅，契税税率是多少？",opts:["1%","1.5%","2%","3%"],ans:"A",ref:"唯一住房140㎡及以下1%、以上1.5%；二套140㎡及以下1%、以上2%。95㎡属二套≤140㎡→1%。"},
+  {type:"bool",q:"卖方出售的是住宅（非商铺、办公等非住宅）且「满五唯一」（满五年且家庭唯一住房），可免征个人所得税。",ans:true,ref:"住宅满五唯一免征个税；其余按差额20%或核定2%缴纳。注意：该减免只适用于住宅，非住宅（商铺、办公、产权式酒店、车位等）即使满五唯一也不可减免。"},
+  {type:"single",q:"三亚「托管返租公寓」类房源的核心风险是？",opts:["地段太好不好谈价","承诺的租金回报往往难以兑现","面积太小","产权是住宅"],ans:"B",ref:"托管返租公寓常见风险是回报兑现不了，属重点拉黑类型。"},
+  {type:"single",q:"二手房过户四步流程中，资金监管发生在哪一步？",opts:["①房源核验及购房资格","②网签合同、资金监管","③缴纳税费","④不动产转移登记"],ans:"B",ref:"顺序：核验资格→网签+资金监管→缴税→转移登记。"},
+  {type:"single",q:"非本省户籍家庭在三亚主城区（红线内）购房，需在海南累计缴纳社保或个税满多少个月？",opts:["6个月","12个月","24个月","60个月"],ans:"C",ref:"按资料库《三亚交易培训知识点汇编》：红线内（主城区）累计 24 个月、红线外（非主城区）累计 12 个月；大专以上学历或中级及以上职称连续缴纳 12 个月可全域适用。（旧口径「主城区5年」已不适用，勿再引用）"},
+  {type:"single",q:"客户预算约200万的刚需自住，三亚应首选哪个板块？",opts:["海棠区顶豪","吉阳区城居","崖州区产业","天涯区大众"],ans:"B",ref:"吉阳区城居2.8-4.2万/㎡、市中心配套成熟、全年均匀去化，刚需首选。"},
+  {type:"single",q:"保利天珺（吉阳区月川CBD）主力户型面积段是？",opts:["60-90㎡","90-110㎡","113-238㎡","240-300㎡"],ans:"C",ref:"113-238㎡三至五房纯板楼大平层，2025年三亚年度销冠盘。"},
+  {type:"multi",q:"以下哪几类房源建议直接拉黑（多选）？",opts:["远郊小户型旅居盘","伪海景房（非核心湾区溢价）","产权瑕疵房","品牌开发商现房"],ans:["A","B","C"],ref:"拉黑5类含远郊小户型、伪海景、产权瑕疵等；品牌现房不在列。"},
+  {type:"bool",q:"单纯在三亚买一套房，就可以直接把户口落过来。",ans:false,ref:"房子只是落户的地址载体，单纯买房不能直接落户，需满足人才/社保等条件。"}
+  ,{type:"single",q:"看新房时，以下哪项不属于必须确认的「五要素」？",opts:["开发商","交付时间","邻居职业","车位配比"],ans:"C",ref:"新房五要素：开发商、交付时间、交付标准、物业费、车位配比。"}
+  ,{type:"bool",q:"板楼通常比塔楼采光通风更好、公摊更小。",ans:true,ref:"板楼一梯两户、南北通透，公摊相对小；塔楼密度高、朝向差异大。"}
+  ,{type:"single",q:"得房率＝套内面积÷建筑面积，得房率越高意味着什么？",opts:["公摊越大","实际使用面积越大","总价一定越高","楼层一定越高"],ans:"B",ref:"得房率高，同样建筑面积下能实际使用的套内面积更多。"}
+  ,{type:"fill",q:"二手房房产证满___年的普通住宅可免征增值税。",ans:"2",ref:"满2年免征增值税；未满2年按全额5%缴纳，税费差距很大。"}
+  ,{type:"single",q:"关于「定金」与「订金」，下列说法正确的是？",opts:["二者完全一样","定金违约适用定金罚则，订金一般可退","订金一定不可退","定金可无条件退还"],ans:"B",ref:"定金具担保性质，违约适用定金罚则；订金视为预付款，一般可退。"}
+  ,{type:"multi",q:"签约前房屋查档应重点确认哪些（多选）？",opts:["产权人","抵押情况","是否被查封","小区绿化率"],ans:["A","B","C"],ref:"查档四项：产权人、抵押、查封、异议登记；绿化率不属查档内容。"}
+  ,{type:"bool",q:"网签完成后，该房源即被锁定，不能再卖给其他人。",ans:true,ref:"网签的核心作用就是锁定房源、防止一房多卖。"}
+  ,{type:"single",q:"海南购房限购认定的单位是？",opts:["个人","家庭","户籍所在地","社保缴纳地"],ans:"B",ref:"限购以家庭为单位认定，海南无房的家庭限购一套。"}
+  ,{type:"bool",q:"海南自贸港封关后，三亚住房限购会自动取消。",ans:false,ref:"封关不改变现行住房限购政策，购房资格仍按现行规定执行，不要向客户承诺。"}
+  ,{type:"single",q:"人才落户三亚后，购房主要改变的是哪一项？",opts:["房屋成交价格","社保与户籍对应的购房资格","银行贷款利率","契税税率"],ans:"B",ref:"人才落户后按本地户籍认定购房资格，社保年限要求相应变化。"}
+  ,{type:"single",q:"海棠湾的房源更适合推荐给哪类客户？",opts:["刚需自住家庭","高端度假与顶豪客户","预算有限的首次置业者","只看租金回报的客户"],ans:"B",ref:"海棠湾以高端度假与顶豪为主，单价高、配套偏度假属性，不适合刚需。"}
+  ,{type:"single",q:"预算有限且看重租售比的客户，可优先考虑哪个区？",opts:["海棠区","吉阳区","崖州区","天涯区"],ans:"C",ref:"崖州湾科技城带动产业人口，租赁需求有支撑且总价相对低。"}
+  ,{type:"bool",q:"自住刚需客户应优先推荐三亚湾一线海景房。",ans:false,ref:"海景房溢价高、生活配套弱，自住刚需更适合市区（如吉阳区）。"}
+  ,{type:"single",q:"带看动线一般按什么顺序安排？",opts:["先看户型再谈价","先看小区环境与配套，再看户型，最后谈价格","先谈价格再看房","先看样板间再直接签合同"],ans:"B",ref:"由外到内、由整体到细节，最后再进入价格谈判。"}
+  ,{type:"single",q:"处理客户异议的第一步应该是？",opts:["立刻反驳","认同客户的顾虑","马上转移话题","直接申请降价"],ans:"B",ref:"异议处理三步：先认同顾虑，再用事实回应，最后给出方案。"}
+  ,{type:"multi",q:"带看新房时，应向客户确认的交付相关信息包括（多选）？",opts:["交付时间","交付标准（精装/毛坯）","物业费标准","车位配比"],ans:["A","B","C","D"],ref:"这四项都属新房五要素范畴，带看时必须逐项确认并记录。"}
+  ,{type:"single",q:"三亚首套住房首付比例最低一般是多少？",opts:["15%","20%","30%","40%"],ans:"A",ref:"首套首付最低一般15%，限购区以贷款银行最新执行口径为准。"}
+  ,{type:"bool",q:"在老家缴纳的公积金，满足条件可以在三亚申请异地公积金贷款。",ans:true,ref:"三亚支持异地公积金贷款，需缴存地开具证明并满足连续缴存要求。"}
+  ,{type:"bool",q:"非本省户籍购房的社保年限，事后补缴一般可计入连续缴纳年限。",ans:false,ref:"补缴通常不计入连续年限，断缴会影响购房资格认定，需逐月核对。"}
+  ,{type:"single",q:"海南住房限售的起算时点是？",opts:["签订买卖合同","网签备案","取得不动产权证","交定金"],ans:"C",ref:"限售一般自取得不动产权证起算，具体年限以市县政策为准。"}
+  ,{type:"multi",q:"法拍房的主要风险包括（多选）？",opts:["需一次性付款","税费可能由买方承担","原房主占用难以清退","一定能正常贷款"],ans:["A","B","C"],ref:"法拍房需一次性付款、税费或由买方承担、清退困难，不向新手客户主动推荐。"}
+  ,{type:"single",q:"通过赠与取得的房屋，日后再次出售时个税通常如何计征？",opts:["按差额20%","免征","按1%","按2%核定"],ans:"A",ref:"赠与/继承取得房屋再出售，个税按差额20%计征，原值低会导致税负重。"}
+  ,{type:"single",q:"客户问「多孩家庭能不能多买一套」，正确的处理方式是？",opts:["以住建部门最新文件为准并代为核实","肯定可以多买一套","全国统一多一套","与三亚无关"],ans:"A",ref:"特殊群体购房政策以三亚住建部门最新文件为准，不得凭经验臆断。"}
+  ,{type:"single",q:"吉阳区（2026年参考）二手房均价区间约为？",opts:["0.8—1.2万/㎡","1.5—2万/㎡","2.8—4.2万/㎡","5—6万/㎡"],ans:"C",ref:"吉阳区是市中心，配套成熟，均价2.8—4.2万/㎡。"}
+  ,{type:"single",q:"天涯区相对其他区最突出的特点是？",opts:["城市化最成熟、生活便利","以顶豪为主","产业人口最强","完全无海景资源"],ans:"A",ref:"天涯区含三亚湾，城市化成熟、生活便利，价格带2.2—4.2万/㎡。"}
+  ,{type:"single",q:"海棠区（2026年参考）均价区间约为？",opts:["2.2—3.2万/㎡","2.8—4.2万/㎡","3.5—5.5万/㎡","1.5—2万/㎡"],ans:"C",ref:"海棠区以顶豪与高端度假为主，均价3.5—5.5万/㎡，不适合刚需。"}
+  ,{type:"multi",q:"崖州区的产业支撑主要包括（多选）？",opts:["崖州湾科技城","南繁","深海所","免税城"],ans:["A","B","C"],ref:"崖州区是三亚唯一有产业人口支撑的区；免税城属海棠区。"}
+  ,{type:"single",q:"三亚全市二手住房均价（2026年参考）约为？",opts:["约1.2万/㎡","约2.2万/㎡","约3.5万/㎡","约5万/㎡"],ans:"B",ref:"2026年三亚二手均价约2.2万/㎡（58同城2026-08数据）。"}
+  ,{type:"multi",q:"物业交割时需结清或核对的事项包括（多选）？",opts:["物业费","水费电费燃气","门禁与车位","中介服务费"],ans:["A","B","C"],ref:"物业交割结清物业水电燃气并办理更名；中介费不属交割事项。"}
+  ,{type:"single",q:"三亚市场二手房中介服务费常见区间是？",opts:["0.1%—0.3%","1%—3%","5%—8%","固定1000元"],ans:"B",ref:"中介费一般按成交价1%—3%，以门店公示标准为准并写入合同。"}
+  ,{type:"multi",q:"购买期房需要重点关注的风险有（多选）？",opts:["延期交付","减配","烂尾","一定比现房贵"],ans:["A","B","C"],ref:"期房价格常有优势，但存在延期交付、减配、烂尾三类主要风险。"}
+  ,{type:"multi",q:"精装房验房应重点核对（多选）？",opts:["厨卫防水","瓷砖空鼓","五金品牌是否与合同一致","邻居的职业"],ans:["A","B","C"],ref:"验房核对防水、空鼓、合同品牌与隐蔽工程；邻居职业与验房无关。"}
+  ,{type:"single",q:"关于容积率，下列说法正确的是？",opts:["容积率越低，居住密度越小、舒适度越高","容积率越高越舒适","容积率与居住体验无关","容积率只影响房价不影响体验"],ans:"A",ref:"容积率越低密度越小、舒适度越高，是判断小区品质的硬指标。"}
+  ,{type:"single",q:"三亚三套及以上住房的契税税率是？",opts:["1%","1.5%","2%","3%"],ans:"D",ref:"三套及以上一律3%，不受面积影响。"}
+  ,{type:"single",q:"家庭唯一住房、面积140㎡及以下的契税税率是？",opts:["1%","1.5%","2%","3%"],ans:"A",ref:"唯一住房140㎡及以下1%、以上1.5%。"}
+  ,{type:"single",q:"卖方个税无原值凭证时，常见的核定征收率是？",opts:["1%","2%","5%","20%"],ans:"B",ref:"有原值凭证按差额20%，无凭证核定2%；住宅满五唯一免征（非住宅不适用）。"}
+  ,{type:"single",q:"「满五唯一」中的「唯一」按什么口径认定？",opts:["家庭唯一住房","个人唯一住房","本省唯一住房","本市唯一住房"],ans:"A",ref:"按家庭（含配偶及未成年子女）唯一住房认定。"}
+  ,{type:"multi",q:"带看前应做的准备包括（多选）？",opts:["熟悉房源资料与产权情况","规划看房路线与动线","梳理客户需求清单","调取客户银行流水"],ans:["A","B","C"],ref:"带看前准备房源、路线、需求清单；银行流水不属带看准备。"}
+  ,{type:"single",q:"客户说「我再考虑考虑」，第一步应该？",opts:["挖掘真实顾虑","立刻降价","停止跟进","反复催促成交"],ans:"A",ref:"异议处理三步：先认同顾虑，再用事实回应，最后给方案。"}
+  ,{type:"single",q:"向客户报价时，更稳妥的做法是？",opts:["先报价格区间，再谈具体房源","直接报最低价吸引客户","坚持不报价","让客户先出价再决定"],ans:"A",ref:"先报区间能让客户建立合理预期，避免被单一数字误导。"}
+  ,{type:"bool",q:"为促成成交，可以向客户承诺「买这里一定能上某学校」。",ans:false,ref:"学区划片以当年教育部门公布为准，不得做确定性承诺。"}
+  ,{type:"multi",q:"劝退远郊低价盘时，最有说服力的事实是（多选）？",opts:["入住率低","转手流动性差","同类盘5年跌幅明显","开发商品牌知名度高"],ans:["A","B","C"],ref:"用入住率、转手流动性、5年跌幅三个事实客观劝退，而非笼统否定。"}
+  ,{type:"single",q:"客户只看海景想下单，专业经纪人应主动提示什么？",opts:["离海距离与潮湿腐蚀问题","海景房一定升值","无需提示，直接成交","只看价格即可"],ans:"A",ref:"应客观分析离海距离、潮湿腐蚀与配套问题，不顺着客户一味夸海景。"}
+  ,{type:"multi",q:"相比新房，二手房的优势包括（多选）？",opts:["所见即所得","配套成熟","可议价空间","税费一定更低"],ans:["A","B","C"],ref:"二手房优势是确定性、成熟度与议价空间；税费通常高于新房。"}
+  ,{type:"multi",q:"购买新房主要涉及的税费/费用包括（多选）？",opts:["契税","住宅专项维修基金","卖方个人所得税","增值税"],ans:["A","B"],ref:"新房主要涉及契税与维修基金；个税与增值税属二手房交易税费。"}
+  ,{type:"multi",q:"资金监管主要防范的风险是（多选）？",opts:["钱付了但过不了户","过了户但拿不到钱","房价上涨","贷款批不下来"],ans:["A","B"],ref:"资金监管核心是防止钱房两空，过户完成后才划款给卖方。"}
+  ,{type:"bool",q:"网签完成后，买方可以单方面申请撤销网签。",ans:false,ref:"网签撤销需买卖双方共同申请，网签的作用是锁定房源防止一房多卖。"}
+  ,{type:"single",q:"接待外地客户时，判断购房资格的第一步是？",opts:["问清户籍、社保/个税、婚姻与家庭住房情况","先带看再核实","先签合同","先收定金"],ans:"A",ref:"先花2分钟梳理资格再推盘，避免带看后才发现无资格白忙。"}
+  ,{type:"single",q:"带看结束后，比较合适的跟进时效是？",opts:["24小时内","一周以后","等客户主动联系","一个月后"],ans:"A",ref:"带看后24小时内跟进，趁客户印象清晰时强化需求匹配。"}
+  ,{type:"multi",q:"房源实勘时应重点记录的内容有（多选）？",opts:["户型与朝向","楼龄与产权状况","周边配套","业主的个人隐私信息"],ans:["A","B","C"],ref:"实勘记录户型朝向、楼龄产权与周边配套；业主隐私不应记录外传。"}
+  ,{type:"single",q:"三亚商业贷款的套数认定标准是？",opts:["既认三亚房产也看全国贷款记录","只认三亚房产，不看全国贷款记录","认全国范围内的房产","只看征信、不认房"],ans:"B",ref:"商业贷款只认三亚房产，不看全国贷款记录。多孩家庭可申请购买多套，但贷款套数认定仍按此规则。"}
+  ,{type:"single",q:"三亚公积金贷款购买自住住房的最高基准额度是（单方缴存 / 双方缴存）？",opts:["80万 / 100万","100万 / 120万","120万 / 150万","50万 / 70万"],ans:"B",ref:"基准额度：单方缴存 100 万、双方缴存 120 万；多子女家庭、高层次人才等可上浮，最高单方 160 万、双方 192 万。"}
+  ,{type:"single",q:"三亚商品住宅限售：需备案时间满几年，且领取不动产权证后方可上市出售？",opts:["2年","3年","5年","不限售"],ans:"C",ref:"商品住宅限售：备案时间满 5 年，且领取不动产权证后，方可上市出售。产权式酒店、酒店式公寓不限售、不限购。"}
+  ,{type:"bool",q:"非住宅（商铺、办公、产权式酒店、车位等）只要满五唯一，同样可以免征个人所得税。",ans:false,ref:"错误。满五唯一减免个税只适用于住宅；非住宅无论是否满五唯一，个税都不可减免，需按差额20%或核定2%缴纳。这是新人最容易记混的一点。"}
+  ,{type:"single",q:"客户出售一套三亚的商铺，房产证满五年且是家庭唯一房产，其个人所得税如何处理？",opts:["免征","按差额20%或核定2%缴纳","按1%缴纳","减半征收"],ans:"B",ref:"商铺属非住宅，不适用住宅的满五唯一减免，需按差额20%（提供原值）或核定2%（不提供原值）缴纳个税。"}
+];
+let quizUser=[];let quizShown=[];   /* quizShown 记录当前渲染在页面上的题，提交校验以它为准 */
+function norm(s){return String(s==null?"":s).trim().toLowerCase().replace(/\s+/g,"");}
+function quizTypeLabel(t){return {single:"单选题",multi:"多选题",bool:"判断题",fill:"填空题"}[t]||"题";}
+/* 每天 6 道题（≥5），轮转抽取并跳过近期已考过的；当天结果缓存，保证多次打开题目一致 */
+/* 当天云端考核题：店长在后台录入新房知识/房产知识时可附带，用于当日考核 */
+function cloudQuizItems(){
+  const out=[];
+  ["new","prop"].forEach(k=>{
+    (cloudKnow[k]||[]).forEach(x=>{
+      const qz=x&&x.quiz;
+      const arr=Array.isArray(qz)?qz:(qz?[qz]:[]);   /* 支持一条知识挂多道题 */
+      arr.forEach(z=>{
+        if(z&&z.q){
+          let ans=z.ans;
+          if(z.type==="bool")ans=(String(z.ans)==="true"||z.ans===true);
+          out.push({type:z.type||"single",q:z.q,opts:z.opts||[],ans:ans,ref:z.ref||"",cloud:true});
+        }
+      });
+    });
+  });
+  return out;
+}
+/* 每日考题 = 云端考核题优先 + 静态题库轮转补足，保证每天不同且不少于5题 */
+function quizItems(){
+  const dyn=cloudQuizItems();
+  /* 云端当天的考核题必须优先进入当日考题。
+     否则早上打开 App 已缓存静态题，下午才推送的云端题就永远进不去（用户会看到旧题）。 */
+  if(D&&D.quizDate===TODAY_cur()&&Array.isArray(D.quizCache)&&D.quizCache.length===5){   /* 固定 5 道，旧的 6 道缓存自动作废 */
+    const cached=D.quizCache;
+    const dynQs=dyn.map(x=>x.q);
+    const hasAll=dynQs.length>0&&dynQs.every(q=>cached.some(c=>c.q===q));
+    if(dynQs.length===0||hasAll)return cached;   /* 无云端题或已全部包含 → 沿用缓存 */
+  }
+  const dyn5=dyn.slice(0,5);   /* 每天固定 5 道；云端题多于 5 道时只取前 5 */
+  const need=Math.max(5-dyn5.length,0);
+  const dynQs=new Set(dyn5.map(x=>x.q));
+  const pool=QUIZ.filter(q=>!dynQs.has(q.q));   /* 与云端考核题重复的不再出一遍 */
+  const picked=need?pickDaily(pool,need,"mm_quiz_shown",q=>q.q):[];
+  const all=dyn5.concat(picked);
+  if(D){D.quizCache=all;D.quizDate=TODAY_cur();if(typeof save==="function")save();}
+  return all;
+}
+function quizToggle(i,val,el){
+  quizUser[i]=quizUser[i]||[];
+  if(el.checked){if(!quizUser[i].includes(val))quizUser[i].push(val);}
+  else{quizUser[i]=quizUser[i].filter(x=>x!==val);}
+}
+function quizInputHTML(q,i){
+  if(q.type==="fill")return `<div class="field" style="margin-top:6px"><input type="text" placeholder="请输入答案" oninput="quizUser[${i}]=this.value"></div>`;
+  if(q.type==="single"||q.type==="bool"){
+    const opts=q.type==="bool"?[["true","对"],["false","错"]]:q.opts.map((o,idx)=>[String.fromCharCode(65+idx),o]);
+    return `<div style="margin-top:6px">`+opts.map(([v,label])=>`<label style="display:block;padding:6px 0;font-size:14px"><input type="radio" name="q${i}" value="${v}" onchange="quizUser[${i}]=${q.type==="bool"?(v==="true"):`'${v}'`}"> ${esc(label)}</label>`).join("")+`</div>`;
+  }
+  if(q.type==="multi")return `<div style="margin-top:6px">`+q.opts.map((o,idx)=>`<label style="display:block;padding:6px 0;font-size:14px"><input type="checkbox" value="${String.fromCharCode(65+idx)}" onchange="quizToggle(${i},'${String.fromCharCode(65+idx)}',this)"> ${esc(o)}</label>`).join("")+`</div>`;
+  return "";
+}
+function quizResultHTML(q,r){
+  let ua,ca;
+  if(q.type==="fill"){ua=r.user?("你的答案："+esc(r.user)):"（未作答）";ca="正确答案："+esc(q.ans);}
+  else if(q.type==="bool"){ua=r.user===true?"你的答案：对":r.user===false?"你的答案：错":"（未作答）";ca="正确答案："+(q.ans?"对":"错");}
+  else{const arr=Array.isArray(r.user)?r.user:(r.user?[r.user]:[]);ua=arr.length?("你的答案："+arr.join("、")):"（未作答）";ca="正确答案："+(Array.isArray(q.ans)?q.ans.join("、"):q.ans);}
+  const okc=r.correct?"var(--ok)":"var(--bad)";
+  return `<div class="kv"><b style="color:${okc}">${r.correct?"✅ 答对":"❌ 答错"}</b><span style="text-align:right">${ua}</span></div>
+    <div class="kv"><b>正确答案</b><span style="text-align:right;color:${okc}">${ca}</span></div>
+    <div class="q">💡 ${esc(q.ref||"")}</div>`;
+}
+function quizAnsText(r){if(r.type==="fill")return String(r.ans||"");if(r.type==="bool")return r.ans?"对":"错";return Array.isArray(r.ans)?r.ans.join("、"):String(r.ans||"");}
+function quizUserAnsText(r){if(r.type==="fill")return r.user?String(r.user):"（未作答）";if(r.type==="bool")return r.user===true?"对":r.user===false?"错":"（未作答）";const arr=Array.isArray(r.user)?r.user:(r.user?[r.user]:[]);return arr.length?arr.join("、"):"（未作答）";}
+/* 判断某题是否已作答（用于「答完考核题才能提交日报」的校验） */
+function quizAnswered(u,q){
+  if(q.type==="multi")return Array.isArray(u)&&u.length>0;
+  if(q.type==="bool")return u===true||u===false;
+  return u!==undefined&&u!==null&&String(u).trim()!=="";
+}
+function gradeQuiz(){
+  const list=quizItems();let correct=0;
+  const res=list.map((q,i)=>{
+    const u=quizUser[i];let ok=false;
+    if(q.type==="single"||q.type==="bool")ok=(u===q.ans);
+    else if(q.type==="multi"){const a=(u||[]).slice().sort().join(",");const b=q.ans.slice().sort().join(",");ok=(a===b&&q.ans.length>0);}
+    else if(q.type==="fill"){const nu=norm(u),na=norm(q.ans);ok=(nu===na)||(na&&nu.indexOf(na)>=0&&nu.length>0);}
+    if(ok)correct++;
+    return {type:q.type,q:q.q,user:u,ans:q.ans,ref:q.ref,correct:ok};
+  });
+  return {res,rate:list.length?Math.round(correct/list.length*100):0};
+}
+function renderQuiz(){
+  const box=document.getElementById("quizBox");if(!box)return;
+  const list=quizItems();
+  quizShown=list;   /* 记住当前显示的这批题，提交时按它校验 */
+  /* 只在题目本身变化时才清空答案。无条件清空会导致任何一次重渲染都抹掉已答内容，
+     表现为「明明全答完了，提交却说还有题没答」 */
+  const sig=list.map(q=>q.q).join("|");
+  if(window.__quizSig!==sig){quizUser=[];window.__quizSig=sig;}
+  const cnt=document.getElementById("quizCount");if(cnt)cnt.textContent="共 "+list.length+" 题";
+  if(!list.length){box.innerHTML="<div class='muted'>今日暂无房产知识，无测验题。</div>";return;}
+  const taken=(D.report&&D.report.quiz);
+  box.innerHTML=list.map((q,i)=>{
+    const body=taken?quizResultHTML(q,taken.res[i]||{}):quizInputHTML(q,i);
+    return `<div class="house" style="border-left:4px solid var(--pri)">
+      <div class="ht">${i+1}. ${esc(q.q)} <span class="tag pri">${quizTypeLabel(q.type)}</span></div>
+      ${body}
+    </div>`;
+  }).join("");
+}
+
+/* ============ 日报 ============ */
+function renderReport(){
+  const tx=document.getElementById("reportTexts");tx.innerHTML="";
+  TEXT_QS.forEach((q,i)=>{
+    tx.insertAdjacentHTML("beforeend",`<div class="field"><label>${q}</label><textarea oninput="D.report.texts['${i}']=this.value;save()">${esc(D.report.texts[i]||"")}</textarea></div>`);
+  });
+  renderQuiz();
+}
+function submitReport(){
+  const filled=TEXT_QS.some((q,i)=>(D.report.texts[i]||"").trim());
+  if(!filled){toast("请先填写「一、今日总结」才能提交日报");return;}
+  /* 跑盘必须逐条点「提交」：填了内容却没提交的拦下来，避免资料库收到半成品 */
+  const panUnsubmitted=(D.pans||[]).findIndex(p=>{
+    if(p&&p.submitted)return false;
+    return Object.keys(p||{}).some(k=>k!=="submitted"&&k!=="submitAt"&&String(p[k]||"").trim());
+  });
+  if(panUnsubmitted>=0){toast("跑盘"+(panUnsubmitted+1)+"还没点「提交」，请先填好小区名称并提交，再交日报");goPage("pan");return;}
+  /* 当日考核题必须全部答完才能提交日报 */
+  const qs=(quizShown&&quizShown.length)?quizShown:quizItems();
+  if(qs.length){
+    const miss=qs.findIndex((q,i)=>!quizAnswered(quizUser[i],q));
+    if(miss>=0){toast("第 "+(miss+1)+" 道（"+quizTypeLabel(qs[miss].type)+"）还没答，答完全部 "+qs.length+" 道才能提交日报");goPage("report");return;}
+  }
+  if(!P.name)toast("提示：首页未填经纪人姓名，建议补填便于统计");
+  D.report.nums={};
+  D.tasks.forEach(t=>{for(const [f,name] of Object.entries(TASK_MAP)){if(t.n.startsWith(name))D.report.nums[f]=t.a;}});
+  if(!D.report.quiz){const g=gradeQuiz();D.report.quiz=g.res;D.report.quizRate=g.rate;}
+  save();genReview();
+  if(lkLeft()>0)setTimeout(lkOpen,700);   /* 签单达成 → 恭喜页 + 盲盒抽奖（签几单抽几次，还有次数就弹） */
+  toast("日报已提交，复盘已生成");vibrate();
+  cloudUpload((cloudCfg().env||"").trim()?1:0);   /* 提交即上传，配置了云端才提示结果 */
+  goPage("review");
+}
+function reportMd(){
+  let s=`# 新人每日工作总结 · ${TODAY_cur()}\n\n**经纪人：${P.name||"（未填写姓名）"}**\n\n## 一、今日总结\n\n`;
+  TEXT_QS.forEach((q,i)=>s+=`**${q}**\n${D.report.texts[i]||"（未填写）"}\n\n`);
+  const rate=(D.report&&D.report.quizRate!=null)?D.report.quizRate:"-";
+  s+=`## 二、今日房产知识测验（正确率 ${rate}%）\n\n`;
+  const res=(D.report&&D.report.quiz)||[];
+  if(res.length){
+    res.forEach((r,i)=>{
+      s+=`${i+1}. ${r.q}\n`;
+      s+=`   - 你的答案：${quizUserAnsText(r)}\n`;
+      s+=`   - 正确答案：${quizAnsText(r)}\n`;
+      s+=`   - ${r.correct?"✅答对":"❌答错"}　💡${r.ref||""}\n\n`;
+    });
+  }else{
+    s+=`（提交后显示答题与正确答案）\n\n`;
+  }
+  if(D.pans&&D.pans.length){
+    s+=`## 附：今日跑盘记录\n\n`;
+    D.pans.forEach((p,i)=>{
+      s+=`### 跑盘 ${i+1}：${p.name||"（小区名称待填）"}\n\n`;
+      PAN_FIELDS.forEach(([f,l])=>{if(f!=="name")s+=`- ${l}：${(p[f]||"").trim()||"（未填写）"}\n`;});
+      s+=`\n`;
+    });
+  }
+  return s;
+}
+function copyReport(){
+  const md=reportMd();
+  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(md).then(()=>toast("日报Markdown已复制"));}
+  else{fallbackCopy(md);}
+}
+function fallbackCopy(txt){
+  const ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();
+  try{document.execCommand("copy");toast("已复制");}catch(e){prompt("长按全选复制：",txt);}
+  document.body.removeChild(ta);
+}
+
+/* ============ 复盘 ============ */
+function genReview(){
+  const gaps=[];
+  D.tasks.forEach(t=>{if(t.t>0)gaps.push({n:t.n,t:t.t,a:t.a,pct:t.a/t.t});});
+  const sign=signDone();
+  const rate=sign?100:(gaps.length?Math.round(gaps.reduce((s,x)=>s+Math.min(1,x.pct),0)/gaps.length*100):0);
+  const done=sign?gaps.map(x=>x.n):gaps.filter(x=>x.pct>=1).map(x=>x.n);
+  const undone=sign?[]:gaps.filter(x=>x.pct<1).map(x=>`${x.n}（目标${x.t}/实际${x.a}）`);
+  const worstRaw=sign?null:[...gaps].filter(x=>x.pct<1).sort((a,b)=>a.pct-b.pct)[0];
+  const worst=sign?"无（签单达成，今日目标100%完成）":(worstRaw?`${worstRaw.n}（目标${worstRaw.t}，实际${worstRaw.a}，完成率${Math.round(worstRaw.pct*100)}%）`:"无");
+  const tomorrows=[];
+  if(!sign&&worstRaw)tomorrows.push(`优先补「${worstRaw.n}」缺口：目标${worstRaw.t}，仅完成${worstRaw.a}，明日上午集中攻克`);
+  const zero=gaps.filter(x=>x.a===0&&x.pct<1).slice(0,2);
+  zero.forEach(z=>tomorrows.push(`「${z.n}」今日为0，明日目标${Math.max(1,Math.round(z.t/2))}，列入上午首要安排`));
+  while(tomorrows.length<3)tomorrows.push(["完成1个小区的实地跑盘并填全10项信息","重点客户各进行1次深度跟进","新增2套有效房源并完成实勘","复述今日房产知识要点给同事听一遍"][tomorrows.length%4]);
+  D.review={rate,done:done,undone:undone,
+    worst:worst,
+    tomorrows:tomorrows.slice(0,3),time:new Date().toLocaleString("zh-CN"),
+    quiz:(D.report&&D.report.quiz)||[],
+    quizRate:(D.report&&D.report.quizRate!=null)?D.report.quizRate:null};
+  save();renderReview();cloudAuto();
+}
+function renderReview(){
+  const r=D.review,st=document.getElementById("rvStatus"),stat=document.getElementById("rvStat"),body=document.getElementById("rvBody");
+  if(!r){st.textContent="待日报提交";st.className="tag warn";stat.innerHTML="";body.innerHTML=`<div class="note">先在「日报」页填写并提交日报，复盘将自动生成。</div>`;return;}
+  st.textContent="已完成";st.className="tag ok";
+  const color=r.rate>=80?"var(--ok)":r.rate>=50?"var(--warn)":"var(--bad)";
+  stat.innerHTML=`<div class="s"><div class="n" style="color:${color}">${r.rate}%</div><div class="l">今日完成率</div></div>
+    <div class="s"><div class="n">${r.done.length}</div><div class="l">达标任务</div></div>
+    <div class="s"><div class="n" style="color:var(--bad)">${r.undone.length}</div><div class="l">未达标任务</div></div>
+    <div class="s"><div class="n">${(D.pans||[]).length}</div><div class="l">跑盘小区</div></div>
+    ${r.quizRate!=null?`<div class="s"><div class="n" style="color:${r.quizRate>=60?'var(--ok)':'var(--warn)'}">${r.quizRate}%</div><div class="l">考题正确率</div></div>`:""}`;
+  body.innerHTML=`
+    ${lkEntryHTML()}
+    <h3 style="font-size:13px;color:var(--sub)">✅ 做得好的地方</h3>
+    <div class="q">${r.done.length?r.done.map(x=>"· "+esc(x)).join("<br>"):"今日暂无完全达标项，先保证量再谈质。"}</div>
+    <h3 style="font-size:13px;color:var(--sub);margin-top:12px">⚠️ 存在的问题（目标 vs 实际）</h3>
+    <div class="q">${r.undone.length?r.undone.map(x=>"· "+esc(x)).join("<br>"):"全部达标，继续保持并适当上调明日目标。"}</div>
+    <h3 style="font-size:13px;color:var(--sub);margin-top:12px">🎯 今日最需要改进（仅1个）</h3>
+    <div class="q">${esc(r.worst)}</div>
+    <h3 style="font-size:13px;color:var(--sub);margin-top:12px">📌 明日重点任务（3个）</h3>
+    <div class="q">${r.tomorrows.map((x,i)=>`${i+1}. ${esc(x)}`).join("<br>")}</div>
+    ${r.quizRate!=null?`<h3 style="font-size:13px;color:var(--sub);margin-top:12px">📝 今日房产知识测验（正确率 ${r.quizRate}%）</h3>
+    <div class="q">${(r.quiz||[]).map((q,i)=>`${i+1}. ${esc(q.q)} —— ${q.correct?'<b style="color:var(--ok)">答对</b>':'<b style="color:var(--bad)">答错</b>'}（正确答案：${esc(quizAnsText(q))}）`).join("<br>")}</div>`:""}
+    <div class="muted" style="margin-top:12px">复盘生成时间：${r.time} ｜ 复盘基于真实数据，缺失项按0计，禁止编造。</div>`;
+}
+function copyReview(){
+  if(!D.review){toast("尚无复盘");return;}
+  const r=D.review;
+  let s=`# AI复盘 · ${TODAY_cur()}\n\n**经纪人：${P.name||"（未填写姓名）"}**\n\n**今日完成率：${r.rate}%**\n**今日房产知识测验正确率：${r.quizRate!=null?r.quizRate+'%':'未作答'}**\n\n## 做得好的地方\n${r.done.map(x=>"- "+x).join("\n")||"- 无"}\n\n## 存在的问题\n${r.undone.map(x=>"- "+x).join("\n")||"- 无"}\n\n## 今日最需要改进\n${r.worst}\n\n## 明日重点任务\n${r.tomorrows.map((x,i)=>`${i+1}. ${x}`).join("\n")}\n`;
+  if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(s).then(()=>toast("复盘报告已复制"));}
+  else{fallbackCopy(s);}
+}
+
+/* ============ 经纪人信息 ============ */
+function renderProfile(){
+  document.getElementById("agentName").value=P.name||"";
+}
+document.getElementById("agentName").addEventListener("change",e=>{
+  P.name=e.target.value.trim();saveProfile2();renderProfile();
+  toast(P.name?"经纪人姓名已保存："+P.name:"姓名已清空");});
+
+/* ============ 数据备份 ============ */
+function exportData(){
+  const all={days:{},profile:P};
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k.startsWith("sanya_"))all.days[k]=JSON.parse(localStorage.getItem(k));
+  }
+  const blob=new Blob([JSON.stringify(all,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="三亚房产新人数据备份_"+TODAY+".json";a.click();
+  toast("备份文件已生成，请保存到手机");
+}
+function importData(){
+  const inp=document.createElement("input");inp.type="file";inp.accept=".json";
+  inp.onchange=()=>{
+    const f=inp.files[0];if(!f)return;
+    const rd=new FileReader();
+    rd.onload=()=>{
+      try{
+        const data=JSON.parse(rd.result);
+        if(data.days)Object.entries(data.days).forEach(([k,v])=>localStorage.setItem(k,JSON.stringify(v)));
+        if(data.profile)localStorage.setItem("sanya_profile",JSON.stringify(data.profile));
+        loadProfile();load();renderAll();toast("数据导入成功");
+      }catch(e){toast("导入失败：文件格式不正确");}
+    };
+    rd.readAsText(f);
+  };
+  inp.click();
+}
+
+/* ============ 日期切换 ============ */
+document.getElementById("datePick").addEventListener("change",()=>{
+  const d=TODAY_cur();
+  const raw=localStorage.getItem("sanya_"+d);
+  if(raw){D=JSON.parse(raw);if(!D.report)D.report={nums:{},texts:{}};}
+  else{
+    if(!confirm(d+" 无历史数据，是否按模板新建该日？")){document.getElementById("datePick").value=TODAY;load();renderAll();document.getElementById("todayTag").textContent="今天";return;}
+    D={goal:"",tasks:defaultTasks(),houses:[],pans:[],knows:[],report:{nums:{},texts:{}},review:null};
+    save();
+  }
+  document.getElementById("todayTag").textContent=d===new Date().toISOString().slice(0,10)?"今天":"历史";
+  /* 顶部日期切换时，知识页的「查看日期」跟随，避免两个日期不一致造成困惑 */
+  const kd=document.getElementById("knowDate");if(kd)kd.value=d;
+  renderAll();
+});
+
+/* ============ 云端同步（腾讯云开发 CloudBase） ============ */
+const CLOUD_COLL = "agent_daily";
+let cloudApp=null, cloudDb=null, cloudReady=false, cloudTimer=null, cloudBusy=false;
+
+const CLOUD_ENV_DEFAULT = "agentdata-d3gy3iioa56710afc";
+function cloudCfg(){
+  try{
+    const o=JSON.parse(localStorage.getItem("mm_cloud")||'{}');
+    if(!o.env)o.env=CLOUD_ENV_DEFAULT;
+    return o;
+  }catch(e){return {env:CLOUD_ENV_DEFAULT};}
+}
+function cloudSaveCfg(o){try{localStorage.setItem("mm_cloud",JSON.stringify(o));}catch(e){}}
+/* 当前应用访问域名（用于云开发 Web 安全域名白名单） */
+function cloudDomain(){return location.hostname;}
+/* 把云端错误翻译成可操作的提示：安全域名未配置是最常见根因 */
+function cloudErrMsg(err){
+  const msg=((err&&err.message)?err.message:String(err||""));
+  if(/安全域名|not in|security|domain|allowlist|40103|未授权|授权|refused|blocked|not allowed/i.test(msg))
+    return "本网址未加入云开发「Web 安全域名」。请到云开发控制台 → 环境 → 安全配置，把 "+cloudDomain()+" 加入允许域名后重试";
+  return msg;
+}
+
+/* 初始化：加载 SDK + 匿名登录。未配置 env 直接返回 false，不影响本地使用 */
+async function cloudInit(){
+  const env=(cloudCfg().env||"").trim();
+  if(!env)return false;
+  if(cloudReady&&cloudDb)return true;
+  if(!window.cloudbase){
+    await new Promise((res,rej)=>{
+      const s=document.createElement("script");
+      s.src="https://static.cloudbase.net/cloudbase-js-sdk/latest/cloudbase.full.js";
+      s.onload=res;s.onerror=()=>rej(new Error("云端 SDK 加载失败，请检查网络"));
+      document.head.appendChild(s);
+    });
+  }
+  if(!cloudApp)cloudApp=window.cloudbase.init({env:env});
+  const auth=cloudApp.auth({persistence:"local"});
+  const st=await auth.hasLoginState();
+  if(!st)await auth.signInAnonymously();
+  cloudDb=cloudApp.database();
+  cloudReady=true;
+  return true;
+}
+function cloudId(agent,date){return String(agent+"_"+date).replace(/[.\/$\[\]#]/g,"_");}
+function cloudPayload(){
+  return {
+    agent:(P&&P.name)||"", date:TODAY_cur(),
+    tasks:D.tasks||[], pans:D.pans||[],
+    report:D.report||{nums:{},texts:{}}, review:D.review||null,
+    lucky:D.lucky||null,                 /* 签单盲盒中奖结果，老板端可见（保留最后一次） */
+    luckyList:D.luckyList||[],           /* 当日全部抽奖记录：签几单抽几次，每次一条 */
+    goal:D.goal||"", updatedAt:new Date().toISOString()
+  };
+}
+/* 上传今日数据。manual=1 时给用户反馈；自动上传静默失败不打扰 */
+async function cloudUpload(manual){
+  const env=(cloudCfg().env||"").trim();
+  if(!env){if(manual)toast("请先填写云开发环境 ID");return false;}
+  if(!((P&&P.name)||"").trim()){if(manual)toast("请先在任务页填写经纪人姓名");return false;}
+  if(cloudBusy)return false;
+  cloudBusy=true;
+  try{
+    await cloudInit();
+    const p=cloudPayload();
+    await cloudDb.collection(CLOUD_COLL).doc(cloudId(p.agent,p.date)).set(p);
+    const cfg=cloudCfg();cfg.lastSync=new Date().toLocaleString("zh-CN");cloudSaveCfg(cfg);
+    if(manual)toast("已上传云端："+p.agent+" · "+p.date);
+    return true;
+  }catch(err){
+    const full=cloudErrMsg(err);
+    const cfg=cloudCfg();cfg.lastErr=full;cloudSaveCfg(cfg);
+    if(manual)toast("上传失败："+full.slice(0,46));
+    return false;
+  }finally{cloudBusy=false;}
+}
+/* 防抖自动上传：任务计步、跑盘填写后 1.5 秒同步一次 */
+function cloudAuto(){
+  if(!(cloudCfg().env||"").trim())return;
+  clearTimeout(cloudTimer);
+  cloudTimer=setTimeout(()=>cloudUpload(0),1500);
+}
+async function cloudTest(){
+  const env=(cloudCfg().env||"").trim();
+  if(!env){toast("请先填写云开发环境 ID");return;}
+  toast("正在连接云端…");
+  const ok=await cloudUpload(1);
+  if(ok)toast("云端连接正常，数据已同步");
+  else toast("连接失败：请检查环境 ID，或让店长把本网址加入云开发安全域名");
+}
+function renderCloud(){
+  const cfg=cloudCfg();
+  const tag=document.getElementById("cloudTag"),note=document.getElementById("cloudNote");
+  const inp=document.getElementById("cloudEnv");
+  if(inp&&document.activeElement!==inp)inp.value=cfg.env||"";
+  if(!cfg.env){
+    tag.textContent="未配置";tag.className="tag warn";
+    note.innerHTML="未配置云端时数据仅存本机。配置后：任务计步、跑盘填写、提交日报都会自动上传，每晚 22:00 自动汇总到老板端。";
+    return;
+  }
+  if(cfg.lastErr){
+    tag.textContent="同步异常";tag.className="tag warn";
+    note.innerHTML="⚠️ 云端同步失败：<b>"+esc(cfg.lastErr)+"</b><br>本应用访问域名：<b>"+cloudDomain()+"</b>（需加入云开发 Web 安全域名白名单）";
+    return;
+  }
+  tag.textContent=cfg.lastSync?("已同步 "+cfg.lastSync):"已配置";
+  tag.className="tag ok";
+  note.innerHTML="云端已启用，数据自动上传中。"+(cfg.lastSync?("最近同步：<b>"+cfg.lastSync+"</b>　"):"")+
+    "<br>本应用访问域名：<b>"+cloudDomain()+"</b>（需加入云开发 Web 安全域名白名单）"+
+    "<br>若提示「权限不足」，需要店长在云开发控制台把集合 <b>agent_daily</b> 权限设为「所有用户可读写」，并把本网址加入安全域名。";
+}
+/* 云端同步窗口已移除：环境ID已内置于代码，数据静默自动上传 */
+
+/* ============ 每日内容自动拉取 ============ */
+async function pullDaily(){
+  const d=TODAY_cur();
+  try{
+    const r=await fetch("./data/daily-"+d+".json",{cache:"no-store"});
+    if(!r.ok)return false;
+    const j=await r.json();
+    /* 下发文件的房源并入房源池参与轮换，不再直接覆盖（否则每天都是同样几套旧房源） */
+    if(j.houses&&j.houses.length){
+      j.houses.forEach(h=>{ if(h&&h.name&&!HOUSE_POOL_EXTRA.some(x=>(x.name||"")===(h.name||"")))HOUSE_POOL_EXTRA.push(h); });
+      D.houseDate="";   /* 置空后由 applyDailyHouses 重新轮换，让新房源参与当天选题 */
+    }
+    /* 下发文件里的知识并入知识池参与轮换，不再直接覆盖（否则每天都是同样几条旧知识） */
+    if(j.knows&&j.knows.length){
+      j.knows.forEach(k=>{ if(k&&k.t&&!KNOW_POOL_EXTRA.some(x=>x.t===k.t))KNOW_POOL_EXTRA.push(k); });
+      D.knowDate="";   /* 置空后由 applyDailyKnows 重新轮换，让新知识参与当天选题 */
+    }
+    if(j.goal)D.goal=j.goal;
+    if(j.tasks&&j.tasks.length){
+      const old={};(D.tasks||[]).forEach(t=>old[t.n]=t.a);  /* 保住已记录的实际值 */
+      D.tasks=j.tasks.map(t=>({n:t.n,t:Number(t.t)||0,a:old[t.n]||0}));
+      mergeTasks();  /* 数据文件若过时（缺少新任务），用代码模板补齐，避免新任务被覆盖掉 */
+    }
+    D.dailyVer=j.ver||d;
+    applyDailyHouses();
+    applyDailyKnows();
+    save();renderAll();
+    return true;
+  }catch(e){return false;}
+}
+
+/* ============ 好房分享（云端实时） ============ */
+let sharedHouses=[], houseType="", houseErr="", houseLastSync="";   /* 初始不选：出租/出售都必须主动点选，杜绝默认值与界面不一致 */
+/* 房源唯一键：优先房源编码，无编码则用 小区+价格+户型 兜底 */
+function houseKey(h){
+  const c=String((h&&h.code)||"").trim();
+  if(c)return "c:"+c.toLowerCase();
+  return "k:"+[String((h&&h.community)||"").trim(),String((h&&h.price)||"").trim(),String((h&&h.layout)||"").trim()].join("|").toLowerCase();
+}
+/* 去重：同一套房源只保留最新一条，避免跨天重复堆积 */
+function dedupeHouses(arr){
+  const map=new Map();
+  (arr||[]).forEach(h=>{
+    if(!h)return;
+    const k=houseKey(h),old=map.get(k);
+    if(!old)map.set(k,h);
+    else if(String(h.createdAt||"")>String(old.createdAt||""))map.set(k,h);
+  });
+  return Array.from(map.values()).sort((a,b)=>String(b.createdAt||"").localeCompare(String(a.createdAt||"")));
+}
+function setHouseType(t){houseType=t;document.getElementById("hfRent").className="btn sm"+(t==="rent"?"":" ghost");document.getElementById("hfSale").className="btn sm"+(t==="sale"?"":" ghost");}
+function openHouseForm(){
+  const pe=document.getElementById("hfPublisher");if(pe&&!pe.value)pe.value=(P&&P.name)||"";
+  setHouseType("");   /* 每次打开都清空选择：出租/出售均不高亮，必须主动点选 */
+  const f=document.getElementById("houseForm");f.classList.remove("hidden");
+  /* 表单就在按钮下方，展开后平滑定位过去，不用手动找 */
+  try{f.scrollIntoView({behavior:"smooth",block:"nearest"});}catch(e){window.scrollTo({top:0});}
+}
+function closeHouseForm(){document.getElementById("houseForm").classList.add("hidden");}
+function saveShared(){try{localStorage.setItem("mm_houses",JSON.stringify(sharedHouses.slice(0,300)));}catch(e){}}
+function loadShared(){try{sharedHouses=JSON.parse(localStorage.getItem("mm_houses")||"[]");}catch(e){sharedHouses=[];}}
+async function submitHouse(){
+  const publisher=document.getElementById("hfPublisher").value.trim()||((P&&P.name)||"匿名");
+  const code=document.getElementById("hfCode").value.trim();
+  const community=document.getElementById("hfCommunity").value.trim();
+  const layout=document.getElementById("hfLayout").value.trim();
+  const price=document.getElementById("hfPrice").value.trim();
+  const area=document.getElementById("hfArea").value.trim();
+  if(!houseType){toast("请先选择「出租」或「出售」");return;}
+  if(!publisher){toast("请填写发布人");return;}
+  if(!code||!community){toast("请填写房源编码和小区名称");return;}
+  /* 查重：同房源编码（或同小区+价格+户型）已存在就不再重复添加 */
+  const nk=houseKey({code,community,price,layout});
+  const dup=sharedHouses.find(x=>houseKey(x)===nk);
+  if(dup){toast("该房源已在好房列表中（发布人："+(dup.publisher||"")+"），请勿重复添加");return;}
+  const h={type:houseType,code,community,layout,price,area,publisher,agent:publisher,date:TODAY_cur(),createdAt:new Date().toISOString()};
+  sharedHouses.unshift(h);saveShared();renderShare();
+  try{
+    await cloudInit();
+    const ad=await cloudDb.collection("agent_houses").add(h);
+    if(ad&&(ad.id||(ad.data&&ad.data._id))){h._id=ad.id||ad.data._id;sharedHouses[0]._id=h._id;saveShared();}
+    await pullHouses();   /* 等回拉完成再提示，确保「已同步」是真的同步成功 */
+    toast("已发布并同步到全店（共 "+sharedHouses.length+" 套）");
+  }
+  catch(e){houseErr=((e&&e.message)?e.message:String(e));toast("云端发布失败："+houseErr.slice(0,60));}
+  ["hfPublisher","hfCode","hfCommunity","hfLayout","hfPrice","hfArea"].forEach(id=>document.getElementById(id).value="");
+  closeHouseForm();
+}
+function shareHouseCard(h){
+  const idx=sharedHouses.indexOf(h);
+  const rent=h.type==="rent";
+  const col=rent?"var(--pri)":"var(--bad)",bg=rent?"var(--pri-soft)":"var(--bad-soft)",tag=rent?"出租":"出售";
+  return `<div class="house" style="border-left:4px solid ${col}">
+      <button class="delbtn" title="删除房源" onclick="askDelHouse(${idx})">❌️</button>
+      <div class="ht">${esc(h.community||h.code||"")} <span class="tag" style="background:${bg};color:${col}">${tag}</span></div>
+      <div class="kv"><b>房源编码</b><span style="text-align:right">${esc(h.code||"")}</span></div>
+      ${h.layout?`<div class="kv"><b>户型</b><span style="text-align:right">${esc(h.layout)}</span></div>`:""}
+      <div class="kv"><b>价格</b><span style="text-align:right;color:${col};font-weight:700">${esc(h.price||"")}</span></div>
+      ${h.area?`<div class="kv"><b>面积</b><span style="text-align:right">${esc(h.area)}</span></div>`:""}
+      <div class="kv"><b>发布人</b><span style="text-align:right">${esc(h.publisher||h.agent||"")}</span></div>
+    </div>`;
+}
+function renderShare(){
+  const el=document.getElementById("shareList");if(!el)return;
+  const bar=document.getElementById("shareSyncBar");
+  if(bar){
+    if(houseErr)bar.innerHTML="⚠️ 云端同步失败：<b>"+esc(houseErr)+"</b><br>请检查网络，或让店长把 <b>"+esc(cloudDomain())+"</b> 加入云开发 Web 安全域名。";
+    else if(houseLastSync)bar.innerHTML="✅ 已与全店同步 · "+esc(houseLastSync)+"　（每30秒自动刷新）";
+    else bar.innerHTML="正在同步全店房源…";
+  }
+  if(!sharedHouses.length){el.innerHTML="<div class='muted'>暂无经纪人分享的房源，点上方按钮发布第一套。</div>";return;}
+  const sale=sharedHouses.filter(h=>h.type!=="rent");
+  const rent=sharedHouses.filter(h=>h.type==="rent");
+  const wrap=(title,col,arr)=>`<div class="sec-title" style="color:${col};font-weight:700;margin:14px 0 6px">${title}（${arr.length}）</div>`+(arr.length?arr.map(shareHouseCard).join(""):`<div class='muted' style="margin-bottom:8px">暂无</div>`);
+  el.innerHTML=wrap("🔴 出售房源","var(--bad)",sale)+wrap("🔵 出租房源","var(--pri)",rent);
+}
+async function pullHouses(){
+  try{
+    await cloudInit();
+    const res=await cloudDb.collection("agent_houses").limit(500).get();
+    sharedHouses=dedupeHouses((res&&res.data)||[]);   /* 按房源编码去重，保留最新 */
+    houseErr="";houseLastSync=new Date().toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit"});
+    saveShared();renderShare();
+  }catch(e){houseErr=(e&&e.message)?e.message:String(e);}
+}
+
+/* 好房分享删除：所有经纪人均可核销，删除前需确认 */
+let delIdx=-1;
+function askDelHouse(i){delIdx=i;const h=sharedHouses[i];document.getElementById("delMsg").textContent="是否已联系业主核实，确认核销？\n（核销后该房源将从全店经纪人端移除，所有人均可操作）";document.getElementById("delModal").classList.add("on");}
+function closeDel(){delIdx=-1;document.getElementById("delModal").classList.remove("on");}
+async function confirmDel(){
+  const i=delIdx;closeDel();
+  if(i<0||!sharedHouses[i])return;
+  const h=sharedHouses[i];
+  try{
+    await cloudInit();
+    if(h._id)await cloudDb.collection("agent_houses").doc(h._id).remove();
+    sharedHouses.splice(i,1);saveShared();renderShare();
+    toast("已核销该房源");
+  }catch(e){toast("核销失败："+(((e&&e.message)||"").slice(0,24)));}
+}
+
+/* ============ 签单惊喜 · 5 秒接红包挑战 ============ */
+/* 规则：5 秒内天上掉落 15 个红包，接到 1 个 = 0.8 元，接得越多金额越大；开始前 3 秒倒计时 */
+const RB_TOTAL=15;            /* 一轮掉落的红包总数 */
+const RB_UNIT=0.8;            /* 每个红包对应金额（不在页面展示） */
+const RB_BOMB=4;              /* 炸弹个数：点到倒扣 1 个，并短暂遮挡视线 */
+const RB_TRAP=3;              /* 干扰项：小猫、白菜各 3 个，点到不计分 */
+const RB_PLAY=5000;           /* 游戏时长 5 秒 */
+const RB_READY=3000;          /* 开始前准备时间 3 秒 */
+const RB_SPAWN=150;           /* 掉落间隔（含干扰项，节奏更密） */
+const RB_V0=170,RB_V1=235;    /* 掉落速度 px/s（比原来更快） */
+const rbState={on:false,t:0,spawn:0,caught:0,seq:0,items:[],last:0,raf:0,timer:0,plan:[]};
+/* 一轮的掉落序列：15 红包 + 4 炸弹 + 3 小猫 + 3 白菜，打乱后保证第一个是红包 */
+function rbPlan(){
+  const a=[];
+  for(let i=0;i<RB_TOTAL;i++)a.push("rb");
+  for(let i=0;i<RB_BOMB;i++)a.push("bomb");
+  for(let i=0;i<RB_TRAP;i++)a.push("cat");
+  for(let i=0;i<RB_TRAP;i++)a.push("cabbage");
+  const p=shuffleArr(a);
+  if(p[0]!=="rb"){const k=p.indexOf("rb");if(k>0){const t=p[0];p[0]=p[k];p[k]=t;}}
+  return p;
+}
+const RB_RAF=(typeof requestAnimationFrame==="function")?requestAnimationFrame.bind(window):(f=>setTimeout(()=>f(Date.now()),16));
+function rbMoney(cnt){return Math.round((Number(cnt)||0)*RB_UNIT*100)/100;}   /* 接到个数 → 金额 */
+function rbAmtText(v){return (Math.round((Number(v)||0)*100)/100).toFixed(2);} /* 金额 → 两位小数文本 */
+function shuffleArr(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[j];a[j]=t;}return a;}
+/* ===== 签几单玩几次：挑战次数 = 当日「签单」的实际完成数 ===== */
+function lkSignTask(){return D.tasks.find(x=>x.n.indexOf("签单")>=0);}
+function lkQuota(){const t=lkSignTask();if(!t)return 0;const a=Number(t.a)||0;return a>0?a:0;}
+function lkTodayList(){return (Array.isArray(D.luckyList)?D.luckyList:[]).filter(x=>x&&x.date===TODAY_cur());}
+function lkUsed(){return lkTodayList().length;}
+function lkLeft(){return Math.max(0,lkQuota()-lkUsed());}
+function lkDrawn(){return lkUsed()>0;}   /* 兼容旧调用：今天是否已经抽过 */
+function lkQuotaText(){
+  const q=lkQuota(),u=lkUsed(),l=lkLeft();
+  if(q<=0)return "";
+  return "今日签单 <b>"+q+"</b> 单 → 可玩 <b>"+q+"</b> 次，已玩 "+u+" 次，还剩 <b>"+l+"</b> 次";
+}
+function lkStep(s){["lkCele","lkDraw","lkResult"].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.toggle("hidden",id!==s);});}
+function lkOpen(){
+  const m=document.getElementById("luckyModal");if(!m)return;
+  const cs=document.getElementById("lkCeleSub"),ds=document.getElementById("lkDrawSub"),qt=lkQuotaText();
+  if(cs)cs.innerHTML="今日签单达成，完成率 <b>100%</b><br>"+(qt||"老板给你准备了一份惊喜，来接红包吧！");
+  if(ds)ds.innerHTML=(qt?qt+"<br>":"")+"🧧 点红包越多金额越大，小心 💣 炸弹，🐱🥬 是来捣乱的";
+  if(lkLeft()>0){lkStep("lkCele");lkConfetti();}
+  else{const tip=document.getElementById("rbTip");if(tip)tip.style.display="none";lkShowResult(null,true);}
+  m.classList.add("on");
+}
+function lkClose(){rbStop();const m=document.getElementById("luckyModal");if(m)m.classList.remove("on");renderAll();}
+function lkConfetti(){
+  const el=document.getElementById("lkConfetti");if(!el)return;
+  const em=["🧧","💰","🎉","✨","🧧","🎊","💰","🧧"];let h="";
+  for(let i=0;i<14;i++){
+    const left=Math.floor(Math.random()*92);
+    const delay=(Math.random()*1.4).toFixed(2);
+    const dur=(1.4+Math.random()*1.2).toFixed(2);
+    h+=`<span style="left:${left}%;animation-delay:${delay}s;animation-duration:${dur}s">${em[i%em.length]}</span>`;
+  }
+  el.innerHTML=h;
+}
+/* ===== 游戏：5 秒接红包 ===== */
+function rbClear(){
+  rbState.items.forEach(it=>{try{it.el.remove();}catch(e){}});
+  rbState.items=[];
+  const arena=document.getElementById("rbArena");
+  if(arena&&typeof arena.querySelectorAll==="function"){
+    const old=arena.querySelectorAll(".rb,.rb-fx");
+    for(let i=0;i<old.length;i++){try{old[i].remove();}catch(e){}}
+  }
+}
+function rbStop(){
+  rbState.on=false;
+  if(rbState.timer){clearInterval(rbState.timer);rbState.timer=0;}
+  if(rbState.raf){if(typeof cancelAnimationFrame==="function")cancelAnimationFrame(rbState.raf);rbState.raf=0;}
+  rbClear();
+}
+function rbHud(){
+  const t=document.getElementById("rbTime"),c=document.getElementById("rbCnt"),a=document.getElementById("rbAmt");
+  const sec=Math.max(0,rbState.t/1000);
+  if(t)t.textContent=sec.toFixed(1);
+  if(c)c.textContent=String(rbState.caught);
+  if(a)a.textContent=rbAmtText(rbMoney(rbState.caught));
+}
+function rbSpawn(){
+  const arena=document.getElementById("rbArena");if(!arena)return;
+  const type=(rbState.plan&&rbState.plan[rbState.seq])||"rb";
+  const el=document.createElement("div");
+  let inner="<i></i><span>🧧</span>";
+  if(type==="bomb"){el.className="rb rb-bomb";inner="<span>💣</span>";}
+  else if(type==="cat"){el.className="rb rb-cat";inner="<i></i><span>🐱</span>";}
+  else if(type==="cabbage"){el.className="rb rb-cab";inner="<i></i><span>🥬</span>";}
+  else el.className="rb";
+  el.style.left=(6+Math.random()*82).toFixed(1)+"%";
+  el.style.top="-46px";
+  el.innerHTML=inner;
+  const it={el:el,type:type,y:-46,v:RB_V0+Math.random()*(RB_V1-RB_V0),got:false};
+  const hit=e=>{if(e&&e.preventDefault)e.preventDefault();rbCatch(it);};
+  try{
+    if(typeof window!=="undefined"&&window.PointerEvent)el.addEventListener("pointerdown",hit,{passive:false});
+    else{el.addEventListener("touchstart",hit,{passive:false});el.addEventListener("mousedown",hit,{passive:false});}
+  }catch(e){el.onclick=hit;}
+  arena.appendChild(el);
+  rbState.items.push(it);
+  rbState.seq++;
+}
+/* 飘字提示（+1 / -1 / 不是红包） */
+function rbFloat(it,txt){
+  const arena=document.getElementById("rbArena");if(!arena)return;
+  const f=document.createElement("div");
+  f.className="rb-fx rb-float";
+  f.textContent=txt;
+  f.style.left=(it&&it.el&&it.el.style&&it.el.style.left)||"50%";
+  f.style.top=Math.max(8,Math.min(260,(it&&it.y)||0))+"px";
+  arena.appendChild(f);
+  setTimeout(()=>{try{f.remove();}catch(e){}},720);
+}
+/* 炸弹：闪白 + 烟雾遮挡视线约 1.2 秒，并倒扣 1 个红包 */
+function rbBoom(it){
+  const arena=document.getElementById("rbArena");if(!arena)return;
+  try{if(navigator.vibrate)navigator.vibrate([40,30,70]);}catch(e){}
+  try{
+    const fl=document.createElement("div");fl.className="rb-fx rb-flash";
+    const sm=document.createElement("div");sm.className="rb-fx rb-smoke";
+    arena.appendChild(fl);arena.appendChild(sm);
+    setTimeout(()=>{try{fl.remove();}catch(e){}},520);
+    setTimeout(()=>{try{sm.remove();}catch(e){}},1200);
+  }catch(e){}
+  rbFloat(it,"💥 -1");
+}
+function rbCatch(it){
+  if(!it||it.got||!rbState.on)return;
+  it.got=true;
+  const type=it.type||"rb";
+  if(type==="rb"){
+    rbState.caught++;
+    rbFloat(it,"+1");
+    try{vibrate();}catch(e){}
+  }else if(type==="bomb"){
+    rbState.caught=Math.max(0,rbState.caught-1);
+    rbBoom(it);
+  }else{
+    /* 小猫 / 白菜：干扰项，不计分也不扣分，但白白浪费一次手速 */
+    rbFloat(it,type==="cat"?"🐱 不是红包~":"🥬 白菜不算钱~");
+    try{vibrate();}catch(e){}
+  }
+  try{it.el.classList.add("got");}catch(e){}
+  setTimeout(()=>{try{it.el.remove();}catch(e){}},320);
+  rbState.items=rbState.items.filter(x=>!x.got);
+  rbHud();
+}
+function rbTick(ts){
+  if(!rbState.on)return;
+  const now=(typeof ts==="number")?ts:Date.now();
+  const dt=rbState.last?Math.min(140,now-rbState.last):16;
+  rbState.last=now;
+  rbState.t-=dt;
+  rbState.spawn+=dt;
+  while(rbState.spawn>=RB_SPAWN&&rbState.seq<rbState.plan.length){rbState.spawn-=RB_SPAWN;rbSpawn();}
+  const arena=document.getElementById("rbArena");
+  const H=(arena&&arena.clientHeight)||300;
+  rbState.items=rbState.items.filter(it=>{
+    if(it.got)return false;
+    it.y+=it.v*dt/1000;
+    if(it.y>H){try{it.el.remove();}catch(e){}return false;}
+    it.el.style.top=it.y.toFixed(1)+"px";
+    return true;
+  });
+  rbHud();
+  if(rbState.t<=0){rbFinish();return;}
+  rbState.raf=RB_RAF(rbTick);
+}
+function rbStart(){
+  rbStop();
+  const tip=document.getElementById("rbTip");
+  rbState.on=true;rbState.t=RB_PLAY;rbState.spawn=0;rbState.caught=0;rbState.seq=0;rbState.last=0;
+  rbState.plan=rbPlan();
+  rbHud();
+  let n=3;
+  if(tip){tip.style.display="flex";tip.innerHTML=n+"<small>红包马上来，准备好…</small>";}
+  rbState.timer=setInterval(()=>{
+    n--;
+    if(n>0){if(tip)tip.innerHTML=n+"<small>红包马上来，准备好…</small>";return;}
+    clearInterval(rbState.timer);rbState.timer=0;
+    if(tip)tip.innerHTML="开始！<small>只点 🧧，别碰 💣</small>";
+    setTimeout(()=>{if(tip)tip.style.display="none";},550);
+    rbState.last=0;
+    rbState.raf=RB_RAF(rbTick);
+  },1000);
+}
+function rbFinish(){
+  rbState.on=false;
+  if(rbState.timer){clearInterval(rbState.timer);rbState.timer=0;}
+  if(rbState.raf){if(typeof cancelAnimationFrame==="function")cancelAnimationFrame(rbState.raf);rbState.raf=0;}
+  rbClear();
+  const tip=document.getElementById("rbTip");
+  rbState.t=0;rbHud();
+  if(tip){tip.style.display="flex";tip.innerHTML="时间到！<small>这轮接到 "+rbState.caught+" 个红包</small>";}
+  setTimeout(()=>rbSettle(rbState.caught),750);
+}
+/* 一轮结束后结算：接到几个 = 几个 × 0.8 元，记入当日战绩并上传 */
+function rbSettle(caught){
+  if(lkLeft()<=0)return null;
+  const n=Math.max(0,Math.min(RB_TOTAL,Math.round(Number(caught)||0)));
+  const amount=rbMoney(n);
+  const rec={
+    date:TODAY_cur(),type:"redbag",caught:n,total:RB_TOTAL,amount:amount,
+    agent:(P&&P.name)||"",time:new Date().toLocaleString("zh-CN"),no:lkUsed()+1,quota:lkQuota(),
+    prize:{c:"🧧",n:rbAmtText(n)+" 元现金红包",
+      note:"5 秒接红包挑战：接到 "+n+" 个红包，共 "+rbAmtText(n)+" 元，凭本页找老板兑换 💰，当天有效，别客气！"}
+  };
+  if(!Array.isArray(D.luckyList))D.luckyList=[];
+  D.luckyList.push(rec);
+  D.lucky=rec;   /* 老板端仍按单条 lucky 读取，这里保留最后一次结果 */
+  save();cloudAuto();
+  lkShowResult(rec,false);
+  return rec;
+}
+function lkGoDraw(){
+  if(lkLeft()<=0){toast("今天的挑战次数已经用完啦 🧧");lkShowResult(null,true);return;}
+  const ds=document.getElementById("lkDrawSub"),qt=lkQuotaText();
+  if(ds)ds.innerHTML=(qt?qt+"<br>":"")+"天上掉红包啦，点得越多，金额越大！";
+  lkStep("lkDraw");
+  rbStart();
+}
+function lkShowResult(rec,replay){
+  let r=rec;
+  if(!r){
+    const list=lkTodayList();
+    r=list.length?list[list.length-1]:((D.lucky&&D.lucky.date===TODAY_cur())?D.lucky:null);
+  }
+  if(!r){lkStep("lkCele");return;}
+  const n=(typeof r.caught==="number")?r.caught:0;
+  const amount=(typeof r.amount==="number")?r.amount:rbMoney(n);
+  const t=document.getElementById("lkResTitle"),pr=document.getElementById("lkResPrize"),no=document.getElementById("lkResNote");
+  if(t)t.textContent=replay?"🧧 你今天的红包战绩":"🧧 挑战结束！";
+  if(pr)pr.innerHTML=`<div style="font-size:46px">🧧</div><div class="rb-amt-big">¥ ${rbAmtText(amount)}</div><div class="lk-prize-n">接到 ${n} 个红包</div>`;
+  if(no)no.textContent="5 秒内接到 "+n+" 个红包，共 "+rbAmtText(amount)+" 元 —— 凭本页找老板兑换 💰，当天有效！";
+  lkStep("lkResult");
+  lkRenderResultExtra();
+}
+/* 开奖页下方：本日各轮战绩 + 「再来一次」按钮（还剩次数时） */
+function rbSum(list){return list.reduce((s,x)=>s+((typeof x.amount==="number")?x.amount:0),0);}
+function lkRenderResultExtra(){
+  const list=lkTodayList(),q=lkQuota(),left=lkLeft();
+  const box=document.getElementById("lkPrizeList"),btn=document.getElementById("lkAgainBtn");
+  if(btn){
+    if(left>0){btn.style.display="block";btn.textContent="🧧 再来一次（还剩 "+left+" 次）";}
+    else btn.style.display="none";
+  }
+  if(box){
+    if(list.length>1){
+      box.innerHTML="<div class='note' style='text-align:center'>今日已玩 "+list.length+" / "+q+" 轮："+
+        list.map(x=>rbAmtText((typeof x.amount==="number")?x.amount:0)+" 元").join("、")+
+        "<br>合计 <b style='color:#e02020'>¥ "+rbAmtText(rbSum(list))+"</b>，凭本页找老板兑换</div>";
+    }else box.innerHTML="";
+  }
+}
+/* 复盘页的挑战入口（签单达成后显示，签几单就能玩几轮） */
+function lkEntryHTML(){
+  if(!signDone())return "";
+  const q=lkQuota(),list=lkTodayList(),left=lkLeft();
+  const sum=rbSum(list);
+  if(left>0){
+    return `<div class="q" style="text-align:center">🎉 今日签单 <b>${q}</b> 单，可玩 ${q} 轮，还剩 <b>${left}</b> 轮${list.length?"（已抢到 ¥"+rbAmtText(sum)+"）":""}<br><button class="btn sm" style="margin-top:8px" onclick="lkOpen()">🧧 去接红包</button></div>`;
+  }
+  if(list.length){
+    return `<div class="q" style="text-align:center">🎉 今日签单 ${q} 单，${list.length} 轮挑战已玩完，共抢到 <b style="color:#e02020">¥ ${rbAmtText(sum)}</b><br><button class="btn sm" style="margin-top:8px" onclick="lkOpen()">查看红包</button></div>`;
+  }
+  return "";
+}
+
+/* ============ 知识（云端：新房知识 / 视频文案） ============ */
+let cloudKnow={new:[],video:[],prop:[]};
+async function pullKnow(){
+  try{
+    await cloudInit();
+    const r1=await cloudDb.collection("agent_knowledge").where({cat:"新房知识",date:TODAY_cur()}).limit(100).get();
+    const r2=await cloudDb.collection("agent_knowledge").where({cat:"视频文案",date:TODAY_cur()}).limit(100).get();
+    const r3=await cloudDb.collection("agent_knowledge").where({cat:"房产知识",date:TODAY_cur()}).limit(100).get();
+    cloudKnow.new=(r1&&r1.data)||[];cloudKnow.video=(r2&&r2.data)||[];cloudKnow.prop=(r3&&r3.data)||[];
+    renderKnowCat();
+    /* 云端若带考核题：让当日考题缓存失效并重渲染日报测验。
+       否则「先开 App、后推送」时，日报页会一直显示早上缓存的旧题。 */
+    const hasQuiz=(cloudKnow.prop||[]).some(x=>x&&x.quiz)||(cloudKnow.new||[]).some(x=>x&&x.quiz);
+    if(hasQuiz){
+      try{
+        const cache=(D&&Array.isArray(D.quizCache))?D.quizCache:[];
+        const dynQs=cloudQuizItems().map(x=>x.q);
+        const hasAll=dynQs.length>0&&dynQs.every(q=>cache.some(c=>c.q===q));
+        if(!hasAll&&D){D.quizCache=null;D.quizDate="";if(typeof save==="function")save();}
+      }catch(e){}
+      if(typeof renderReport==="function")renderReport();
+    }
+  }catch(e){}
+}
+function knowCard(k){return `<div class="house">
+  <div class="ht">${esc(k.title||k.t||"")}</div>
+  ${k.body||k.c?`<div class="q" style="line-height:1.75">${fmtBody(k.body||k.c||"")}</div>`:""}
+  ${k.src?`<div class="kv"><b>来源</b><span style="text-align:right">${esc(k.src)}</span></div>`:""}
+</div>`;}
+/* ===== 按日期查看：当天内容走实时缓存，往期内容从云端按日期拉取 ===== */
+const KNOW_CAT_CN={prop:"房产知识",new:"新房知识",video:"视频文案"};
+let knowHist={},knowHistReq=0;
+function fmtDate(d){const m=String(d.getMonth()+1).padStart(2,"0"),dd=String(d.getDate()).padStart(2,"0");return d.getFullYear()+"-"+m+"-"+dd;}
+function knowDateCur(){const el=document.getElementById("knowDate");return (el&&el.value)||TODAY_cur();}
+function knowShift(n){
+  const el=document.getElementById("knowDate");if(!el)return;
+  const d=new Date(knowDateCur()+"T00:00:00");if(isNaN(d.getTime()))return;
+  d.setDate(d.getDate()+n);const s=fmtDate(d);
+  if(s>TODAY_cur()){toast("还没到那天，没有内容可看");return;}
+  el.value=s;renderKnowCat();
+}
+function knowToday(){const el=document.getElementById("knowDate");if(el)el.value=TODAY_cur();renderKnowCat();}
+function knowListHTML(list,v,d){
+  if(!list.length)return "<div class='muted'>"+esc(d)+" 没有"+(KNOW_CAT_CN[v]||"")+"记录（当天未下发）。</div>";
+  return list.map(knowCard).join("");
+}
+function renderKnowCat(){
+  const sel=document.getElementById("knowCat");const v=sel?sel.value:"prop";
+  const el=document.getElementById("knowCatBody");if(!el)return;
+  const d=knowDateCur(),today=TODAY_cur();
+  const hint=document.getElementById("knowDateHint");
+  if(hint)hint.textContent=(d===today)?("正在看今天 · "+today):("正在看往期 · "+d);
+  /* 往期：云端按日期拉取，结果按「分类+日期」缓存，翻回去不用重复请求 */
+  if(d!==today){
+    const key=v+"|"+d;
+    if(knowHist[key]){el.innerHTML=knowListHTML(knowHist[key],v,d);return;}
+    el.innerHTML="<div class='muted'>正在读取 "+esc(d)+" 的"+(KNOW_CAT_CN[v]||"")+"…</div>";
+    const req=++knowHistReq;
+    (async()=>{
+      try{
+        await cloudInit();
+        const r=await cloudDb.collection("agent_knowledge").where({cat:KNOW_CAT_CN[v],date:d}).limit(100).get();
+        const list=(r&&r.data)||[];
+        knowHist[key]=list;
+        const nowSel=document.getElementById("knowCat");
+        if(req===knowHistReq&&knowDateCur()===d&&(!nowSel||nowSel.value===v))el.innerHTML=knowListHTML(list,v,d);
+      }catch(e){
+        if(req===knowHistReq&&knowDateCur()===d)el.innerHTML="<div class='muted'>读取失败，请检查网络后重试。</div>";
+      }
+    })();
+    return;
+  }
+  if(v==="prop"){
+    if((cloudKnow.prop||[]).length){
+      /* 老板后台当天录入的房产知识优先（排版后展示），保证每天内容由后台控制、不重复 */
+      el.innerHTML=cloudKnow.prop.map(k=>`<div class="house" style="border-left:4px solid var(--pri)">
+        <div class="ht">📘 ${esc(k.title||"今日房产知识")}</div>
+        <div class="q" style="line-height:1.75">${fmtBody(k.body||"")}</div>
+        ${k.src?`<div class="kv"><b>来源</b><span style="text-align:right">${esc(k.src)}</span></div>`:""}
+      </div>`).join("");
+      return;
+    }
+    el.innerHTML=D.knows.length?D.knows.map(k=>`<div class="house">
+      <div class="ht">${catTag(k.cat)} 今日知识：${esc(k.t)}</div>
+      <div class="kv"><b>核心观点</b><span style="text-align:right">${esc(k.c)}</span></div>
+      <div class="kv"><b>客户为什么关心</b><span style="text-align:right">${esc(k.w)}</span></div>
+      <div class="kv"><b>新人需要掌握</b><span style="text-align:right">${esc(k.m)}</span></div>
+      <div class="kv"><b>实际工作怎么用</b><span style="text-align:right">${esc(k.u)}</span></div>
+      <div class="q"><b>新人测试题：</b>${esc(k.q)}</div>
+      <div class="kv"><b>来源与日期</b><span style="text-align:right">${esc(k.src)}</span></div>
+    </div>`).join(""):"<div class='muted'>今日房产知识尚未下发。</div>";
+  }else if(v==="new"){
+    el.innerHTML=cloudKnow.new.length?cloudKnow.new.map(knowCard).join(""):"<div class='muted'>今日新房知识尚未录入。店长将在管理后台录入，或由系统每日从楼盘库抓取。</div>";
+  }else if(v==="video"){
+    el.innerHTML=cloudKnow.video.length?cloudKnow.video.map(knowCard).join(""):"<div class='muted'>今日视频文案尚未发布。店长将前一天晚间发布。</div>";
+  }
+}
+
+/* ============ 手机系统通知（9:00 / 18:30） ============ */
+async function regSw(){
+  if(!("serviceWorker" in navigator))return null;
+  try{
+    /* 新版 Service Worker 接管后自动刷新一次，确保当次打开就能用上最新代码 */
+    if(!window.__swReloadBound){
+      window.__swReloadBound=true;
+      navigator.serviceWorker.addEventListener("controllerchange",()=>{
+        if(window.__swReloaded)return;window.__swReloaded=true;location.reload();
+      });
+    }
+    /* 注册 URL 带版本号：URL 一变，浏览器必定重新拉取 SW 并触发更新 + 自动刷新，
+       否则 SW 脚本被缓存住时，用户会一直停留在旧页面、点了新按钮也没反应 */
+    return await navigator.serviceWorker.register("sw.js?v=12");
+  }catch(e){return null;}
+}
+function phoneNotify(title,body){
+  try{
+    if(!("Notification" in window))return false;
+    if(Notification.permission!=="granted")return false;
+    if(navigator.serviceWorker&&navigator.serviceWorker.ready){
+      navigator.serviceWorker.ready.then(reg=>{try{reg.showNotification(title,{body:body,icon:"icon.svg",tag:"mm-daily",renotify:true});}catch(e){}});
+      return true;
+    }
+    new Notification(title,{body:body});return true;
+  }catch(e){return false;}
+}
+async function enableNotify(){
+  if(!("Notification" in window)){toast("当前浏览器不支持系统通知");return;}
+  try{
+    const p=await Notification.requestPermission();
+    if(p==="granted"){toast("已开启每日提醒通知 ✅");await regSw();phoneNotify("妙妙屋日程提醒","通知已开启，每天 9:00 与 18:30 将准时提醒你");}
+    else toast("通知权限被拒绝，提醒将无法弹出");
+  }catch(e){toast("开启通知失败："+(((e&&e.message)||"").slice(0,24)));}
+  renderNotifyState();
+}
+function renderNotifyState(){
+  const s=document.getElementById("notifyState");if(!s)return;
+  if(!("Notification" in window)){s.textContent="当前浏览器不支持通知";return;}
+  s.textContent=Notification.permission==="granted"?"已开启 ✅":(Notification.permission==="denied"?"已被拒绝 ❌":"未开启");
+}
+function checkNotify(){
+  const now=new Date();const hm=now.getHours()*60+now.getMinutes();
+  const today=now.toISOString().slice(0,10);
+  let key="",msg="";
+  if(hm>=1260){key="evening";msg="⏰ 请尽快提交今日工作总结（日报），22:00 截止，避免被罚款。";}
+  else if(hm>=540){key="morning";msg="📢 今日工作任务已更新，请及时查收并完成今日量化目标。";}
+  if(!key)return;
+  try{const n=JSON.parse(localStorage.getItem("mm_notified")||"{}");if(n[key]===today)return;n[key]=today;localStorage.setItem("mm_notified",JSON.stringify(n));}catch(e){}
+  const shown=phoneNotify("妙妙屋日程提醒",msg);
+  if(!shown && !window.__nmHinted){window.__nmHinted=true;toast("未开启通知权限，请先在「经纪人信息」点「开启每日提醒通知」");}
+}
+
+/* ============ 启动 ============ */
+function renderAll(){renderTasks();renderHouses();renderKnowCat();renderPans();renderReport();renderReview();renderShare();}
+document.getElementById("datePick").value=TODAY;
+const kd0=document.getElementById("knowDate");if(kd0)kd0.value=TODAY;
+load();loadProfile();renderProfile();loadShared();renderAll();
+/* 启动后拉取当日云端内容（好房/知识/目标），失败则沿用本地 */
+pullDaily().then(ok=>{if(ok){toast("已更新为今日最新内容");renderKnowCat();}});
+/* 打开 App 即同步一次已记录的数据 */
+cloudAuto();
+/* 云端实时：好房分享 / 知识 / 提醒 */
+pullHouses();pullKnow();checkNotify();
+regSw();renderNotifyState();
+setInterval(()=>{pullHouses();},30000);
+setInterval(()=>{checkNotify();},60000);
+
+/* ===== iPhone 专属：引导 + 备份提醒 ===== */
+function dismissBackup(id){try{localStorage.setItem("mm_ios_"+id,"1");}catch(e){}const el=document.getElementById(id);if(el)el.classList.remove("on");}
+function iosGuide(){
+  const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
+  if(!isIOS)return;
+  if(!localStorage.getItem("mm_ios_iosGuide")){const g=document.getElementById("iosGuide");if(g)g.classList.add("on");}
+  if(!localStorage.getItem("mm_ios_iosBackup")){const b=document.getElementById("iosBackup");if(b)b.classList.add("on");}
+}
+iosGuide();
+</script>
+</body>
+</html>
