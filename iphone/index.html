@@ -1500,17 +1500,18 @@ const RB_RAF=(typeof requestAnimationFrame==="function")?requestAnimationFrame.b
 function rbMoney(cnt){return Math.round((Math.min(Math.max(0,Math.round(Number(cnt)||0)),RB_TOTAL))*RB_UNIT*100)/100;}   /* 红包个数 → 金额（封顶 10 个 = 12 元） */
 function rbAmtText(v){return (Math.round((Number(v)||0)*100)/100).toFixed(2);} /* 金额 → 两位小数文本 */
 function shuffleArr(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[j];a[j]=t;}return a;}
-/* ===== 签几单玩几次：挑战次数 = 当日「签单」的实际完成数 ===== */
+/* ===== 签几单玩几次：挑战次数 = 当日「签单」实际完成数 + 1 次免费试玩 ===== */
 function lkSignTask(){return D.tasks.find(x=>x.n.indexOf("签单")>=0);}
 function lkQuota(){const t=lkSignTask();if(!t)return 0;const a=Number(t.a)||0;return a>0?a:0;}
+const LK_TRIAL=1;   /* 每天免费试玩局数：首局不计钱，试玩结束后正式计分 */
 function lkTodayList(){return (Array.isArray(D.luckyList)?D.luckyList:[]).filter(x=>x&&x.date===TODAY_cur());}
 function lkUsed(){return lkTodayList().length;}
-function lkLeft(){return Math.max(0,lkQuota()-lkUsed());}
+function lkLeft(){return Math.max(0,lkQuota()+LK_TRIAL-lkUsed());}
 function lkDrawn(){return lkUsed()>0;}   /* 兼容旧调用：今天是否已经抽过 */
 function lkQuotaText(){
   const q=lkQuota(),u=lkUsed(),l=lkLeft();
-  if(q<=0)return "";
-  return "今日签单 <b>"+q+"</b> 单 → 可玩 <b>"+q+"</b> 次，已玩 "+u+" 次，还剩 <b>"+l+"</b> 次";
+  if(u===0&&q<=0)return "今日还没签单：可先玩 <b>1</b> 次免费试玩（不计钱），签单后每局正式计分";
+  return "今日签单 <b>"+q+"</b> 单 → 可玩 <b>"+(q+LK_TRIAL)+"</b> 局（第 1 局为试玩，不计钱），已玩 "+u+" 局，还剩 <b>"+l+"</b> 局";
 }
 function lkStep(s){["lkCele","lkDraw","lkResult"].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.toggle("hidden",id!==s);});}
 function lkOpen(){
@@ -1771,17 +1772,21 @@ function rbFinish(){
   if(tip){tip.style.display="flex";tip.innerHTML="收工！<small>抓到 "+rbState.caught+" 个红包"+(rbState.dia?" + 1 颗💎":"")+"</small>";}
   setTimeout(()=>rbSettle(rbState.caught,rbState.dia),750);
 }
-/* 一轮结束后结算：红包个数 × 1.2 元（封顶 10 个 = 12 元）+ 钻石 8 元，记入当日战绩并上传 */
+/* 一轮结束后结算：正式局 = 红包个数 × 1.2 元（封顶 10 个 = 12 元）+ 钻石 8 元；
+   每天首局为免费试玩（trial=1）：成绩只展示、amount 记 0，不计入兑换 */
 function rbSettle(caught,dia){
   if(lkLeft()<=0)return null;
   const n=Math.max(0,Math.min(RB_TOTAL,Math.round(Number(caught)||0)));
   const d=Number(dia)?1:0;
-  const amount=Math.round((rbMoney(n)+d*DIA_VALUE)*100)/100;
+  const trial=(lkUsed()===0)?1:0;   /* 本局是当天第 1 局 → 试玩局 */
+  const raw=Math.round((rbMoney(n)+d*DIA_VALUE)*100)/100;
+  const amount=trial?0:raw;         /* 试玩局不产生可兑换金额 */
   const rec={
-    date:TODAY_cur(),type:"redbag",caught:n,total:RB_TOTAL,dia:d,amount:amount,
+    date:TODAY_cur(),type:"redbag",caught:n,total:RB_TOTAL,dia:d,trial:trial,amount:amount,
     agent:(P&&P.name)||"",time:new Date().toLocaleString("zh-CN"),no:lkUsed()+1,quota:lkQuota(),
-    prize:{c:d?"💎":"🧧",n:rbAmtText(n)+" 元现金红包"+(d?"（含钻石 8 元）":""),
-      note:"黄金矿工挑战：抓到 "+n+" 个红包"+(d?"，挖到 1 颗💎钻石":"")+"，共 "+rbAmtText(amount)+" 元，凭本页找老板兑换 💰，当天有效，别客气！"}
+    prize:{c:trial?"🎓":(d?"💎":"🧧"),n:trial?"试玩局 · 不计兑换":rbAmtText(n)+" 元现金红包"+(d?"（含钻石 8 元）":""),
+      note:trial?("黄金矿工试玩局：抓到 "+n+" 个红包"+(d?"、挖到 1 颗💎":"")+"（折算 "+rbAmtText(raw)+" 元）。试玩不计分，从下一局开始正式计分，抓到的都是真金白银！")
+           :("黄金矿工挑战：抓到 "+n+" 个红包"+(d?"，挖到 1 颗💎钻石":"")+"，共 "+rbAmtText(amount)+" 元，凭本页找老板兑换 💰，当天有效，别客气！")}
   };
   if(!Array.isArray(D.luckyList))D.luckyList=[];
   D.luckyList.push(rec);
@@ -1793,7 +1798,8 @@ function rbSettle(caught,dia){
 function lkGoDraw(){
   if(lkLeft()<=0){toast("今天的挑战次数已经用完啦 🧧");lkShowResult(null,true);return;}
   const ds=document.getElementById("lkDrawSub"),qt=lkQuotaText();
-  if(ds)ds.innerHTML=(qt?qt+"<br>":"")+"钩子摆到哪就往哪挖——🧧 红包 1.2 元/个，💎 钻石 +8 元！";
+  const trialTip=(lkUsed()===0)?"🎓 <b>本局为免费试玩（不计钱）</b>，试玩结束后正式计分<br>":"";
+  if(ds)ds.innerHTML=(qt?qt+"<br>":"")+trialTip+"钩子摆到哪就往哪挖——🧧 红包 1.2 元/个，💎 钻石 +8 元！";
   lkStep("lkDraw");
   rbStart();
 }
@@ -1808,9 +1814,15 @@ function lkShowResult(rec,replay){
   const dia=r.dia?1:0;
   const amount=(typeof r.amount==="number")?r.amount:Math.round((rbMoney(n)+dia*DIA_VALUE)*100)/100;
   const t=document.getElementById("lkResTitle"),pr=document.getElementById("lkResPrize"),no=document.getElementById("lkResNote");
-  if(t)t.textContent=replay?"⛏️ 你今天的挖宝战绩":"⛏️ 挑战结束！";
-  if(pr)pr.innerHTML=`<div style="font-size:46px">${dia?"💎":"🧧"}</div><div class="rb-amt-big">¥ ${rbAmtText(amount)}</div><div class="lk-prize-n">抓到 ${n} 个红包${dia?" + 💎×1":""}</div>`;
-  if(no)no.textContent="30 秒内抓到 "+n+" 个红包"+(dia?"并挖到钻石":"")+"，共 "+rbAmtText(amount)+" 元 —— 凭本页找老板兑换 💰，当天有效！";
+  if(r.trial){
+    if(t)t.textContent="🎓 试玩完成！（不计分）";
+    if(pr)pr.innerHTML=`<div style="font-size:46px">🎓</div><div class="rb-amt-big">¥ 0.00</div><div class="lk-prize-n">试玩局 · 不计兑换 ｜ 抓到 ${n} 个红包${dia?" + 💎×1":""}</div>`;
+    if(no)no.textContent="试玩局成绩不计入兑换。下一局开始正式计分——抓到的都是真金白银，凭本页找老板兑换 💰，当天有效！";
+  }else{
+    if(t)t.textContent=replay?"⛏️ 你今天的挖宝战绩":"⛏️ 挑战结束！";
+    if(pr)pr.innerHTML=`<div style="font-size:46px">${dia?"💎":"🧧"}</div><div class="rb-amt-big">¥ ${rbAmtText(amount)}</div><div class="lk-prize-n">抓到 ${n} 个红包${dia?" + 💎×1":""}</div>`;
+    if(no)no.textContent="30 秒内抓到 "+n+" 个红包"+(dia?"并挖到钻石":"")+"，共 "+rbAmtText(amount)+" 元 —— 凭本页找老板兑换 💰，当天有效！";
+  }
   lkStep("lkResult");
   lkRenderResultExtra();
 }
@@ -1825,22 +1837,23 @@ function lkRenderResultExtra(){
   }
   if(box){
     if(list.length>1){
-      box.innerHTML="<div class='note' style='text-align:center'>今日已玩 "+list.length+" / "+q+" 轮："+
-        list.map(x=>rbAmtText((typeof x.amount==="number")?x.amount:0)+" 元").join("、")+
-        "<br>合计 <b style='color:#e02020'>¥ "+rbAmtText(rbSum(list))+"</b>，凭本页找老板兑换</div>";
+      box.innerHTML="<div class='note' style='text-align:center'>今日已玩 "+list.length+" / "+(q+LK_TRIAL)+" 局："+
+        list.map(x=>x.trial?"试玩(不计)":"¥"+rbAmtText((typeof x.amount==="number")?x.amount:0)).join("、")+
+        "<br>正式局合计 <b style='color:#e02020'>¥ "+rbAmtText(rbSum(list))+"</b>，凭本页找老板兑换</div>";
     }else box.innerHTML="";
   }
 }
-/* 复盘页的挑战入口（签单达成后显示，签几单就能玩几轮） */
+/* 复盘页的挑战入口（每人每天 1 次免费试玩 + 签几单玩几局正式计分） */
 function lkEntryHTML(){
-  if(!signDone())return "";
   const q=lkQuota(),list=lkTodayList(),left=lkLeft();
   const sum=rbSum(list);
   if(left>0){
-    return `<div class="q" style="text-align:center">🎉 今日签单 <b>${q}</b> 单，可玩 ${q} 轮，还剩 <b>${left}</b> 轮${list.length?"（已挖到 ¥"+rbAmtText(sum)+"）":""}<br><button class="btn sm" style="margin-top:8px" onclick="lkOpen()">⛏️ 去挖宝</button></div>`;
+    const head=(q>0)?("🎉 今日签单 <b>"+q+"</b> 单，可玩 <b>"+(q+LK_TRIAL)+"</b> 局（首局试玩不计钱），还剩 <b>"+left+"</b> 局")
+                    :("🎁 今日还没签单，可先玩 <b>1</b> 局免费试玩（不计钱）");
+    return `<div class="q" style="text-align:center">${head}${list.length?"（已挖到 ¥"+rbAmtText(sum)+"）":""}<br><button class="btn sm" style="margin-top:8px" onclick="lkOpen()">⛏️ 去挖宝</button></div>`;
   }
   if(list.length){
-    return `<div class="q" style="text-align:center">🎉 今日签单 ${q} 单，${list.length} 轮挖宝已玩完，共挖到 <b style="color:#e02020">¥ ${rbAmtText(sum)}</b><br><button class="btn sm" style="margin-top:8px" onclick="lkOpen()">查看战绩</button></div>`;
+    return `<div class="q" style="text-align:center">🎉 今日 ${list.length} 局挖宝已玩完（含试玩），正式局共挖到 <b style="color:#e02020">¥ ${rbAmtText(sum)}</b><br><button class="btn sm" style="margin-top:8px" onclick="lkOpen()">查看战绩</button></div>`;
   }
   return "";
 }
@@ -1956,7 +1969,7 @@ async function regSw(){
     }
     /* 注册 URL 带版本号：URL 一变，浏览器必定重新拉取 SW 并触发更新 + 自动刷新，
        否则 SW 脚本被缓存住时，用户会一直停留在旧页面、点了新按钮也没反应 */
-    return await navigator.serviceWorker.register("sw.js?v=15");
+    return await navigator.serviceWorker.register("sw.js?v=16");
   }catch(e){return null;}
 }
 function phoneNotify(title,body){
