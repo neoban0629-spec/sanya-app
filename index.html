@@ -1590,7 +1590,8 @@ function rbMaxLen(){
 function rbRope(){
   const r=document.getElementById("gmRope");if(!r)return;
   r.style.height=rbState.len.toFixed(1)+"px";
-  r.style.transform="rotate("+rbState.ang.toFixed(1)+"deg)";
+  /* CSS 正角度=顺时针，垂绳底端向左摆；逻辑 rbTipPos 用 sin(ang) 为正=向右 → 必须取负号才能视觉=判定 */
+  r.style.transform="rotate("+(-rbState.ang).toFixed(1)+"deg)";
 }
 /* 点屏幕 = 放爪（只在摆动中有效；收放中点了不响应） */
 function rbTap(){
@@ -1931,7 +1932,7 @@ async function regSw(){
     }
     /* 注册 URL 带版本号：URL 一变，浏览器必定重新拉取 SW 并触发更新 + 自动刷新，
        否则 SW 脚本被缓存住时，用户会一直停留在旧页面、点了新按钮也没反应 */
-    return await navigator.serviceWorker.register("sw.js?v=14");
+    return await navigator.serviceWorker.register("sw.js?v=15");
   }catch(e){return null;}
 }
 function phoneNotify(title,body){
